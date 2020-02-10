@@ -159,6 +159,7 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                           _barCode.text,
                           _selectedProduct.id,
                           int.tryParse(_quantity.text),
+                          "$expirationDate",
                           "${DateTime.now()}",
                           "${DateTime.now()}");
                       // AppDatabase db = await DbProvider.instance.database;

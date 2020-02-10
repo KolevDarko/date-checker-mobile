@@ -49,6 +49,16 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
         yield ProductBatchError(
             error: 'Something went wrong. Please try again.');
       }
+    } else if (event is OrderByExpiryDateEvent) {
+      yield ProductBatchLoading();
+      try {
+        List<ProductBatch> productBatchList =
+            await productBatchRepository.orderedByExpiryDateList();
+        yield OrderedByExpiryDate(productBatchList: productBatchList);
+      } catch (e) {
+        yield ProductBatchError(
+            error: 'Something went wrong. Please try again.');
+      }
     }
   }
 }

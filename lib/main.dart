@@ -142,6 +142,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool orderByExpiry = false;
+
   @override
   void initState() {
     super.initState();
@@ -185,6 +187,72 @@ class _HomePageState extends State<HomePage> {
               SizedBox(
                 height: 20.0,
               ),
+              Column(
+                children: <Widget>[
+                  Container(
+                    child: Text('Filters:', style: TextStyle(fontSize: 16.0)),
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            if (orderByExpiry) {
+                              BlocProvider.of<ProductBatchBloc>(context)
+                                  .add(AllProductBatch());
+                              setState(() {
+                                orderByExpiry = !orderByExpiry;
+                              });
+                            } else {
+                              BlocProvider.of<ProductBatchBloc>(context)
+                                  .add(OrderByExpiryDateEvent());
+                              setState(() {
+                                orderByExpiry = !orderByExpiry;
+                              });
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10.0),
+                            color: orderByExpiry
+                                ? Colors.indigo[200]
+                                : Colors.transparent,
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  child: Text('Order by expiry date',
+                                      style: TextStyle(fontSize: 16.0)),
+                                ),
+                                orderByExpiry
+                                    ? Icon(Icons.keyboard_arrow_up)
+                                    : Icon(Icons.keyboard_arrow_down),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {},
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                child: Text('Order by date created',
+                                    style: TextStyle(fontSize: 16.0)),
+                              ),
+                              Icon(Icons.keyboard_arrow_down),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
               Container(
                 alignment: Alignment.centerLeft,
                 child: Text('All Product Batches:',
@@ -199,15 +267,9 @@ class _HomePageState extends State<HomePage> {
                       child: CircularProgressIndicator(),
                     );
                   } else if (state is AllProductBatchLoaded) {
-                    return ListView.builder(
-                        itemCount: state.productBatchList.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            child: Text(
-                                '${state.productBatchList[index].barCode}'),
-                          );
-                        });
+                    return _buildProductBatchItems(state.productBatchList);
+                  } else if (state is OrderedByExpiryDate) {
+                    return _buildProductBatchItems(state.productBatchList);
                   } else {
                     return Container();
                   }
@@ -218,5 +280,18 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
+    return ListView.builder(
+        itemCount: productBatchList.length,
+        shrinkWrap: true,
+        itemBuilder: (context, index) {
+          return Container(
+            color: orderByExpiry ? Colors.indigo[200] : Colors.transparent,
+            padding: EdgeInsets.all(10.0),
+            child: Text('${productBatchList[index].barCode}'),
+          );
+        });
   }
 }

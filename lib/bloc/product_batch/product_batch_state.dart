@@ -25,6 +25,12 @@ class AllProductBatchLoaded extends ProductBatchState {
   AllProductBatchLoaded({this.productBatchList});
 }
 
+class OrderedByExpiryDate extends ProductBatchState {
+  final List<ProductBatch> productBatchList;
+
+  OrderedByExpiryDate({this.productBatchList});
+}
+
 class ProductBatchLoaded extends ProductBatchState {
   final ProductBatch productBatch;
 

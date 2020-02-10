@@ -48,8 +48,11 @@ class ProductBatch {
 
   @override
   String toString() {
-    // TODO: implement toString
-    return "Product Batch $barCode, $id, $productId";
+    return "Product Batch $barCode, expDate: $expirationDate";
+  }
+
+  DateTime returnDateTimeExpDate() {
+    return DateTime.parse(this.expirationDate);
   }
 }
 

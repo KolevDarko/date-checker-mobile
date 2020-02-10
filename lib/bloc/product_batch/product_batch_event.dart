@@ -24,6 +24,11 @@ class GetProductBatch extends ProductBatchEvent {
   List<Object> get props => [id];
 }
 
+class OrderByExpiryDateEvent extends ProductBatchEvent {
+  @override
+  List<Object> get props => null;
+}
+
 class AllProductBatch extends ProductBatchEvent {
   @override
   List<Object> get props => null;
