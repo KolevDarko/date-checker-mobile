@@ -1,6 +1,6 @@
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:flutter_test/flutter_test.dart';
+// import 'package:flutter_test/flutter_test.dart';
 
 Future<AppDatabase> setDb() async {
   final database =
@@ -18,7 +18,7 @@ fillDb(AppDatabase db) async {
 }
 
 void main() async {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  // TestWidgetsFlutterBinding.ensureInitialized();
   final AppDatabase db = await setDb();
   await fillDb(db);
   var products = await db.productDao.all();

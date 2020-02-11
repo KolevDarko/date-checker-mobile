@@ -1,5 +1,3 @@
-import 'package:date_checker_app/bloc/product/products_event.dart';
-import 'package:date_checker_app/bloc/product/products_state.dart';
 import 'package:date_checker_app/bloc/product_batch/product_batch_event.dart';
 import 'package:date_checker_app/bloc/product_batch/product_batch_state.dart';
 import 'package:date_checker_app/database/models.dart';

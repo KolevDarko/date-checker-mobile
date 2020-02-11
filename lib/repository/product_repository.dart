@@ -1,6 +1,6 @@
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/main.dart';
+import 'package:date_checker_app/database/provider.dart';
 
 class ProductRepository {
   Future<List<Product>> getAllProducts() async {

@@ -1,6 +1,7 @@
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
+import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -41,30 +42,6 @@ Future<void> createProducts(AppDatabase database) async {
   await database.productDao.add(product7);
   await database.productDao.add(product8);
   await database.productDao.add(product9);
-}
-
-class DbProvider {
-  static final DbProvider _dbProvider = DbProvider._internal();
-  DbProvider._internal();
-
-  static DbProvider get instance => _dbProvider;
-
-  static AppDatabase _database;
-
-  Future<AppDatabase> get database async {
-    if (_database != null) {
-      return _database;
-    } else {
-      _database = await _initDb();
-      return _database;
-    }
-  }
-
-  Future<AppDatabase> _initDb() async {
-    AppDatabase dbRef =
-        await $FloorAppDatabase.databaseBuilder('date_checker.db').build();
-    return dbRef;
-  }
 }
 
 class InheritedDataProvider extends InheritedWidget {

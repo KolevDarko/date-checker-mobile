@@ -19,6 +19,7 @@ dev_dependencies:
     sdk: flutter
   floor_generator: ^0.9.0
   build_runner: ^1.7.1
+  bloc_test: ^3.0.0
 flutter:
   uses-material-design: true
 
