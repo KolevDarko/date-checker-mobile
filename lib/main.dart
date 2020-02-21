@@ -51,6 +51,7 @@ class InheritedDataProvider extends InheritedWidget {
     this.database,
     Widget child,
   }) : super(child: child);
+
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) {
     return true;
@@ -260,15 +261,40 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
-    return ListView.builder(
-        itemCount: productBatchList.length,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          return Container(
-            color: orderByExpiry ? Colors.indigo[200] : Colors.transparent,
-            padding: EdgeInsets.all(10.0),
-            child: Text('${productBatchList[index].barCode}'),
-          );
-        });
+    return DataTable(
+      columns: [
+        DataColumn(
+          label: Text('Product'),
+        ),
+        DataColumn(label: Text('Bar Code')),
+        DataColumn(label: Text('Quantity'), numeric: true),
+        DataColumn(label: Text('Expiration'))
+      ],
+      rows: productBatchList
+          .map((_batch) => DataRow(cells: [
+                DataCell(Text(_batch.productId.toString())),
+                DataCell(Text(_batch.barCode)),
+                DataCell(Text(_batch.quantity.toString())),
+                DataCell(Text(_batch.expirationDate)),
+              ]))
+          .toList(),
+    );
+//    return ListView.builder(
+//        itemCount: productBatchList.length,
+//        shrinkWrap: true,
+//        itemBuilder: (context, index) {
+//          return Container(
+//            color: orderByExpiry ? Colors.indigo[200] : Colors.transparent,
+//            padding: EdgeInsets.all(10.0),
+//            child: Text('${productBatchList[index].barCode}'),
+//          );
+//        });
   }
 }
+
+//class _ProductBatchDataSource extends DataTableSource {
+//  _ProductBatchDataSource(this.context){
+//  }
+//  final BuildContext context;
+//  List<ProductBatchBloc> _desserts;
+//}
