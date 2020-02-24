@@ -23,12 +23,14 @@ class AllProductBatchLoaded extends ProductBatchState {
   final List<ProductBatch> productBatchList;
 
   AllProductBatchLoaded({this.productBatchList});
+  List<Object> get props => [productBatchList];
 }
 
 class OrderedByExpiryDate extends ProductBatchState {
   final List<ProductBatch> productBatchList;
 
   OrderedByExpiryDate({this.productBatchList});
+  List<Object> get props => [productBatchList];
 }
 
 class ProductBatchLoaded extends ProductBatchState {

@@ -56,7 +56,7 @@ class ProductBatch {
   }
 
   String formatDateTime() {
-    return '${this.returnDateTimeExpDate().day}/${this.returnDateTimeExpDate().month}/${this.returnDateTimeExpDate().year}';
+    return '${this.returnDateTimeExpDate().day}/${this.returnDateTimeExpDate().month}/${this.returnDateTimeExpDate().year.remainder(100)}';
   }
 }
 

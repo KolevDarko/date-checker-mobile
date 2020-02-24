@@ -125,315 +125,224 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    BlocProvider.of<ProductBatchBloc>(context).add(AllProductBatch());
   }
 
   @override
   void didChangeDependencies() {
-    BlocProvider.of<ProductBatchBloc>(context).add(AllProductBatch());
     super.didChangeDependencies();
+  }
+
+  toggleOrderByExpiry() {
+    setState(() {
+      orderByExpiry = !orderByExpiry;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-              bottom: TabBar(
-                tabs: [
-                  Tab(icon: Text('Пратки')),
-                  Tab(icon: Text("Истекува")),
-                  Tab(icon: Text("Производи")),
-                ],
-              ),
-              title: Text('Date Checker Tabs')),
-          body: TabBarView(children: [
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Column(
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () {
-                                  if (orderByExpiry) {
-                                    BlocProvider.of<ProductBatchBloc>(context)
-                                        .add(AllProductBatch());
-                                    setState(() {
-                                      orderByExpiry = !orderByExpiry;
-                                    });
-                                  } else {
-                                    BlocProvider.of<ProductBatchBloc>(context)
-                                        .add(OrderByExpiryDateEvent());
-                                    setState(() {
-                                      orderByExpiry = !orderByExpiry;
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(10.0),
-                                  color: orderByExpiry
-                                      ? Colors.indigo[200]
-                                      : Colors.transparent,
-                                  child: Row(
-                                    children: <Widget>[
-                                      Container(
-                                        child: Text('Order by expiry date',
-                                            style: TextStyle(fontSize: 16.0)),
-                                      ),
-                                      orderByExpiry
-                                          ? Icon(Icons.keyboard_arrow_up)
-                                          : Icon(Icons.keyboard_arrow_down),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () {},
-                                child: Row(
-                                  children: <Widget>[
-                                    Container(
-                                      child: Text('Order by date created',
-                                          style: TextStyle(fontSize: 16.0)),
-                                    ),
-                                    Icon(Icons.keyboard_arrow_down),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                    BlocBuilder<ProductBatchBloc, ProductBatchState>(
-                      builder: (context, state) {
-                        if (state is ProductBatchEmpty) {
-                          return Container();
-                        } else if (state is ProductBatchLoading) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (state is AllProductBatchLoaded) {
-                          return _buildProductBatchItems(
-                              state.productBatchList);
-                        } else if (state is OrderedByExpiryDate) {
-                          return _buildProductBatchItems(
-                              state.productBatchList);
-                        } else {
-                          return Container();
-                        }
-                      },
-                    )
-                  ],
-                ),
-              ),
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+            bottom: TabBar(
+              tabs: [
+                Tab(icon: Text('Пратки')),
+                Tab(icon: Text("Истекува")),
+                Tab(icon: Text("Производи")),
+              ],
+            ),
+            title: Text('Date Checker Tabs')),
+        body: TabBarView(
+          children: [
+            ProductBatchTable(
+              orderByDate: orderByExpiry,
+              callBack: toggleOrderByExpiry,
             ),
             Icon(Icons.directions_bike),
-            Icon(Icons.directions_car)
-          ]),
-          floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddProductBatchView()));
-              },
-          ),
-        ));
-  }
-}
-
-<<<<<<< HEAD
-  Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
-    return Column(
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Container(
-                alignment: Alignment.center,
-                height: 50.0,
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Colors.black, width: 2.0),
-                    right: BorderSide(color: Colors.black, width: 2.0),
-                    left: BorderSide(color: Colors.black, width: 2.0),
-                  ),
-                ),
-                child: Text(
-                  'ID',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                alignment: Alignment.center,
-                height: 50.0,
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Colors.black, width: 2.0),
-                    right: BorderSide(color: Colors.black, width: 2.0),
-                  ),
-                ),
-                child: Text(
-                  'Шифра',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                alignment: Alignment.center,
-                height: 50.0,
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Colors.black, width: 2.0),
-                    right: BorderSide(color: Colors.black, width: 2.0),
-                  ),
-                ),
-                child: Text(
-                  'Количина',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                alignment: Alignment.center,
-                height: 50.0,
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Colors.black, width: 2.0),
-                    right: BorderSide(color: Colors.black, width: 2.0),
-                  ),
-                ),
-                child: Text(
-                  'Датум на истекување',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
+            Icon(Icons.directions_car),
           ],
         ),
-        ListView.builder(
-          itemCount: productBatchList.length,
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            return Row(
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: index == productBatchList.length - 1
-                            ? BorderSide(color: Colors.black, width: 2.0)
-                            : BorderSide.none,
-                        top: BorderSide(color: Colors.black, width: 2.0),
-                        right: BorderSide(color: Colors.black, width: 2.0),
-                        left: BorderSide(color: Colors.black, width: 2.0),
-                      ),
-                    ),
-                    child: Text(
-                      '${productBatchList[index].id}',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: index == productBatchList.length - 1
-                            ? BorderSide(color: Colors.black, width: 2.0)
-                            : BorderSide.none,
-                        top: BorderSide(color: Colors.black, width: 2.0),
-                        right: BorderSide(color: Colors.black, width: 2.0),
-                      ),
-                    ),
-                    child: Text(
-                      '${productBatchList[index].barCode}',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: index == productBatchList.length - 1
-                            ? BorderSide(color: Colors.black, width: 2.0)
-                            : BorderSide.none,
-                        top: BorderSide(color: Colors.black, width: 2.0),
-                        right: BorderSide(color: Colors.black, width: 2.0),
-                      ),
-                    ),
-                    child: Text(
-                      '${productBatchList[index].quantity}',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: index == productBatchList.length - 1
-                            ? BorderSide(color: Colors.black, width: 2.0)
-                            : BorderSide.none,
-                        top: BorderSide(color: Colors.black, width: 2.0),
-                        right: BorderSide(color: Colors.black, width: 2.0),
-                      ),
-                    ),
-                    child: Text(
-                      '${productBatchList[index].formatDateTime()}',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            );
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddProductBatchView()));
           },
+          child: Icon(Icons.add),
         ),
-      ],
+      ),
     );
   }
-=======
-Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
-  var formatter = new DateFormat('dd-MM-yy');
-  return DataTable(
-    columns: [
-      DataColumn(label: Text('Датум истек')),
-      DataColumn(label: Text('Производ')),
-      DataColumn(label: Text('Количина'), numeric: true),
-      DataColumn(label: Text('Баркод')),
-    ],
-    rows: productBatchList
-        .map((_batch) => DataRow(cells: [
-              DataCell(Text(_batch.expirationDate)),
-              DataCell(Text(_batch.productId.toString())),
-              DataCell(Text(_batch.barCode)),
-              DataCell(Text(_batch.quantity.toString())),
-            ]))
-        .toList(),
-  );
->>>>>>> dev/darko
 }
 
+class ProductBatchTable extends StatefulWidget {
+  final bool orderByDate;
+  final Function callBack;
+
+  const ProductBatchTable({
+    Key key,
+    this.orderByDate,
+    this.callBack,
+  }) : super(key: key);
+  @override
+  _ProductBatchTableState createState() => _ProductBatchTableState();
+}
+
+class _ProductBatchTableState extends State<ProductBatchTable>
+    with AutomaticKeepAliveClientMixin {
+  bool orderByDate;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    print("CONTEXT ${widget.orderByDate}");
+    orderByDate = widget.orderByDate;
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: BlocBuilder<ProductBatchBloc, ProductBatchState>(
+          builder: (context, state) {
+            print("STATE $state");
+            if (state is ProductBatchEmpty) {
+              return Container();
+            } else if (state is ProductBatchLoading) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is AllProductBatchLoaded) {
+              return _buildProductBatchItems(state.productBatchList);
+            } else if (state is OrderedByExpiryDate) {
+              return _buildProductBatchItems(state.productBatchList);
+            } else {
+              return Container();
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
+    var cellWidth = MediaQuery.of(context).size.width / 4;
+    print(orderByDate);
+    return SingleChildScrollView(
+      child: DataTable(
+        columnSpacing: 0.0,
+        horizontalMargin: 0.0,
+        columns: [
+          DataColumn(
+            label: Container(
+              width: cellWidth,
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    child: Text(
+                      'Датум истек',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  orderByDate
+                      ? Icon(Icons.arrow_drop_down)
+                      : Icon(Icons.arrow_drop_up),
+                ],
+              ),
+            ),
+            onSort: (i, b) {
+              widget.callBack();
+              if (!orderByDate) {
+                BlocProvider.of<ProductBatchBloc>(context).add(
+                  OrderByExpiryDateEvent(),
+                );
+              } else {
+                BlocProvider.of<ProductBatchBloc>(context)
+                    .add(AllProductBatch());
+              }
+            },
+          ),
+          DataColumn(label: Text('Производ')),
+          DataColumn(label: Text('Количина')),
+          DataColumn(label: Text('Баркод')),
+        ],
+        rows: productBatchList
+            .map((_batch) => DataRow(cells: [
+                  DataCell(Container(
+                      child: Text(_batch.formatDateTime()), width: cellWidth)),
+                  DataCell(Container(
+                      child: Text(_batch.productId.toString()),
+                      width: cellWidth)),
+                  DataCell(Container(
+                      child: Text("${_batch.quantity}"), width: cellWidth)),
+                  DataCell(Container(
+                      child: Text(
+                        _batch.barCode,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      width: cellWidth)),
+                ]))
+            .toList(),
+      ),
+    );
+  }
+}
+
+// Row(
+//                 children: <Widget>[
+//                   Expanded(
+//                     child: GestureDetector(
+//                       behavior: HitTestBehavior.opaque,
+//                       onTap: () {
+//                         if (orderByExpiry) {
+//                           BlocProvider.of<ProductBatchBloc>(context)
+//                               .add(AllProductBatch());
+//                           setState(() {
+//                             orderByExpiry = !orderByExpiry;
+//                           });
+//                         } else {
+//                           BlocProvider.of<ProductBatchBloc>(context)
+//                               .add(OrderByExpiryDateEvent());
+//                           setState(() {
+//                             orderByExpiry = !orderByExpiry;
+//                           });
+//                         }
+//                       },
+//                       child: Container(
+//                         padding: EdgeInsets.all(10.0),
+//                         color: orderByExpiry
+//                             ? Colors.indigo[200]
+//                             : Colors.transparent,
+//                         child: Row(
+//                           children: <Widget>[
+//                             Container(
+//                               child: Text('Order by expiry date',
+//                                   style: TextStyle(fontSize: 16.0)),
+//                             ),
+//                             orderByExpiry
+//                                 ? Icon(Icons.keyboard_arrow_up)
+//                                 : Icon(Icons.keyboard_arrow_down),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                   Expanded(
+//                     child: GestureDetector(
+//                       behavior: HitTestBehavior.opaque,
+//                       onTap: () {},
+//                       child: Row(
+//                         children: <Widget>[
+//                           Container(
+//                             child: Text('Order by date created',
+//                                 style: TextStyle(fontSize: 16.0)),
+//                           ),
+//                           Icon(Icons.keyboard_arrow_down),
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
 
 //class _ProductBatchDataSource extends DataTableSource {
 //  _ProductDataSource(batchList) {

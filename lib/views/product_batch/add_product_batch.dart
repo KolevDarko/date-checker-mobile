@@ -168,10 +168,8 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                         // await db.productBatchDao.add(productBatch);
                         BlocProvider.of<ProductBatchBloc>(context)
                             .add(AddProductBatch(productBatch: productBatch));
-                        final snackBar = SnackBar(
-                          content: Text("Пратката е снимена"),
-                        );
-                        Scaffold.of(context).showSnackBar(snackBar);
+                        BlocProvider.of<ProductBatchBloc>(context)
+                            .add(AllProductBatch());
                         Navigator.of(context).pop();
                       }
                     },
