@@ -51,6 +51,7 @@ class InheritedDataProvider extends InheritedWidget {
     this.database,
     Widget child,
   }) : super(child: child);
+
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) {
     return true;
@@ -134,131 +135,121 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Home Page'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: Column(
-            children: <Widget>[
-              Center(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => AddProductBatchView()));
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: MediaQuery.of(context).size.width - 40.0,
-                    padding: EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 2.0, color: Colors.indigo)),
-                    child: Text("Add New Product Batch"),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Column(
-                children: <Widget>[
-                  Container(
-                    child: Text('Filters:', style: TextStyle(fontSize: 16.0)),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {
-                            if (orderByExpiry) {
-                              BlocProvider.of<ProductBatchBloc>(context)
-                                  .add(AllProductBatch());
-                              setState(() {
-                                orderByExpiry = !orderByExpiry;
-                              });
-                            } else {
-                              BlocProvider.of<ProductBatchBloc>(context)
-                                  .add(OrderByExpiryDateEvent());
-                              setState(() {
-                                orderByExpiry = !orderByExpiry;
-                              });
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10.0),
-                            color: orderByExpiry
-                                ? Colors.indigo[200]
-                                : Colors.transparent,
-                            child: Row(
-                              children: <Widget>[
-                                Container(
-                                  child: Text('Order by expiry date',
-                                      style: TextStyle(fontSize: 16.0)),
-                                ),
-                                orderByExpiry
-                                    ? Icon(Icons.keyboard_arrow_up)
-                                    : Icon(Icons.keyboard_arrow_down),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {},
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                child: Text('Order by date created',
-                                    style: TextStyle(fontSize: 16.0)),
-                              ),
-                              Icon(Icons.keyboard_arrow_down),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
+    return DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+              bottom: TabBar(
+                tabs: [
+                  Tab(icon: Text('Пратки')),
+                  Tab(icon: Text("Истекува")),
+                  Tab(icon: Text("Производи")),
                 ],
               ),
-              SizedBox(
-                height: 20.0,
+              title: Text('Date Checker Tabs')),
+          body: TabBarView(children: [
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Column(
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () {
+                                  if (orderByExpiry) {
+                                    BlocProvider.of<ProductBatchBloc>(context)
+                                        .add(AllProductBatch());
+                                    setState(() {
+                                      orderByExpiry = !orderByExpiry;
+                                    });
+                                  } else {
+                                    BlocProvider.of<ProductBatchBloc>(context)
+                                        .add(OrderByExpiryDateEvent());
+                                    setState(() {
+                                      orderByExpiry = !orderByExpiry;
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10.0),
+                                  color: orderByExpiry
+                                      ? Colors.indigo[200]
+                                      : Colors.transparent,
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        child: Text('Order by expiry date',
+                                            style: TextStyle(fontSize: 16.0)),
+                                      ),
+                                      orderByExpiry
+                                          ? Icon(Icons.keyboard_arrow_up)
+                                          : Icon(Icons.keyboard_arrow_down),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () {},
+                                child: Row(
+                                  children: <Widget>[
+                                    Container(
+                                      child: Text('Order by date created',
+                                          style: TextStyle(fontSize: 16.0)),
+                                    ),
+                                    Icon(Icons.keyboard_arrow_down),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    BlocBuilder<ProductBatchBloc, ProductBatchState>(
+                      builder: (context, state) {
+                        if (state is ProductBatchEmpty) {
+                          return Container();
+                        } else if (state is ProductBatchLoading) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (state is AllProductBatchLoaded) {
+                          return _buildProductBatchItems(
+                              state.productBatchList);
+                        } else if (state is OrderedByExpiryDate) {
+                          return _buildProductBatchItems(
+                              state.productBatchList);
+                        } else {
+                          return Container();
+                        }
+                      },
+                    )
+                  ],
+                ),
               ),
-              Container(
-                alignment: Alignment.centerLeft,
-                child: Text('All Product Batches:',
-                    style: TextStyle(fontSize: 16.0)),
-              ),
-              BlocBuilder<ProductBatchBloc, ProductBatchState>(
-                builder: (context, state) {
-                  if (state is ProductBatchEmpty) {
-                    return Container();
-                  } else if (state is ProductBatchLoading) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (state is AllProductBatchLoaded) {
-                    return _buildProductBatchItems(state.productBatchList);
-                  } else if (state is OrderedByExpiryDate) {
-                    return _buildProductBatchItems(state.productBatchList);
-                  } else {
-                    return Container();
-                  }
-                },
-              )
-            ],
+            ),
+            Icon(Icons.directions_bike),
+            Icon(Icons.directions_car)
+          ]),
+          floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddProductBatchView()));
+              },
           ),
-        ),
-      ),
-    );
+        ));
   }
+}
 
+<<<<<<< HEAD
   Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
     return Column(
       children: <Widget>[
@@ -421,4 +412,97 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+=======
+Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
+  var formatter = new DateFormat('dd-MM-yy');
+  return DataTable(
+    columns: [
+      DataColumn(label: Text('Датум истек')),
+      DataColumn(label: Text('Производ')),
+      DataColumn(label: Text('Количина'), numeric: true),
+      DataColumn(label: Text('Баркод')),
+    ],
+    rows: productBatchList
+        .map((_batch) => DataRow(cells: [
+              DataCell(Text(_batch.expirationDate)),
+              DataCell(Text(_batch.productId.toString())),
+              DataCell(Text(_batch.barCode)),
+              DataCell(Text(_batch.quantity.toString())),
+            ]))
+        .toList(),
+  );
+>>>>>>> dev/darko
 }
+
+
+//class _ProductBatchDataSource extends DataTableSource {
+//  _ProductDataSource(batchList) {
+//    _batchList = batchList;
+//  }
+//
+//  List<ProductBatch> _batchList;
+//
+//
+//  void _sort<T>(Comparable<T> getField(ProductBatch d), bool ascending) {
+//    _desserts.sort((a, b) {
+//      final Comparable<T> aValue = getField(a);
+//      final Comparable<T> bValue = getField(b);
+//      return ascending
+//          ? Comparable.compare(aValue, bValue)
+//          : Comparable.compare(bValue, aValue);
+//    });
+//    notifyListeners();
+//  }
+//
+//  int _selectedCount = 0;
+//
+//  @override
+//  DataRow getRow(int index) {
+//    final format = NumberFormat.decimalPercentPattern(
+//      locale: GalleryOptions.of(context).locale.toString(),
+//      decimalDigits: 0,
+//    );
+//    assert(index >= 0);
+//    if (index >= _desserts.length) return null;
+//    final _Dessert dessert = _desserts[index];
+//    return DataRow.byIndex(
+//      index: index,
+//      selected: dessert.selected,
+//      onSelectChanged: (value) {
+//        if (dessert.selected != value) {
+//          _selectedCount += value ? 1 : -1;
+//          assert(_selectedCount >= 0);
+//          dessert.selected = value;
+//          notifyListeners();
+//        }
+//      },
+//      cells: [
+//        DataCell(Text(dessert.name)),
+//        DataCell(Text('${dessert.calories}')),
+//        DataCell(Text(dessert.fat.toStringAsFixed(1))),
+//        DataCell(Text('${dessert.carbs}')),
+//        DataCell(Text(dessert.protein.toStringAsFixed(1))),
+//        DataCell(Text('${dessert.sodium}')),
+//        DataCell(Text('${format.format(dessert.calcium / 100)}')),
+//        DataCell(Text('${format.format(dessert.iron / 100)}')),
+//      ],
+//    );
+//  }
+//
+//  @override
+//  int get rowCount => _desserts.length;
+//
+//  @override
+//  bool get isRowCountApproximate => false;
+//
+//  @override
+//  int get selectedRowCount => _selectedCount;
+//
+//  void _selectAll(bool checked) {
+//    for (final _Dessert dessert in _desserts) {
+//      dessert.selected = checked;
+//    }
+//    _selectedCount = checked ? _desserts.length : 0;
+//    notifyListeners();
+//  }
+//}

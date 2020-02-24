@@ -151,36 +151,31 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                 height: 40.0,
               ),
               Builder(builder: (BuildContext context) {
-                return InkWell(
-                  onTap: () async {
-                    if (_formKey.currentState.validate()) {
-                      ProductBatch productBatch = ProductBatch(
-                          null,
-                          _barCode.text,
-                          _selectedProduct.id,
-                          int.tryParse(_quantity.text),
-                          "$expirationDate",
-                          "${DateTime.now()}",
-                          "${DateTime.now()}");
-                      // AppDatabase db = await DbProvider.instance.database;
-                      // await db.productBatchDao.add(productBatch);
-                      BlocProvider.of<ProductBatchBloc>(context)
-                          .add(AddProductBatch(productBatch: productBatch));
-                      final snackBar = SnackBar(
-                        content: Text("You have added product batch"),
-                      );
-                      Scaffold.of(context).showSnackBar(snackBar);
-                    }
-                    Navigator.of(context).pop();
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: MediaQuery.of(context).size.width - 40.0,
-                    padding: EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 3.0, color: Colors.black),
-                    ),
-                    child: Text("Submit"),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: RaisedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState.validate()) {
+                        ProductBatch productBatch = ProductBatch(
+                            null,
+                            _barCode.text,
+                            _selectedProduct.id,
+                            int.tryParse(_quantity.text),
+                            "$expirationDate",
+                            "${DateTime.now()}",
+                            "${DateTime.now()}");
+                        // AppDatabase db = await DbProvider.instance.database;
+                        // await db.productBatchDao.add(productBatch);
+                        BlocProvider.of<ProductBatchBloc>(context)
+                            .add(AddProductBatch(productBatch: productBatch));
+                        final snackBar = SnackBar(
+                          content: Text("Пратката е снимена"),
+                        );
+                        Scaffold.of(context).showSnackBar(snackBar);
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Text('Снимај'),
                   ),
                 );
               }),
