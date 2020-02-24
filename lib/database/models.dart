@@ -54,6 +54,10 @@ class ProductBatch {
   DateTime returnDateTimeExpDate() {
     return DateTime.parse(this.expirationDate);
   }
+
+  String formatDateTime() {
+    return '${this.returnDateTimeExpDate().day}/${this.returnDateTimeExpDate().month}/${this.returnDateTimeExpDate().year}';
+  }
 }
 
 @Entity(foreignKeys: [

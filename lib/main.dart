@@ -260,15 +260,165 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
-    return ListView.builder(
-        itemCount: productBatchList.length,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          return Container(
-            color: orderByExpiry ? Colors.indigo[200] : Colors.transparent,
-            padding: EdgeInsets.all(10.0),
-            child: Text('${productBatchList[index].barCode}'),
-          );
-        });
+    return Column(
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                alignment: Alignment.center,
+                height: 50.0,
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.black, width: 2.0),
+                    right: BorderSide(color: Colors.black, width: 2.0),
+                    left: BorderSide(color: Colors.black, width: 2.0),
+                  ),
+                ),
+                child: Text(
+                  'ID',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                alignment: Alignment.center,
+                height: 50.0,
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.black, width: 2.0),
+                    right: BorderSide(color: Colors.black, width: 2.0),
+                  ),
+                ),
+                child: Text(
+                  'Шифра',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                alignment: Alignment.center,
+                height: 50.0,
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.black, width: 2.0),
+                    right: BorderSide(color: Colors.black, width: 2.0),
+                  ),
+                ),
+                child: Text(
+                  'Количина',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                alignment: Alignment.center,
+                height: 50.0,
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.black, width: 2.0),
+                    right: BorderSide(color: Colors.black, width: 2.0),
+                  ),
+                ),
+                child: Text(
+                  'Датум на истекување',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
+        ),
+        ListView.builder(
+          itemCount: productBatchList.length,
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            return Row(
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 50.0,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: index == productBatchList.length - 1
+                            ? BorderSide(color: Colors.black, width: 2.0)
+                            : BorderSide.none,
+                        top: BorderSide(color: Colors.black, width: 2.0),
+                        right: BorderSide(color: Colors.black, width: 2.0),
+                        left: BorderSide(color: Colors.black, width: 2.0),
+                      ),
+                    ),
+                    child: Text(
+                      '${productBatchList[index].id}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 50.0,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: index == productBatchList.length - 1
+                            ? BorderSide(color: Colors.black, width: 2.0)
+                            : BorderSide.none,
+                        top: BorderSide(color: Colors.black, width: 2.0),
+                        right: BorderSide(color: Colors.black, width: 2.0),
+                      ),
+                    ),
+                    child: Text(
+                      '${productBatchList[index].barCode}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 50.0,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: index == productBatchList.length - 1
+                            ? BorderSide(color: Colors.black, width: 2.0)
+                            : BorderSide.none,
+                        top: BorderSide(color: Colors.black, width: 2.0),
+                        right: BorderSide(color: Colors.black, width: 2.0),
+                      ),
+                    ),
+                    child: Text(
+                      '${productBatchList[index].quantity}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 50.0,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: index == productBatchList.length - 1
+                            ? BorderSide(color: Colors.black, width: 2.0)
+                            : BorderSide.none,
+                        top: BorderSide(color: Colors.black, width: 2.0),
+                        right: BorderSide(color: Colors.black, width: 2.0),
+                      ),
+                    ),
+                    child: Text(
+                      '${productBatchList[index].formatDateTime()}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
   }
 }
