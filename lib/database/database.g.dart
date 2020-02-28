@@ -88,7 +88,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productId`) REFERENCES `Product` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productBatchId`) REFERENCES `ProductBatch` (`barCode`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
+            'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productName` TEXT, `daysLeft` INTEGER, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productBatchId`) REFERENCES `ProductBatch` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -243,6 +243,8 @@ class _$BatchWarningDao extends BatchWarningDao {
             'BatchWarning',
             (BatchWarning item) => <String, dynamic>{
                   'id': item.id,
+                  'productName': item.productName,
+                  'daysLeft': item.daysLeft,
                   'productBatchId': item.productBatchId,
                   'status': item.status,
                   'priority': item.priority,
@@ -260,6 +262,8 @@ class _$BatchWarningDao extends BatchWarningDao {
 
   static final _batchWarningMapper = (Map<String, dynamic> row) => BatchWarning(
       row['id'] as int,
+      row['productName'] as String,
+      row['daysLeft'] as int,
       row['productBatchId'] as int,
       row['status'] as String,
       row['priority'] as String,

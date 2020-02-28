@@ -4,11 +4,8 @@ import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:bloc/bloc.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 import 'repository/repository.dart';
 
@@ -22,7 +19,6 @@ Future<void> fillDb() async {
 }
 
 Future<void> createProducts(AppDatabase database) async {
-  print("here");
   Product product1 = Product(null, 'Product 1', 30.0, 'p1-100');
   Product product2 = Product(null, 'Product 2', 40.0, 'p2-100');
   Product product3 = Product(null, 'Product 3', 50.0, 'p3-100');
@@ -33,15 +29,46 @@ Future<void> createProducts(AppDatabase database) async {
   Product product8 = Product(null, 'Product 8', 302.0, 'p8-100');
   Product product9 = Product(null, 'Product 9', 130.0, 'p9-100');
 
-  await database.productDao.add(product1);
-  await database.productDao.add(product2);
-  await database.productDao.add(product3);
-  await database.productDao.add(product4);
-  await database.productDao.add(product5);
-  await database.productDao.add(product6);
-  await database.productDao.add(product7);
-  await database.productDao.add(product8);
-  await database.productDao.add(product9);
+  int idP1 = await database.productDao.add(product1);
+  int idP2 = await database.productDao.add(product2);
+  int idP3 = await database.productDao.add(product3);
+  int idP4 = await database.productDao.add(product4);
+  int idP5 = await database.productDao.add(product5);
+  int idP6 = await database.productDao.add(product6);
+  int idP7 = await database.productDao.add(product7);
+  int idP8 = await database.productDao.add(product8);
+  int idP9 = await database.productDao.add(product9);
+
+  ProductBatch pb1 =
+      ProductBatch(null, 'barcode1', idP1, 30, "${DateTime.now()}");
+  ProductBatch pb2 =
+      ProductBatch(null, 'barcode1', idP2, 15, "${DateTime.now()}");
+  ProductBatch pb3 =
+      ProductBatch(null, 'barcode1', idP3, 3, "${DateTime.now()}");
+  ProductBatch pb4 =
+      ProductBatch(null, 'barcode1', idP4, 50, "${DateTime.now()}");
+  ProductBatch pb5 =
+      ProductBatch(null, 'barcode1', idP5, 1, "${DateTime.now()}");
+  ProductBatch pb6 =
+      ProductBatch(null, 'barcode1', idP6, 40, "${DateTime.now()}");
+  ProductBatch pb7 =
+      ProductBatch(null, 'barcode1', idP7, 30, "${DateTime.now()}");
+
+  int pb1Id = await database.productBatchDao.add(pb1);
+  int pb2Id = await database.productBatchDao.add(pb2);
+  int pb3Id = await database.productBatchDao.add(pb3);
+  int pb4Id = await database.productBatchDao.add(pb4);
+  int pb5Id = await database.productBatchDao.add(pb5);
+  int pb6Id = await database.productBatchDao.add(pb6);
+  int pb7Id = await database.productBatchDao.add(pb7);
+
+  BatchWarning.createBatchWarningInstance(database, 'Product 1', 4, pb1Id);
+  BatchWarning.createBatchWarningInstance(database, 'Product 2', 2, pb2Id);
+  BatchWarning.createBatchWarningInstance(database, 'Product 3', 13, pb3Id);
+  BatchWarning.createBatchWarningInstance(database, 'Product 4', 6, pb4Id);
+  BatchWarning.createBatchWarningInstance(database, 'Product 5', 9, pb5Id);
+  BatchWarning.createBatchWarningInstance(database, 'Product 6', 5, pb6Id);
+  BatchWarning.createBatchWarningInstance(database, 'Product 7', 4, pb7Id);
 }
 
 class InheritedDataProvider extends InheritedWidget {
@@ -108,6 +135,11 @@ class MyApp extends StatelessWidget {
           create: (BuildContext context) => ProductBatchBloc(
               productBatchRepository: ProductBatchRepository()),
         ),
+        BlocProvider<BatchWarningBloc>(
+          create: (BuildContext context) => BatchWarningBloc(
+            batchWarningRepository: BatchWarningRepository(),
+          ),
+        ),
       ],
       child: MaterialApp(title: "Date Checker App", home: HomePage()),
     );
@@ -125,12 +157,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<ProductBatchBloc>(context).add(AllProductBatch());
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    BlocProvider.of<BatchWarningBloc>(context).add(AllBatchWarnings());
   }
 
   toggleOrderByExpiry() {
@@ -159,7 +191,7 @@ class _HomePageState extends State<HomePage> {
               orderByDate: orderByExpiry,
               callBack: toggleOrderByExpiry,
             ),
-            Icon(Icons.directions_bike),
+            BatchWarningTable(),
             Icon(Icons.directions_car),
           ],
         ),
@@ -196,15 +228,19 @@ class _ProductBatchTableState extends State<ProductBatchTable>
   bool get wantKeepAlive => true;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    BlocProvider.of<ProductBatchBloc>(context).add(AllProductBatch());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print("CONTEXT ${widget.orderByDate}");
     orderByDate = widget.orderByDate;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: BlocBuilder<ProductBatchBloc, ProductBatchState>(
           builder: (context, state) {
-            print("STATE $state");
             if (state is ProductBatchEmpty) {
               return Container();
             } else if (state is ProductBatchLoading) {
@@ -226,192 +262,137 @@ class _ProductBatchTableState extends State<ProductBatchTable>
 
   Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
     var cellWidth = MediaQuery.of(context).size.width / 4;
-    print(orderByDate);
-    return SingleChildScrollView(
-      child: DataTable(
-        columnSpacing: 0.0,
-        horizontalMargin: 0.0,
-        columns: [
-          DataColumn(
-            label: Container(
-              width: cellWidth,
-              child: Row(
-                children: <Widget>[
-                  Container(
+    return customDataTable(
+      context: context,
+      columns: [
+        DataColumn(
+          label: Container(
+            width: cellWidth,
+            child: Row(
+              children: <Widget>[
+                Container(
+                  child: Text(
+                    'Датум истек',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                orderByDate
+                    ? Icon(Icons.arrow_drop_down)
+                    : Icon(Icons.arrow_drop_up),
+              ],
+            ),
+          ),
+          onSort: (i, b) {
+            widget.callBack();
+            if (!orderByDate) {
+              BlocProvider.of<ProductBatchBloc>(context).add(
+                OrderByExpiryDateEvent(),
+              );
+            } else {
+              BlocProvider.of<ProductBatchBloc>(context).add(AllProductBatch());
+            }
+          },
+        ),
+        DataColumn(label: Text('Производ')),
+        DataColumn(label: Text('Количина')),
+        DataColumn(label: Text('Баркод')),
+      ],
+      rows: productBatchList
+          .map(
+            (_batch) => DataRow(
+              cells: [
+                DataCell(Container(
+                    child: Text(_batch.formatDateTime()), width: cellWidth)),
+                DataCell(Container(
+                    child: Text(_batch.productId.toString()),
+                    width: cellWidth)),
+                DataCell(Container(
+                    child: Text("${_batch.quantity}"), width: cellWidth)),
+                DataCell(Container(
                     child: Text(
-                      'Датум истек',
+                      _batch.barCode,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  orderByDate
-                      ? Icon(Icons.arrow_drop_down)
-                      : Icon(Icons.arrow_drop_up),
-                ],
-              ),
+                    width: cellWidth)),
+              ],
             ),
-            onSort: (i, b) {
-              widget.callBack();
-              if (!orderByDate) {
-                BlocProvider.of<ProductBatchBloc>(context).add(
-                  OrderByExpiryDateEvent(),
-                );
-              } else {
-                BlocProvider.of<ProductBatchBloc>(context)
-                    .add(AllProductBatch());
-              }
-            },
-          ),
-          DataColumn(label: Text('Производ')),
-          DataColumn(label: Text('Количина')),
-          DataColumn(label: Text('Баркод')),
-        ],
-        rows: productBatchList
-            .map((_batch) => DataRow(cells: [
-                  DataCell(Container(
-                      child: Text(_batch.formatDateTime()), width: cellWidth)),
-                  DataCell(Container(
-                      child: Text(_batch.productId.toString()),
-                      width: cellWidth)),
-                  DataCell(Container(
-                      child: Text("${_batch.quantity}"), width: cellWidth)),
-                  DataCell(Container(
-                      child: Text(
-                        _batch.barCode,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      width: cellWidth)),
-                ]))
-            .toList(),
-      ),
+          )
+          .toList(),
     );
   }
 }
 
-// Row(
-//                 children: <Widget>[
-//                   Expanded(
-//                     child: GestureDetector(
-//                       behavior: HitTestBehavior.opaque,
-//                       onTap: () {
-//                         if (orderByExpiry) {
-//                           BlocProvider.of<ProductBatchBloc>(context)
-//                               .add(AllProductBatch());
-//                           setState(() {
-//                             orderByExpiry = !orderByExpiry;
-//                           });
-//                         } else {
-//                           BlocProvider.of<ProductBatchBloc>(context)
-//                               .add(OrderByExpiryDateEvent());
-//                           setState(() {
-//                             orderByExpiry = !orderByExpiry;
-//                           });
-//                         }
-//                       },
-//                       child: Container(
-//                         padding: EdgeInsets.all(10.0),
-//                         color: orderByExpiry
-//                             ? Colors.indigo[200]
-//                             : Colors.transparent,
-//                         child: Row(
-//                           children: <Widget>[
-//                             Container(
-//                               child: Text('Order by expiry date',
-//                                   style: TextStyle(fontSize: 16.0)),
-//                             ),
-//                             orderByExpiry
-//                                 ? Icon(Icons.keyboard_arrow_up)
-//                                 : Icon(Icons.keyboard_arrow_down),
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                   Expanded(
-//                     child: GestureDetector(
-//                       behavior: HitTestBehavior.opaque,
-//                       onTap: () {},
-//                       child: Row(
-//                         children: <Widget>[
-//                           Container(
-//                             child: Text('Order by date created',
-//                                 style: TextStyle(fontSize: 16.0)),
-//                           ),
-//                           Icon(Icons.keyboard_arrow_down),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
+class BatchWarningTable extends StatefulWidget {
+  @override
+  _BatchWarningTableState createState() => _BatchWarningTableState();
+}
 
-//class _ProductBatchDataSource extends DataTableSource {
-//  _ProductDataSource(batchList) {
-//    _batchList = batchList;
-//  }
-//
-//  List<ProductBatch> _batchList;
-//
-//
-//  void _sort<T>(Comparable<T> getField(ProductBatch d), bool ascending) {
-//    _desserts.sort((a, b) {
-//      final Comparable<T> aValue = getField(a);
-//      final Comparable<T> bValue = getField(b);
-//      return ascending
-//          ? Comparable.compare(aValue, bValue)
-//          : Comparable.compare(bValue, aValue);
-//    });
-//    notifyListeners();
-//  }
-//
-//  int _selectedCount = 0;
-//
-//  @override
-//  DataRow getRow(int index) {
-//    final format = NumberFormat.decimalPercentPattern(
-//      locale: GalleryOptions.of(context).locale.toString(),
-//      decimalDigits: 0,
-//    );
-//    assert(index >= 0);
-//    if (index >= _desserts.length) return null;
-//    final _Dessert dessert = _desserts[index];
-//    return DataRow.byIndex(
-//      index: index,
-//      selected: dessert.selected,
-//      onSelectChanged: (value) {
-//        if (dessert.selected != value) {
-//          _selectedCount += value ? 1 : -1;
-//          assert(_selectedCount >= 0);
-//          dessert.selected = value;
-//          notifyListeners();
-//        }
-//      },
-//      cells: [
-//        DataCell(Text(dessert.name)),
-//        DataCell(Text('${dessert.calories}')),
-//        DataCell(Text(dessert.fat.toStringAsFixed(1))),
-//        DataCell(Text('${dessert.carbs}')),
-//        DataCell(Text(dessert.protein.toStringAsFixed(1))),
-//        DataCell(Text('${dessert.sodium}')),
-//        DataCell(Text('${format.format(dessert.calcium / 100)}')),
-//        DataCell(Text('${format.format(dessert.iron / 100)}')),
-//      ],
-//    );
-//  }
-//
-//  @override
-//  int get rowCount => _desserts.length;
-//
-//  @override
-//  bool get isRowCountApproximate => false;
-//
-//  @override
-//  int get selectedRowCount => _selectedCount;
-//
-//  void _selectAll(bool checked) {
-//    for (final _Dessert dessert in _desserts) {
-//      dessert.selected = checked;
-//    }
-//    _selectedCount = checked ? _desserts.length : 0;
-//    notifyListeners();
-//  }
-//}
+class _BatchWarningTableState extends State<BatchWarningTable> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var cellWidth = MediaQuery.of(context).size.width / 3;
+    return BlocBuilder<BatchWarningBloc, BatchWarningState>(
+      builder: (context, state) {
+        if (state is BatchWarningEmpty) {
+          return Container();
+        } else if (state is BatchWarningLoading) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is BatchWarningAllLoaded) {
+          return customDataTable(
+            context: context,
+            columns: [
+              DataColumn(label: Text('Производ')),
+              DataColumn(label: Text('Денови пред истек')),
+              DataColumn(label: Text('Количина')),
+            ],
+            rows: state.allBatchWarning.map((warning) {
+              return DataRow(cells: [
+                DataCell(
+                  Container(child: Text(warning.productName), width: cellWidth),
+                ),
+                DataCell(
+                  Container(
+                      child: Text(
+                        "${warning.daysLeft}",
+                        style: TextStyle(
+                          color: warning.priorityColor(),
+                        ),
+                      ),
+                      width: cellWidth),
+                ),
+                DataCell(
+                  Container(
+                      child: Text("${warning.oldQuantity}"), width: cellWidth),
+                ),
+              ]);
+            }).toList(),
+          );
+        } else if (state is BatchWarningError) {
+          return Center(
+            child: Text(state.error),
+          );
+        }
+      },
+    );
+  }
+}
+
+Widget customDataTable({
+  BuildContext context,
+  List<DataColumn> columns,
+  List<DataRow> rows,
+}) {
+  return SingleChildScrollView(
+    child: DataTable(
+      columnSpacing: 0.0,
+      horizontalMargin: 0.0,
+      columns: columns,
+      rows: rows,
+    ),
+  );
+}
