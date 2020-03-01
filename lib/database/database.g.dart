@@ -185,6 +185,19 @@ class _$ProductBatchDao extends ProductBatchDao {
                   'expirationDate': item.expirationDate,
                   'created': item.created,
                   'updated': item.updated
+                }),
+        _productBatchUpdateAdapter = UpdateAdapter(
+            database,
+            'ProductBatch',
+            ['id'],
+            (ProductBatch item) => <String, dynamic>{
+                  'id': item.id,
+                  'barCode': item.barCode,
+                  'productId': item.productId,
+                  'quantity': item.quantity,
+                  'expirationDate': item.expirationDate,
+                  'created': item.created,
+                  'updated': item.updated
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -203,6 +216,8 @@ class _$ProductBatchDao extends ProductBatchDao {
       row['updated'] as String);
 
   final InsertionAdapter<ProductBatch> _productBatchInsertionAdapter;
+
+  final UpdateAdapter<ProductBatch> _productBatchUpdateAdapter;
 
   @override
   Future<List<ProductBatch>> all() async {
@@ -233,6 +248,12 @@ class _$ProductBatchDao extends ProductBatchDao {
     return _productBatchInsertionAdapter.insertAndReturnId(
         productBatch, sqflite.ConflictAlgorithm.abort);
   }
+
+  @override
+  Future<void> updateProductBatch(ProductBatch productBatch) async {
+    await _productBatchUpdateAdapter.update(
+        productBatch, sqflite.ConflictAlgorithm.abort);
+  }
 }
 
 class _$BatchWarningDao extends BatchWarningDao {
@@ -241,6 +262,22 @@ class _$BatchWarningDao extends BatchWarningDao {
         _batchWarningInsertionAdapter = InsertionAdapter(
             database,
             'BatchWarning',
+            (BatchWarning item) => <String, dynamic>{
+                  'id': item.id,
+                  'productName': item.productName,
+                  'daysLeft': item.daysLeft,
+                  'productBatchId': item.productBatchId,
+                  'status': item.status,
+                  'priority': item.priority,
+                  'oldQuantity': item.oldQuantity,
+                  'newQuantity': item.newQuantity,
+                  'created': item.created,
+                  'updated': item.updated
+                }),
+        _batchWarningUpdateAdapter = UpdateAdapter(
+            database,
+            'BatchWarning',
+            ['id'],
             (BatchWarning item) => <String, dynamic>{
                   'id': item.id,
                   'productName': item.productName,
@@ -274,6 +311,8 @@ class _$BatchWarningDao extends BatchWarningDao {
 
   final InsertionAdapter<BatchWarning> _batchWarningInsertionAdapter;
 
+  final UpdateAdapter<BatchWarning> _batchWarningUpdateAdapter;
+
   @override
   Future<List<BatchWarning>> all() async {
     return _queryAdapter.queryList('SELECT * FROM BatchWarning',
@@ -301,6 +340,12 @@ class _$BatchWarningDao extends BatchWarningDao {
   @override
   Future<int> add(BatchWarning batchWarning) {
     return _batchWarningInsertionAdapter.insertAndReturnId(
+        batchWarning, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> updateBatchWarning(BatchWarning batchWarning) async {
+    await _batchWarningUpdateAdapter.update(
         batchWarning, sqflite.ConflictAlgorithm.abort);
   }
 }

@@ -7,4 +7,14 @@ class BatchWarningRepository {
     AppDatabase db = await DbProvider.instance.database;
     return db.batchWarningDao.all();
   }
+
+  Future<void> updateQuantity(int quantity, BatchWarning batchWarning) async {
+    AppDatabase db = await DbProvider.instance.database;
+    batchWarning.newQuantity = quantity;
+    ProductBatch productBatch =
+        await db.productBatchDao.get(batchWarning.productBatchId);
+    productBatch.quantity = quantity;
+    await db.productBatchDao.updateProductBatch(productBatch);
+    await db.batchWarningDao.updateBatchWarning(batchWarning);
+  }
 }

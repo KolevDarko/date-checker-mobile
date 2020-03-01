@@ -135,6 +135,7 @@ class BatchWarning {
       "${DateTime.now()}",
     );
     batchWarning.oldQuantity = batch.quantity;
+    batchWarning.newQuantity = batch.quantity;
     await database.batchWarningDao.add(batchWarning);
   }
 

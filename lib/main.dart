@@ -335,7 +335,7 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
 
   @override
   Widget build(BuildContext context) {
-    var cellWidth = MediaQuery.of(context).size.width / 3;
+    var cellWidth = MediaQuery.of(context).size.width / 4;
     return BlocBuilder<BatchWarningBloc, BatchWarningState>(
       builder: (context, state) {
         if (state is BatchWarningEmpty) {
@@ -346,30 +346,62 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
           return customDataTable(
             context: context,
             columns: [
-              DataColumn(label: Text('Производ')),
-              DataColumn(label: Text('Денови пред истек')),
+              DataColumn(
+                  label: Text(
+                'Производ',
+              )),
+              DataColumn(
+                  label:
+                      Text('Денови пред истек', overflow: TextOverflow.clip)),
               DataColumn(label: Text('Количина')),
+              DataColumn(label: Text('')),
             ],
             rows: state.allBatchWarning.map((warning) {
-              return DataRow(cells: [
-                DataCell(
-                  Container(child: Text(warning.productName), width: cellWidth),
-                ),
-                DataCell(
-                  Container(
-                      child: Text(
-                        "${warning.daysLeft}",
-                        style: TextStyle(
-                          color: warning.priorityColor(),
+              return DataRow(
+                cells: [
+                  DataCell(
+                    Container(
+                        child: Text(warning.productName), width: cellWidth),
+                  ),
+                  DataCell(
+                    Container(
+                        child: Text(
+                          "${warning.daysLeft}",
+                          style: TextStyle(
+                            color: warning.priorityColor(),
+                          ),
                         ),
+                        width: cellWidth),
+                  ),
+                  DataCell(
+                    GestureDetector(
+                      onTap: () {
+                        // openQuantityEditModal();
+                      },
+                      child: Container(
+                        child: Text("${warning.newQuantity}"),
+                        width: cellWidth,
                       ),
-                      width: cellWidth),
-                ),
-                DataCell(
-                  Container(
-                      child: Text("${warning.oldQuantity}"), width: cellWidth),
-                ),
-              ]);
+                    ),
+                  ),
+                  DataCell(
+                    RaisedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuantityEdit(
+                              oldQuantity: warning.oldQuantity,
+                              batchWarning: warning,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text('Kopce'),
+                    ),
+                  ),
+                ],
+              );
             }).toList(),
           );
         } else if (state is BatchWarningError) {
@@ -388,11 +420,104 @@ Widget customDataTable({
   List<DataRow> rows,
 }) {
   return SingleChildScrollView(
-    child: DataTable(
-      columnSpacing: 0.0,
-      horizontalMargin: 0.0,
-      columns: columns,
-      rows: rows,
+    child: FittedBox(
+      child: DataTable(
+        columnSpacing: 0.0,
+        horizontalMargin: 0.0,
+        columns: columns,
+        rows: rows,
+      ),
     ),
   );
+}
+
+class QuantityEdit extends StatefulWidget {
+  final int oldQuantity;
+  final BatchWarning batchWarning;
+
+  const QuantityEdit({Key key, this.oldQuantity, this.batchWarning})
+      : super(key: key);
+  @override
+  _QuantityEditState createState() => _QuantityEditState();
+}
+
+class _QuantityEditState extends State<QuantityEdit> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _quantity = TextEditingController();
+  final FocusNode _quantityNode = FocusNode();
+
+  @override
+  void initState() {
+    _quantity.text = (widget.oldQuantity).toString();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Промени Количина'),
+      ),
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: TextFormField(
+                  controller: _quantity,
+                  focusNode: _quantityNode,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                    labelText: 'Quantity',
+                  ),
+                  onFieldSubmitted: (val) {
+                    _quantityNode.unfocus();
+                  },
+                  validator: (value) {
+                    var parsedStringNumber = int.tryParse(value);
+
+                    if (value.length == 0) {
+                      return 'Field is required';
+                    } else if (parsedStringNumber.runtimeType != int) {
+                      return 'Quantity must be a number';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+              RaisedButton(
+                child: Text('Зачувај промени'),
+                onPressed: () {
+                  if (_formKey.currentState.validate()) {
+                    int quantity = int.tryParse(_quantity.value.text);
+                    if (widget.oldQuantity == quantity) {
+                      Navigator.pop(context);
+                    } else {
+                      print("here");
+                      BlocProvider.of<BatchWarningBloc>(context).add(
+                        EditQuantityEvent(
+                          quantity: quantity,
+                          batchWarning: widget.batchWarning,
+                        ),
+                      );
+                      BlocProvider.of<BatchWarningBloc>(context)
+                          .add(AllBatchWarnings());
+                      Navigator.pop(context);
+                    }
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

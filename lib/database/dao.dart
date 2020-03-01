@@ -33,6 +33,9 @@ abstract class ProductBatchDao {
   @Query('DELETE FROM ProductBatch WHERE id = :id')
   Future<void> delete(int id);
 
+  @update
+  Future<void> updateProductBatch(ProductBatch productBatch);
+
   @insert
   Future<int> add(ProductBatch productBatch);
 }
@@ -53,4 +56,7 @@ abstract class BatchWarningDao {
 
   @insert
   Future<int> add(BatchWarning batchWarning);
+
+  @update
+  Future<void> updateBatchWarning(BatchWarning batchWarning);
 }

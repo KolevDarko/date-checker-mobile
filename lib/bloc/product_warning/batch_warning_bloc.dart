@@ -24,6 +24,13 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
       } catch (e) {
         yield BatchWarningError(error: 'Грешка при превземање на пратки');
       }
+    } else if (event is EditQuantityEvent) {
+      try {
+        await batchWarningRepository.updateQuantity(
+            event.quantity, event.batchWarning);
+      } catch (e) {
+        yield BatchWarningError(error: 'Грешка при зачувување на промени.');
+      }
     }
   }
 }
