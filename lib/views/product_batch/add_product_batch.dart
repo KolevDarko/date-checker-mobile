@@ -1,14 +1,14 @@
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/database/database.dart';
+import 'package:date_checker_app/custom_widgets.dart/custom_product_picker.dart';
+
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/main.dart';
+
 import 'package:date_checker_app/repository/product_repository.dart';
-import 'package:date_checker_app/views/product_batch/custom_product_picker.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class AddProductBatchView extends StatefulWidget {
   @override
@@ -20,7 +20,7 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
   final TextEditingController _barCode = TextEditingController();
   final TextEditingController _quantity = TextEditingController();
   final TextEditingController _expirationDate = TextEditingController();
-  final TextEditingController _typeAheadController = TextEditingController();
+
   Product _selectedProduct;
   ProductRepository productRepository = ProductRepository();
 
