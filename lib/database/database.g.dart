@@ -344,8 +344,28 @@ class _$BatchWarningDao extends BatchWarningDao {
   }
 
   @override
+  Future<void> insertAllWarnings(List<BatchWarning> warnings) async {
+    await _batchWarningInsertionAdapter.insertList(
+        warnings, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
   Future<void> updateBatchWarning(BatchWarning batchWarning) async {
     await _batchWarningUpdateAdapter.update(
         batchWarning, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> saveWarnings(List<BatchWarning> warnings) async {
+    if (database is sqflite.Transaction) {
+      await super.saveWarnings(warnings);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$AppDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.batchWarningDao.saveWarnings(warnings);
+      });
+    }
   }
 }

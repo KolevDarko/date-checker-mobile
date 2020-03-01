@@ -18,6 +18,15 @@ class Product {
   String toString() {
     return "$name - $barCode";
   }
+
+  static Product fromJson(dynamic json) {
+    return Product(
+      null,
+      json['name'],
+      json['price'],
+      json['barCode'],
+    );
+  }
 }
 
 @Entity(foreignKeys: [
@@ -54,6 +63,18 @@ class ProductBatch {
 
   String formatDateTime() {
     return '${this.returnDateTimeExpDate().day}/${this.returnDateTimeExpDate().month}/${this.returnDateTimeExpDate().year.remainder(100)}';
+  }
+
+  static ProductBatch fromJson(dynamic json) {
+    return ProductBatch(
+      null,
+      json['barCode'],
+      json['productId'],
+      json['quantity'],
+      json['expirationDate'],
+      "${DateTime.now()}",
+      "${DateTime.now()}",
+    );
   }
 }
 
@@ -139,5 +160,18 @@ class BatchWarning {
     await database.batchWarningDao.add(batchWarning);
   }
 
-  //TODO fromJSON
+  static BatchWarning fromJson(dynamic json) {
+    return BatchWarning(
+      json['id'],
+      json['product_name'],
+      json['days_left'],
+      json['product_batch_id'],
+      null,
+      json['priority'],
+      json['quantity'],
+      json['quantity'],
+      "${DateTime.now()}",
+      "${DateTime.now()}",
+    );
+  }
 }

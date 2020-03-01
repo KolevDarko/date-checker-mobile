@@ -2,7 +2,7 @@ import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
-import 'package:date_checker_app/views/home/home_page.dart';
+import 'package:date_checker_app/views/authentication/login.dart';
 
 import 'package:flutter/material.dart';
 
@@ -62,14 +62,6 @@ Future<void> createProducts(AppDatabase database) async {
   int pb5Id = await database.productBatchDao.add(pb5);
   int pb6Id = await database.productBatchDao.add(pb6);
   int pb7Id = await database.productBatchDao.add(pb7);
-
-  BatchWarning.createBatchWarningInstance(database, 'Product 1', 4, pb1Id);
-  BatchWarning.createBatchWarningInstance(database, 'Product 2', 2, pb2Id);
-  BatchWarning.createBatchWarningInstance(database, 'Product 3', 13, pb3Id);
-  BatchWarning.createBatchWarningInstance(database, 'Product 4', 6, pb4Id);
-  BatchWarning.createBatchWarningInstance(database, 'Product 5', 9, pb5Id);
-  BatchWarning.createBatchWarningInstance(database, 'Product 6', 5, pb6Id);
-  BatchWarning.createBatchWarningInstance(database, 'Product 7', 4, pb7Id);
 }
 
 class InheritedDataProvider extends InheritedWidget {
@@ -142,7 +134,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp(title: "Date Checker App", home: HomePage()),
+      child: MaterialApp(title: "Date Checker App", home: LoginView()),
     );
   }
 }

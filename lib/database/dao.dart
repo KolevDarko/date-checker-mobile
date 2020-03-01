@@ -59,4 +59,12 @@ abstract class BatchWarningDao {
 
   @update
   Future<void> updateBatchWarning(BatchWarning batchWarning);
+
+  @insert
+  Future<void> insertAllWarnings(List<BatchWarning> warnings);
+
+  @transaction
+  Future<void> saveWarnings(List<BatchWarning> warnings) async {
+    await insertAllWarnings(warnings);
+  }
 }
