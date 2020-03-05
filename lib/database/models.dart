@@ -166,7 +166,7 @@ class BatchWarning {
       json['product_name'],
       json['days_left'],
       json['product_batch_id'],
-      null,
+      batchWarningStatus()[0],
       json['priority'],
       json['quantity'],
       json['quantity'],

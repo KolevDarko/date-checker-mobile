@@ -44,15 +44,21 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             title: Text('Date Checker Tabs')),
-        body: TabBarView(
-          children: [
-            ProductBatchTable(
-              orderByDate: orderByExpiry,
-              callBack: toggleOrderByExpiry,
-            ),
-            BatchWarningTable(),
-            Icon(Icons.directions_car),
-          ],
+        body: Builder(
+          builder: (BuildContext context) {
+            return TabBarView(
+              children: [
+                ProductBatchTable(
+                  orderByDate: orderByExpiry,
+                  callBack: toggleOrderByExpiry,
+                ),
+                BatchWarningTable(
+                  scaffoldContext: context,
+                ),
+                Icon(Icons.directions_car),
+              ],
+            );
+          },
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

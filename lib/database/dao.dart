@@ -45,6 +45,9 @@ abstract class BatchWarningDao {
   @Query('SELECT * FROM BatchWarning')
   Future<List<BatchWarning>> all();
 
+  @Query('SELECT * FROM BatchWarning WHERE status = :status')
+  Future<List<BatchWarning>> allStatusChecked(String status);
+
   @Query('SELECT * FROM BatchWarning WHERE name = :name')
   Future<BatchWarning> fetchByName(String name);
 

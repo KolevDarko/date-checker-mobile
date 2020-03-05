@@ -320,6 +320,14 @@ class _$BatchWarningDao extends BatchWarningDao {
   }
 
   @override
+  Future<List<BatchWarning>> allStatusChecked(String status) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM BatchWarning WHERE status = ?',
+        arguments: <dynamic>[status],
+        mapper: _batchWarningMapper);
+  }
+
+  @override
   Future<BatchWarning> fetchByName(String name) async {
     return _queryAdapter.query('SELECT * FROM BatchWarning WHERE name = ?',
         arguments: <dynamic>[name], mapper: _batchWarningMapper);

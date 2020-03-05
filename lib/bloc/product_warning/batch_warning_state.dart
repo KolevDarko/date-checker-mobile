@@ -23,3 +23,9 @@ class BatchWarningError extends BatchWarningState {
 
   BatchWarningError({this.error});
 }
+
+class Success extends BatchWarningState {
+  final String productName;
+
+  Success({this.productName});
+}
