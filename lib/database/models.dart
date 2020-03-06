@@ -92,6 +92,7 @@ class BatchWarning {
   // od api doagja product name i denovi pred istek
   String productName;
   int daysLeft;
+  String expirationDate;
   int productBatchId;
   String status;
   String priority;
@@ -105,6 +106,7 @@ class BatchWarning {
       this.id,
       this.productName,
       this.daysLeft,
+      this.expirationDate,
       this.productBatchId,
       this.status,
       this.priority,
@@ -129,42 +131,12 @@ class BatchWarning {
     }
   }
 
-  static createBatchWarningInstance(
-    AppDatabase database,
-    String productName,
-    int daysLeft,
-    int productBatchId,
-  ) async {
-    ProductBatch batch = await database.productBatchDao.get(productBatchId);
-    String priority;
-    if (daysLeft < 0) {
-      priority = batchWarningPriority()[1];
-    } else {
-      priority = batchWarningPriority()[0];
-    }
-
-    BatchWarning batchWarning = BatchWarning(
-      null,
-      productName,
-      daysLeft,
-      productBatchId,
-      batchWarningStatus()[0],
-      priority,
-      null,
-      null,
-      "${DateTime.now()}",
-      "${DateTime.now()}",
-    );
-    batchWarning.oldQuantity = batch.quantity;
-    batchWarning.newQuantity = batch.quantity;
-    await database.batchWarningDao.add(batchWarning);
-  }
-
   static BatchWarning fromJson(dynamic json) {
     return BatchWarning(
       json['id'],
       json['product_name'],
       json['days_left'],
+      json['expiration_date'],
       json['product_batch_id'],
       batchWarningStatus()[0],
       json['priority'],
@@ -174,4 +146,10 @@ class BatchWarning {
       "${DateTime.now()}",
     );
   }
+
+  @override
+  String toString() {
+    return "$productName - $oldQuantity - $expirationDate";
+  }
+
 }

@@ -57,6 +57,9 @@ abstract class BatchWarningDao {
   @Query('DELETE FROM BatchWarning WHERE id = :id')
   Future<void> delete(int id);
 
+  @Query('SELECT * from BatchWarning order by id desc limit 1')
+  Future<BatchWarning> getLast();
+
   @insert
   Future<int> add(BatchWarning batchWarning);
 

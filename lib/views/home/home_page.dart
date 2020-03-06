@@ -33,13 +33,38 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
+        drawer: Drawer(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                DrawerHeader(
+                  child: Text('Navigation'),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                  ),
+                ),
+                ListTile(
+                  title: Text('Пратки'),
+                  onTap: () {
+                    // Update the state of the app.
+                    // ...
+                  },
+                ),
+                ListTile(
+                  title: Text('Истекуват'),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (ctx) => BatchWarningTable()));
+                  },
+                ),
+              ],
+            )
+        ),
         appBar: AppBar(
             bottom: TabBar(
               tabs: [
                 Tab(icon: Text('Пратки')),
-                Tab(icon: Text("Истекува")),
                 Tab(icon: Text("Производи")),
               ],
             ),
@@ -51,9 +76,6 @@ class _HomePageState extends State<HomePage> {
                 ProductBatchTable(
                   orderByDate: orderByExpiry,
                   callBack: toggleOrderByExpiry,
-                ),
-                BatchWarningTable(
-                  scaffoldContext: context,
                 ),
                 Icon(Icons.directions_car),
               ],

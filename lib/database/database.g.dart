@@ -88,7 +88,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productId`) REFERENCES `Product` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productName` TEXT, `daysLeft` INTEGER, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productBatchId`) REFERENCES `ProductBatch` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
+            'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productName` TEXT, `daysLeft` INTEGER, `expirationDate` TEXT, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productBatchId`) REFERENCES `ProductBatch` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -266,6 +266,7 @@ class _$BatchWarningDao extends BatchWarningDao {
                   'id': item.id,
                   'productName': item.productName,
                   'daysLeft': item.daysLeft,
+                  'expirationDate': item.expirationDate,
                   'productBatchId': item.productBatchId,
                   'status': item.status,
                   'priority': item.priority,
@@ -282,6 +283,7 @@ class _$BatchWarningDao extends BatchWarningDao {
                   'id': item.id,
                   'productName': item.productName,
                   'daysLeft': item.daysLeft,
+                  'expirationDate': item.expirationDate,
                   'productBatchId': item.productBatchId,
                   'status': item.status,
                   'priority': item.priority,
@@ -301,6 +303,7 @@ class _$BatchWarningDao extends BatchWarningDao {
       row['id'] as int,
       row['productName'] as String,
       row['daysLeft'] as int,
+      row['expirationDate'] as String,
       row['productBatchId'] as int,
       row['status'] as String,
       row['priority'] as String,
@@ -343,6 +346,13 @@ class _$BatchWarningDao extends BatchWarningDao {
   Future<void> delete(int id) async {
     await _queryAdapter.queryNoReturn('DELETE FROM BatchWarning WHERE id = ?',
         arguments: <dynamic>[id]);
+  }
+
+  @override
+  Future<BatchWarning> getLast() async {
+    return _queryAdapter.query(
+        'SELECT * from BatchWarning order by id desc limit 1',
+        mapper: _batchWarningMapper);
   }
 
   @override

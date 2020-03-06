@@ -27,6 +27,29 @@ class BatchWarningApiClient {
     return warnings;
   }
 
+  Future<List<BatchWarning>> getNewBatchWarnings() async {
+    List<BatchWarning> warnings = [];
+    AppDatabase db = await DbProvider.instance.database;
+    BatchWarning lastBatch = await db.batchWarningDao.getLast();
+
+    String newBatchWarningsUrl = '$batchWarningsUrl?last_id=${lastBatch.id}';
+    final batchWarningResponse = await this.httpClient.get(
+        newBatchWarningsUrl, headers: batchWarningHeaders);
+
+    if (batchWarningResponse.statusCode != 200) {
+      throw Exception('Error getting new batches');
+    }
+    final batchWarnings = jsonDecode(batchWarningResponse.body);
+    for (var batchWarningJson in batchWarnings) {
+      BatchWarning batchWarning = BatchWarning.fromJson(batchWarningJson);
+      warnings.add(batchWarning);
+      print("Got new warning $batchWarning");
+    }
+    return warnings;
+  }
+
+
+
   Future<void> saveWarningsLocally() async {
     AppDatabase db = await DbProvider.instance.database;
     List<BatchWarning> warnings = await this.getAllBatchWarnings();

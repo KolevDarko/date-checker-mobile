@@ -32,6 +32,8 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
       } catch (e) {
         yield BatchWarningError(error: 'Грешка при зачувување на промени.');
       }
+    } else if (event is RefreshBatchWarnings) {
+
     }
   }
 }

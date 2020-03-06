@@ -3,6 +3,7 @@ import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
 
 class BatchWarningRepository {
+
   Future<List<BatchWarning>> warnings() async {
     AppDatabase db = await DbProvider.instance.database;
     return db.batchWarningDao.allStatusChecked('NEW');
@@ -18,4 +19,5 @@ class BatchWarningRepository {
     await db.productBatchDao.updateProductBatch(productBatch);
     await db.batchWarningDao.updateBatchWarning(batchWarning);
   }
+
 }
