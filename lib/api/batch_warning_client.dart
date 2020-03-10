@@ -27,14 +27,15 @@ class BatchWarningApiClient {
     return warnings;
   }
 
-  Future<List<BatchWarning>> getNewBatchWarnings() async {
+  Future<List<BatchWarning>> refreshWarnings() async {
     List<BatchWarning> warnings = [];
     AppDatabase db = await DbProvider.instance.database;
     BatchWarning lastBatch = await db.batchWarningDao.getLast();
 
     String newBatchWarningsUrl = '$batchWarningsUrl?last_id=${lastBatch.id}';
-    final batchWarningResponse = await this.httpClient.get(
-        newBatchWarningsUrl, headers: batchWarningHeaders);
+    final batchWarningResponse = await this
+        .httpClient
+        .get(newBatchWarningsUrl, headers: batchWarningHeaders);
 
     if (batchWarningResponse.statusCode != 200) {
       throw Exception('Error getting new batches');
@@ -43,21 +44,28 @@ class BatchWarningApiClient {
     for (var batchWarningJson in batchWarnings) {
       BatchWarning batchWarning = BatchWarning.fromJson(batchWarningJson);
       warnings.add(batchWarning);
-      print("Got new warning $batchWarning");
     }
+    await saveWarningsLocally(newWarnings: warnings);
     return warnings;
   }
 
-
-
-  Future<void> saveWarningsLocally() async {
+  Future<void> saveWarningsLocally({List<BatchWarning> newWarnings}) async {
     AppDatabase db = await DbProvider.instance.database;
-    List<BatchWarning> warnings = await this.getAllBatchWarnings();
-    try {
-      await db.batchWarningDao.saveWarnings(warnings);
-    } catch (e) {
-      print("here error when saving warnings from http");
-      print(e);
+    if (newWarnings != null) {
+      try {
+        await db.batchWarningDao.saveWarnings(newWarnings);
+      } catch (e) {
+        print("here error when saving warnings from http");
+        print(e);
+      }
+    } else {
+      try {
+        List<BatchWarning> warnings = await this.getAllBatchWarnings();
+        await db.batchWarningDao.saveWarnings(warnings);
+      } catch (e) {
+        print("here error when saving warnings from http, full request");
+        print(e);
+      }
     }
   }
 }

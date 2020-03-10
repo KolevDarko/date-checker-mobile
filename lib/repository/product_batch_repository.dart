@@ -1,8 +1,13 @@
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
+import 'package:http/http.dart';
 
 class ProductBatchRepository {
+  final Client httpClient;
+
+  ProductBatchRepository({this.httpClient});
+
   Future<ProductBatch> getProductBatch(int productBatchId) async {
     AppDatabase db = await DbProvider.instance.database;
     ProductBatch productBatch = await db.productBatchDao.get(productBatchId);

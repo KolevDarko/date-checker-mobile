@@ -1,3 +1,4 @@
+import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
@@ -7,6 +8,7 @@ import 'package:date_checker_app/views/authentication/login.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 
 import 'repository/repository.dart';
 
@@ -81,11 +83,28 @@ class InheritedDataProvider extends InheritedWidget {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppDatabase db = await DbProvider.instance.database;
+  Client httpClient = Client();
+  ProductRepository productRepository =
+      ProductRepository(httpClient: httpClient);
+  ProductBatchRepository productBatchRepository =
+      ProductBatchRepository(httpClient: httpClient);
+  BatchWarningRepository batchWarningRepository = BatchWarningRepository(
+    batchWarningApi: BatchWarningApiClient(
+      httpClient: Client(),
+    ),
+  );
+
   fillDb();
-  runApp(InheritedDataProviderHelper(
-    database: db,
-    child: MyApp(),
-  ));
+
+  runApp(
+    InheritedDataProviderHelper(
+      database: db,
+      child: MyApp(
+          productRepository: productRepository,
+          productBatchRepository: productBatchRepository,
+          batchWarningRepository: batchWarningRepository),
+    ),
+  );
 }
 
 class InheritedDataProviderHelper extends StatefulWidget {
@@ -116,21 +135,31 @@ class _InheritedDataProviderHelperState
 }
 
 class MyApp extends StatelessWidget {
+  final ProductRepository productRepository;
+  final ProductBatchRepository productBatchRepository;
+  final BatchWarningRepository batchWarningRepository;
+
+  const MyApp(
+      {Key key,
+      this.productRepository,
+      this.productBatchRepository,
+      this.batchWarningRepository})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ProductBloc>(
           create: (BuildContext context) =>
-              ProductBloc(productRepository: ProductRepository()),
+              ProductBloc(productRepository: productRepository),
         ),
         BlocProvider<ProductBatchBloc>(
-          create: (BuildContext context) => ProductBatchBloc(
-              productBatchRepository: ProductBatchRepository()),
+          create: (BuildContext context) =>
+              ProductBatchBloc(productBatchRepository: productBatchRepository),
         ),
         BlocProvider<BatchWarningBloc>(
           create: (BuildContext context) => BatchWarningBloc(
-            batchWarningRepository: BatchWarningRepository(),
+            batchWarningRepository: batchWarningRepository,
           ),
         ),
       ],

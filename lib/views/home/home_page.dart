@@ -12,6 +12,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool orderByExpiry = false;
+  int _currentTabIndex = 0;
+  BuildContext scaffoldContext;
 
   @override
   void initState() {
@@ -33,62 +35,58 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
-        drawer: Drawer(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                DrawerHeader(
-                  child: Text('Navigation'),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                  ),
-                ),
-                ListTile(
-                  title: Text('Пратки'),
-                  onTap: () {
-                    // Update the state of the app.
-                    // ...
-                  },
-                ),
-                ListTile(
-                  title: Text('Истекуват'),
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (ctx) => BatchWarningTable()));
-                  },
-                ),
-              ],
-            )
-        ),
         appBar: AppBar(
             bottom: TabBar(
+              onTap: (int currentTabIndex) {
+                setState(() {
+                  _currentTabIndex = currentTabIndex;
+                });
+              },
               tabs: [
                 Tab(icon: Text('Пратки')),
+                Tab(icon: Text('Истекување')),
                 Tab(icon: Text("Производи")),
               ],
             ),
             title: Text('Date Checker Tabs')),
         body: Builder(
           builder: (BuildContext context) {
+            scaffoldContext = context;
             return TabBarView(
               children: [
                 ProductBatchTable(
                   orderByDate: orderByExpiry,
                   callBack: toggleOrderByExpiry,
                 ),
+                BatchWarningTable(
+                  scaffoldContext: context,
+                ),
                 Icon(Icons.directions_car),
               ],
             );
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => AddProductBatchView()));
-          },
-          child: Icon(Icons.add),
-        ),
+        floatingActionButton: _currentTabIndex == 0
+            ? FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => AddProductBatchView(),
+                    ),
+                  );
+                },
+                child: Icon(Icons.add),
+              )
+            : FloatingActionButton(
+                onPressed: () async {
+                  BlocProvider.of<BatchWarningBloc>(context)
+                    ..add(RefreshBatchWarnings())
+                    ..add(AllBatchWarnings());
+                },
+                child: Icon(Icons.refresh),
+              ),
       ),
     );
   }

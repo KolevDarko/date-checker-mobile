@@ -11,22 +11,21 @@ class DataSync extends StatefulWidget {
 }
 
 class _DataSyncState extends State<DataSync> {
-  BatchWarningApiClient batchWarningApiClient;
   Future<void> saveBatchWarnings;
-  Client httpClient = Client();
 
   @override
   void initState() {
     super.initState();
-    batchWarningApiClient = BatchWarningApiClient(httpClient: httpClient);
+
     Future(() {
       Navigator.push(context, MaterialPageRoute(builder: (ctx) => HomePage()));
     });
   }
 
   Future<void> _saveBatchWarnings() async {
-    await batchWarningApiClient.saveWarningsLocally();
-    BlocProvider.of<BatchWarningBloc>(context).add(AllBatchWarnings());
+    BlocProvider.of<BatchWarningBloc>(context)
+      ..add(RefreshBatchWarnings())
+      ..add(AllBatchWarnings());
     BlocProvider.of<ProductBatchBloc>(context).add(AllProductBatch());
   }
 

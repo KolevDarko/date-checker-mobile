@@ -18,6 +18,12 @@ class BatchWarningAllLoaded extends BatchWarningState {
   BatchWarningAllLoaded({this.allBatchWarning});
 }
 
+class BatchWarningRefreshSuccess extends BatchWarningState {
+  final List<BatchWarning> newBatchWarnings;
+
+  BatchWarningRefreshSuccess({this.newBatchWarnings});
+}
+
 class BatchWarningError extends BatchWarningState {
   final String error;
 

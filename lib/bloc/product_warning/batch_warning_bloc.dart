@@ -10,7 +10,6 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
   BatchWarningBloc({this.batchWarningRepository});
 
   @override
-  // TODO: implement initialState
   BatchWarningState get initialState => BatchWarningEmpty();
 
   @override
@@ -33,7 +32,14 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
         yield BatchWarningError(error: 'Грешка при зачувување на промени.');
       }
     } else if (event is RefreshBatchWarnings) {
-
+      yield BatchWarningLoading();
+      try {
+        List<BatchWarning> newWarnings =
+            await batchWarningRepository.refreshWarnings();
+        yield BatchWarningRefreshSuccess(newBatchWarnings: newWarnings);
+      } catch (e) {
+        yield BatchWarningError(error: 'Грешка при ажурирање на податоците');
+      }
     }
   }
 }

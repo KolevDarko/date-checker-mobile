@@ -1,39 +1,35 @@
 import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/custom_widgets.dart/custom_table.dart';
-import 'package:date_checker_app/database/models.dart';
+
 import 'package:date_checker_app/views/product_warning/edit_product_warning.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
 
 class BatchWarningTable extends StatefulWidget {
+  final BuildContext scaffoldContext;
 
+  const BatchWarningTable({Key key, this.scaffoldContext}) : super(key: key);
   @override
   _BatchWarningTableState createState() => _BatchWarningTableState();
 }
 
 class _BatchWarningTableState extends State<BatchWarningTable> {
-
-  Client httpClient = Client();
-  BatchWarningApiClient batchWarningApiClient;
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    batchWarningApiClient = BatchWarningApiClient(httpClient: httpClient);
   }
 
   @override
   Widget build(BuildContext context) {
     var cellWidth = MediaQuery.of(context).size.width / 4;
     return Scaffold(
-      appBar: AppBar(
-          title: Text('Batch Warnings')),
       body: BlocListener<BatchWarningBloc, BatchWarningState>(
         listener: (context, state) {
           if (state is Success) {
-            Scaffold.of(context).showSnackBar(
+            Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
+            Scaffold.of(widget.scaffoldContext).showSnackBar(
               SnackBar(
                 duration: Duration(seconds: 3),
                 backgroundColor: Colors.green,
@@ -41,6 +37,18 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
                     'Успешно ја променивте количината на ${state.productName}. Сега е проверен и отстранет од табелата на внимание.'),
               ),
             );
+          } else if (state is BatchWarningRefreshSuccess) {
+            Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
+            String message;
+            if (state.newBatchWarnings.length > 0) {
+              message = 'Успешно ги ажуриравте податоците';
+            } else {
+              message = 'Нема нови податоци';
+            }
+            final snackBar = SnackBar(
+              content: Text(message),
+            );
+            Scaffold.of(widget.scaffoldContext).showSnackBar(snackBar);
           }
         },
         child: BlocBuilder<BatchWarningBloc, BatchWarningState>(
@@ -55,11 +63,11 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
                 columns: [
                   DataColumn(
                       label: Text(
-                        'Производ',
-                      )),
+                    'Производ',
+                  )),
                   DataColumn(
-                      label: Text('Денови пред истек',
-                          overflow: TextOverflow.clip)),
+                      label:
+                          Text('Датум на истек', overflow: TextOverflow.clip)),
                   DataColumn(label: Text('Количина')),
                   DataColumn(label: Text('')),
                 ],
@@ -68,7 +76,9 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
                     cells: [
                       DataCell(
                         Container(
-                            child: Text(warning.productName), width: cellWidth),
+                          child: Text(warning.productName),
+                          width: cellWidth,
+                        ),
                       ),
                       DataCell(
                         Container(
@@ -82,9 +92,6 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
                       ),
                       DataCell(
                         GestureDetector(
-                          onTap: () {
-                            // openQuantityEditModal();
-                          },
                           child: Container(
                             child: Text("${warning.newQuantity}"),
                             width: cellWidth,
@@ -97,11 +104,10 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    QuantityEdit(
-                                      oldQuantity: warning.oldQuantity,
-                                      batchWarning: warning,
-                                    ),
+                                builder: (context) => QuantityEdit(
+                                  oldQuantity: warning.oldQuantity,
+                                  batchWarning: warning,
+                                ),
                               ),
                             );
                           },
@@ -121,12 +127,6 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          List<BatchWarning> test = await batchWarningApiClient.getNewBatchWarnings();
-        },
-        child: Icon(Icons.refresh),
-      )
     );
   }
 }
