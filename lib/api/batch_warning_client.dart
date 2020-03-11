@@ -68,4 +68,8 @@ class BatchWarningApiClient {
       }
     }
   }
+
+  Future<void> updateQuantity(int quantity, BatchWarning batchWarning) {
+    // TODO, get endpoint to save the quantity straight away
+  }
 }

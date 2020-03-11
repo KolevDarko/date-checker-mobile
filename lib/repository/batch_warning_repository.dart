@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
@@ -22,6 +24,15 @@ class BatchWarningRepository {
     productBatch.quantity = quantity;
     await db.productBatchDao.updateProductBatch(productBatch);
     await db.batchWarningDao.updateBatchWarning(batchWarning);
+    // check if we have internet connection
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        await batchWarningApi.updateQuantity(quantity, batchWarning);
+      }
+    } on SocketException catch (_) {
+      print('not connected');
+    }
   }
 
   Future<List<BatchWarning>> refreshWarnings() async {
