@@ -16,9 +16,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   @override
   Stream<ProductState> mapEventToState(ProductEvent event) async* {
-    print("EVENT $event");
     if (event is FetchProduct) {
-      print("fetch product event ${event.id}");
       yield ProductLoading();
       try {
         final Product product = await productRepository.getProduct(event.id);
@@ -35,6 +33,22 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       } catch (e) {
         yield ProductError(
             error: "Something went wrong when saving the product.");
+      }
+    } else if (event is FetchAllProducts) {
+      yield ProductLoading();
+      try {
+        final List<Product> products = await productRepository.getAllProducts();
+        yield AllProductsLoaded(products: products);
+      } catch (e) {
+        yield ProductError(error: "Грешка при превземање продукти.");
+      }
+    } else if (event is SyncProductData) {
+      yield ProductLoading();
+      try {
+        await this.productRepository.syncProducts();
+        yield ProductSyncDone(message: "Успешно ги синхронизиравте податоците");
+      } catch (e) {
+        yield ProductError(error: "Грешка при синхронизација на податоци");
       }
     }
   }

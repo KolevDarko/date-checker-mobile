@@ -13,9 +13,10 @@ class BatchWarningApiClient {
 
   Future<List<BatchWarning>> getAllBatchWarnings() async {
     List<BatchWarning> warnings = [];
-    final batchWarningResponse = await this
-        .httpClient
-        .get(batchWarningsUrl, headers: batchWarningHeaders);
+    final batchWarningResponse = await this.httpClient.get(
+          batchWarningsUrl,
+          headers: authHeaders,
+        );
     if (batchWarningResponse.statusCode != 200) {
       throw Exception('Error getting batch warning data');
     }
@@ -32,10 +33,11 @@ class BatchWarningApiClient {
     AppDatabase db = await DbProvider.instance.database;
     BatchWarning lastBatch = await db.batchWarningDao.getLast();
 
-    String newBatchWarningsUrl = '$batchWarningsUrl?last_id=${lastBatch.id}';
-    final batchWarningResponse = await this
-        .httpClient
-        .get(newBatchWarningsUrl, headers: batchWarningHeaders);
+    int lastId = lastBatch?.id ?? 0;
+
+    String newBatchWarningsUrl = '$batchWarningsUrl?last_id=${lastId}';
+    final batchWarningResponse =
+        await this.httpClient.get(newBatchWarningsUrl, headers: authHeaders);
 
     if (batchWarningResponse.statusCode != 200) {
       throw Exception('Error getting new batches');

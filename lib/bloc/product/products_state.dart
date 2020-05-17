@@ -39,3 +39,9 @@ class ProductError extends ProductState {
 
   ProductError({this.error});
 }
+
+class ProductSyncDone extends ProductState {
+  final String message;
+
+  ProductSyncDone({this.message});
+}

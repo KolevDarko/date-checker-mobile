@@ -27,6 +27,7 @@ class _DataSyncState extends State<DataSync> {
       ..add(RefreshBatchWarnings())
       ..add(AllBatchWarnings());
     BlocProvider.of<ProductBatchBloc>(context).add(AllProductBatch());
+    BlocProvider.of<ProductBloc>(context).add(FetchAllProducts());
   }
 
   @override

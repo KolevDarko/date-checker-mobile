@@ -1,4 +1,5 @@
 import 'package:date_checker_app/api/batch_warning_client.dart';
+import 'package:date_checker_app/api/products_client.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
@@ -84,17 +85,21 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppDatabase db = await DbProvider.instance.database;
   Client httpClient = Client();
-  ProductRepository productRepository =
-      ProductRepository(httpClient: httpClient);
+  ProductRepository productRepository = ProductRepository(
+    productsApiClient: ProductsApiClient(
+      httpClient: httpClient,
+    ),
+    db: db,
+  );
   ProductBatchRepository productBatchRepository =
       ProductBatchRepository(httpClient: httpClient);
   BatchWarningRepository batchWarningRepository = BatchWarningRepository(
     batchWarningApi: BatchWarningApiClient(
-      httpClient: Client(),
+      httpClient: httpClient,
     ),
   );
 
-  fillDb();
+  // fillDb();
 
   runApp(
     InheritedDataProviderHelper(

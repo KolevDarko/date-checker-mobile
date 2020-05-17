@@ -6,6 +6,9 @@ abstract class ProductDao {
   @Query('SELECT * FROM Product')
   Future<List<Product>> all();
 
+  @Query('SELECT * from Product order by id desc limit 1')
+  Future<Product> getLast();
+
   @Query('SELECT * FROM Product WHERE name = :name')
   Future<Product> fetchByName(String name);
 
@@ -17,12 +20,23 @@ abstract class ProductDao {
 
   @insert
   Future<int> add(Product product);
+
+  @insert
+  Future<void> insertAllProducts(List<Product> products);
+
+  @transaction
+  Future<void> saveProducts(List<Product> products) async {
+    await insertAllProducts(products);
+  }
 }
 
 @dao
 abstract class ProductBatchDao {
   @Query('SELECT * FROM ProductBatch')
   Future<List<ProductBatch>> all();
+
+  @Query('SELECT * from ProductBatch order by id desc limit 1')
+  Future<ProductBatch> getLast();
 
   @Query('SELECT * FROM ProductBatch WHERE name = :name')
   Future<ProductBatch> fetchByName(String name);
@@ -38,6 +52,14 @@ abstract class ProductBatchDao {
 
   @insert
   Future<int> add(ProductBatch productBatch);
+
+  @insert
+  Future<void> insertAllProductBatches(List<ProductBatch> productBatches);
+
+  @transaction
+  Future<void> saveProductBatches(List<ProductBatch> productBatches) async {
+    await insertAllProductBatches(productBatches);
+  }
 }
 
 @dao

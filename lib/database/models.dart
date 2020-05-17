@@ -67,13 +67,13 @@ class ProductBatch {
 
   static ProductBatch fromJson(dynamic json) {
     return ProductBatch(
-      null,
-      json['barCode'],
-      json['productId'],
+      json['id'],
+      json['id_code'],
+      json['product'],
       json['quantity'],
-      json['expirationDate'],
-      "${DateTime.now()}",
-      "${DateTime.now()}",
+      json['expiration_date'],
+      DateTime.parse(json['created_on']).toString(),
+      DateTime.parse(json['updated_on']).toString(),
     );
   }
 }
@@ -151,5 +151,4 @@ class BatchWarning {
   String toString() {
     return "$productName - $oldQuantity - $expirationDate";
   }
-
 }

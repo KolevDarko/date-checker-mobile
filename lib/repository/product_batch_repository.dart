@@ -1,28 +1,27 @@
+import 'package:date_checker_app/api/product_batch_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
-import 'package:http/http.dart';
 
 class ProductBatchRepository {
-  final Client httpClient;
+  final ProductBatchApiClient productBatchApiClient;
+  final AppDatabase db;
 
-  ProductBatchRepository({this.httpClient});
+  ProductBatchRepository({this.productBatchApiClient, this.db});
 
   Future<ProductBatch> getProductBatch(int productBatchId) async {
-    AppDatabase db = await DbProvider.instance.database;
-    ProductBatch productBatch = await db.productBatchDao.get(productBatchId);
+    ProductBatch productBatch =
+        await this.db.productBatchDao.get(productBatchId);
     return productBatch;
   }
 
   Future<int> addProductBatch(ProductBatch productBatch) async {
-    AppDatabase db = await DbProvider.instance.database;
-    int productBatchId = await db.productBatchDao.add(productBatch);
+    int productBatchId = await this.db.productBatchDao.add(productBatch);
     return productBatchId;
   }
 
   Future<List<ProductBatch>> allProductBatchList() async {
-    AppDatabase db = await DbProvider.instance.database;
-    List<ProductBatch> productBatchList = await db.productBatchDao.all();
+    List<ProductBatch> productBatchList = await this.db.productBatchDao.all();
     return productBatchList;
   }
 
@@ -33,5 +32,32 @@ class ProductBatchRepository {
         a.returnDateTimeExpDate().compareTo(b.returnDateTimeExpDate()));
 
     return productBatchList;
+  }
+
+  Future<void> syncProductBatchesData() async {
+    List<ProductBatch> productBatches =
+        await this.productBatchApiClient.getAllProductBatches();
+
+    ProductBatch productBatch;
+    try {
+      productBatch = await this.db.productBatchDao.getLast();
+    } catch (e) {
+      productBatch = null;
+    }
+    if (productBatch != null) {
+    } else {
+      this.saveProductBatchesLocally(productBatches);
+    }
+  }
+
+  Future<void> saveProductBatchesLocally(
+    List<ProductBatch> productBatches,
+  ) async {
+    try {
+      await this.db.productBatchDao.saveProductBatches(productBatches);
+    } catch (e) {
+      print("here error when saving product batches locally");
+      print(e);
+    }
   }
 }

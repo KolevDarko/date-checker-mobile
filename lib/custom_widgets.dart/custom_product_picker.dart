@@ -111,7 +111,9 @@ class _ProductPickerDialogState extends State<ProductPickerDialog> {
     if (inputController.text.length > 0) {
       setState(() {
         filteredProducts = allProducts
-            .where((product) => product.barCode.contains(inputController.text))
+            .where((product) =>
+                product.barCode.contains(inputController.text) ||
+                product.name.contains(inputController.text))
             .toList();
       });
     }

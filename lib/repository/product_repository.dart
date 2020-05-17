@@ -1,16 +1,15 @@
+import 'package:date_checker_app/api/products_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/database/provider.dart';
-import 'package:http/http.dart';
 
 class ProductRepository {
-  final Client httpClient;
+  final ProductsApiClient productsApiClient;
+  final AppDatabase db;
 
-  ProductRepository({this.httpClient});
+  ProductRepository({this.productsApiClient, this.db});
 
   Future<List<Product>> getAllProducts() async {
-    AppDatabase db = await DbProvider.instance.database;
-    return db.productDao.all();
+    return this.db.productDao.all();
   }
 
   Future<List<Product>> getSuggestions(String pattern) async {
@@ -25,8 +24,49 @@ class ProductRepository {
   }
 
   Future<Product> getProduct(int productId) async {
-    AppDatabase db = await DbProvider.instance.database;
-    Product product = await db.productDao.get(productId);
+    Product product = await this.db.productDao.get(productId);
     return product;
+  }
+
+  Future<void> syncProducts() async {
+    Product lastProduct;
+
+    try {
+      lastProduct = await this.db.productDao.getLast();
+    } catch (e) {
+      lastProduct = null;
+    }
+
+    if (lastProduct != null) {
+      List<Product> newProducts =
+          await this.productsApiClient.syncProducts(lastProduct.id);
+      if (newProducts.length > 0) {
+        await this.saveProductsLocally(newProducts);
+      }
+    } else {
+      List<Product> newProducts = await this.productsApiClient.getAllProducts();
+      if (newProducts.length > 0) {
+        await this.saveProductsLocally(newProducts);
+      }
+    }
+  }
+
+  Future<void> saveProductsLocally(List<Product> newProducts) async {
+    if (newProducts != null) {
+      try {
+        await db.productDao.saveProducts(newProducts);
+      } catch (e) {
+        print("here error when saving warnings from http");
+        print(e);
+      }
+    } else {
+      try {
+        List<Product> warnings = await this.getAllProducts();
+        await db.productDao.saveProducts(warnings);
+      } catch (e) {
+        print("here error when saving warnings from http, full request");
+        print(e);
+      }
+    }
   }
 }

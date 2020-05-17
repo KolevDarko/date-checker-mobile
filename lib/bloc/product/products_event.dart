@@ -10,6 +10,11 @@ class FetchAllProducts extends ProductEvent {
   List<Object> get props => null;
 }
 
+class SyncProductData extends ProductEvent {
+  @override
+  List<Object> get props => null;
+}
+
 class AddProductEvent extends ProductEvent {
   final int storeId;
   final String productName;
