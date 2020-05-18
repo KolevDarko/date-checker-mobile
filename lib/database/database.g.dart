@@ -42,9 +42,12 @@ class _$AppDatabaseBuilder {
 
   /// Creates the database and initializes it.
   Future<AppDatabase> build() async {
+    final path = name != null
+        ? join(await sqflite.getDatabasesPath(), name)
+        : ':memory:';
     final database = _$AppDatabase();
     database.database = await database.open(
-      name ?? ':memory:',
+      path,
       _migrations,
       _callback,
     );
@@ -63,10 +66,8 @@ class _$AppDatabase extends AppDatabase {
 
   BatchWarningDao _batchWarningDaoInstance;
 
-  Future<sqflite.Database> open(String name, List<Migration> migrations,
+  Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback callback]) async {
-    final path = join(await sqflite.getDatabasesPath(), name);
-
     return sqflite.openDatabase(
       path,
       version: 1,
@@ -77,7 +78,7 @@ class _$AppDatabase extends AppDatabase {
         await callback?.onOpen?.call(database);
       },
       onUpgrade: (database, startVersion, endVersion) async {
-        MigrationAdapter.runMigrations(
+        await MigrationAdapter.runMigrations(
             database, startVersion, endVersion, migrations);
 
         await callback?.onUpgrade?.call(database, startVersion, endVersion);
@@ -147,6 +148,12 @@ class _$ProductDao extends ProductDao {
   }
 
   @override
+  Future<Product> getLast() async {
+    return _queryAdapter.query('SELECT * from Product order by id desc limit 1',
+        mapper: _productMapper);
+  }
+
+  @override
   Future<Product> fetchByName(String name) async {
     return _queryAdapter.query('SELECT * FROM Product WHERE name = ?',
         arguments: <dynamic>[name], mapper: _productMapper);
@@ -168,6 +175,26 @@ class _$ProductDao extends ProductDao {
   Future<int> add(Product product) {
     return _productInsertionAdapter.insertAndReturnId(
         product, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> insertAllProducts(List<Product> products) async {
+    await _productInsertionAdapter.insertList(
+        products, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> saveProducts(List<Product> products) async {
+    if (database is sqflite.Transaction) {
+      await super.saveProducts(products);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$AppDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.productDao.saveProducts(products);
+      });
+    }
   }
 }
 
@@ -226,6 +253,13 @@ class _$ProductBatchDao extends ProductBatchDao {
   }
 
   @override
+  Future<ProductBatch> getLast() async {
+    return _queryAdapter.query(
+        'SELECT * from ProductBatch order by id desc limit 1',
+        mapper: _productBatchMapper);
+  }
+
+  @override
   Future<ProductBatch> fetchByName(String name) async {
     return _queryAdapter.query('SELECT * FROM ProductBatch WHERE name = ?',
         arguments: <dynamic>[name], mapper: _productBatchMapper);
@@ -250,9 +284,31 @@ class _$ProductBatchDao extends ProductBatchDao {
   }
 
   @override
+  Future<void> insertAllProductBatches(
+      List<ProductBatch> productBatches) async {
+    await _productBatchInsertionAdapter.insertList(
+        productBatches, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
   Future<void> updateProductBatch(ProductBatch productBatch) async {
     await _productBatchUpdateAdapter.update(
         productBatch, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> saveProductBatches(List<ProductBatch> productBatches) async {
+    if (database is sqflite.Transaction) {
+      await super.saveProductBatches(productBatches);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$AppDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.productBatchDao
+            .saveProductBatches(productBatches);
+      });
+    }
   }
 }
 

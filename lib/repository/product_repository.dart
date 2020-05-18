@@ -54,7 +54,7 @@ class ProductRepository {
   Future<void> saveProductsLocally(List<Product> newProducts) async {
     if (newProducts != null) {
       try {
-        await db.productDao.saveProducts(newProducts);
+        await this.db.productDao.saveProducts(newProducts);
       } catch (e) {
         print("here error when saving warnings from http");
         print(e);
@@ -62,7 +62,7 @@ class ProductRepository {
     } else {
       try {
         List<Product> warnings = await this.getAllProducts();
-        await db.productDao.saveProducts(warnings);
+        await this.db.productDao.saveProducts(warnings);
       } catch (e) {
         print("here error when saving warnings from http, full request");
         print(e);

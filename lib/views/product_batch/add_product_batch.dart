@@ -11,6 +11,9 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
 class AddProductBatchView extends StatefulWidget {
+  final ProductRepository repository;
+
+  const AddProductBatchView({Key key, this.repository}) : super(key: key);
   @override
   _AddProductBatchViewState createState() => _AddProductBatchViewState();
 }
@@ -22,7 +25,6 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
   final TextEditingController _expirationDate = TextEditingController();
 
   Product _selectedProduct;
-  ProductRepository productRepository = ProductRepository();
 
   FocusNode _barCodeNode = FocusNode();
   FocusNode _quantityNode = FocusNode();
@@ -38,8 +40,7 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
   }
 
   loadProducts() async {
-    List<Product> products123 = await productRepository.getAllProducts();
-
+    List<Product> products123 = await widget.repository.getAllProducts();
     setState(() {
       products = products123;
     });

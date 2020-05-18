@@ -6,7 +6,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^0.9.0
+  floor: ^0.12.0
   bloc: ^3.0.0
   flutter_bloc: ^3.1.0
   equatable: ^1.0.2
@@ -14,13 +14,13 @@ dependencies:
   intl: ^0.16.1
   flutter_typeahead: ^1.8.0
   cupertino_icons: ^0.1.2
-  http: ^0.12.0+4
+  http: ^0.12.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  floor_generator: ^0.9.0
-  build_runner: ^1.7.1
+  floor_generator: ^0.12.0
+  build_runner: ^1.0.0
   bloc_test: ^3.0.0
 flutter:
   uses-material-design: true

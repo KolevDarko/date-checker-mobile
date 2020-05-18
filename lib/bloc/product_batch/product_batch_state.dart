@@ -48,3 +48,9 @@ class ProductBatchError extends ProductBatchState {
 
   ProductBatchError({this.error});
 }
+
+class SyncProductDataSuccess extends ProductBatchState {
+  final String message;
+
+  SyncProductDataSuccess({this.message});
+}

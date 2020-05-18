@@ -12,7 +12,6 @@ class BatchWarningApiClient {
   BatchWarningApiClient({this.httpClient});
 
   Future<List<BatchWarning>> getAllBatchWarnings() async {
-    List<BatchWarning> warnings = [];
     final batchWarningResponse = await this.httpClient.get(
           batchWarningsUrl,
           headers: authHeaders,
@@ -21,11 +20,8 @@ class BatchWarningApiClient {
       throw Exception('Error getting batch warning data');
     }
     final batchWarnings = jsonDecode(batchWarningResponse.body);
-    for (var batchWarningJson in batchWarnings) {
-      BatchWarning batchWarning = BatchWarning.fromJson(batchWarningJson);
-      warnings.add(batchWarning);
-    }
-    return warnings;
+
+    return this.createBatchWarningsFromJson(batchWarnings);
   }
 
   Future<List<BatchWarning>> refreshWarnings() async {
@@ -33,45 +29,27 @@ class BatchWarningApiClient {
     AppDatabase db = await DbProvider.instance.database;
     BatchWarning lastBatch = await db.batchWarningDao.getLast();
 
-    int lastId = lastBatch?.id ?? 0;
-
-    String newBatchWarningsUrl = '$batchWarningsUrl?last_id=${lastId}';
+    String syncBatchWarningsUrl = '$batchWarningsUrl?last_id=${lastBatch.id}';
     final batchWarningResponse =
-        await this.httpClient.get(newBatchWarningsUrl, headers: authHeaders);
+        await this.httpClient.get(syncBatchWarningsUrl, headers: authHeaders);
 
     if (batchWarningResponse.statusCode != 200) {
       throw Exception('Error getting new batches');
     }
     final batchWarnings = jsonDecode(batchWarningResponse.body);
-    for (var batchWarningJson in batchWarnings) {
-      BatchWarning batchWarning = BatchWarning.fromJson(batchWarningJson);
-      warnings.add(batchWarning);
-    }
-    await saveWarningsLocally(newWarnings: warnings);
-    return warnings;
-  }
-
-  Future<void> saveWarningsLocally({List<BatchWarning> newWarnings}) async {
-    AppDatabase db = await DbProvider.instance.database;
-    if (newWarnings != null) {
-      try {
-        await db.batchWarningDao.saveWarnings(newWarnings);
-      } catch (e) {
-        print("here error when saving warnings from http");
-        print(e);
-      }
-    } else {
-      try {
-        List<BatchWarning> warnings = await this.getAllBatchWarnings();
-        await db.batchWarningDao.saveWarnings(warnings);
-      } catch (e) {
-        print("here error when saving warnings from http, full request");
-        print(e);
-      }
-    }
+    return this.createBatchWarningsFromJson(batchWarnings);
   }
 
   Future<void> updateQuantity(int quantity, BatchWarning batchWarning) {
     // TODO, get endpoint to save the quantity straight away
+  }
+
+  List<BatchWarning> createBatchWarningsFromJson(var batchWarnings) {
+    List<BatchWarning> warnings = [];
+    for (var batchWarningJson in batchWarnings) {
+      BatchWarning batchWarning = BatchWarning.fromJson(batchWarningJson);
+      warnings.add(batchWarning);
+    }
+    return warnings;
   }
 }

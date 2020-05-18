@@ -32,3 +32,8 @@ class AllProductBatch extends ProductBatchEvent {
   @override
   List<Object> get props => null;
 }
+
+class SyncProductBatchData extends ProductBatchEvent {
+  @override
+  List<Object> get props => null;
+}

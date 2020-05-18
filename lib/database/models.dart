@@ -16,15 +16,15 @@ class Product {
 
   @override
   String toString() {
-    return "$name - $barCode";
+    return "$name - $barCode,  id: $id";
   }
 
   static Product fromJson(dynamic json) {
     return Product(
-      null,
+      json['id'],
       json['name'],
       json['price'],
-      json['barCode'],
+      json['id_code'],
     );
   }
 }

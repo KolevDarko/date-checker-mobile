@@ -57,6 +57,16 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
         yield ProductBatchError(
             error: 'Something went wrong. Please try again.');
       }
+    } else if (event is SyncProductBatchData) {
+      yield ProductBatchLoading();
+      try {
+        await this.productBatchRepository.syncProductBatchesData();
+        yield SyncProductDataSuccess(
+            message: "Успешно ги синхронизиравте податоците!");
+      } catch (e) {
+        yield ProductBatchError(
+            error: "Грешка при синхронизација на податоци!");
+      }
     }
   }
 }

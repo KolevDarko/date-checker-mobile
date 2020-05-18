@@ -31,12 +31,12 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
       } catch (e) {
         yield BatchWarningError(error: 'Грешка при зачувување на промени.');
       }
-    } else if (event is RefreshBatchWarnings) {
+    } else if (event is SyncBatchWarnings) {
       yield BatchWarningLoading();
       try {
-        List<BatchWarning> newWarnings =
-            await batchWarningRepository.refreshWarnings();
-        yield BatchWarningRefreshSuccess(newBatchWarnings: newWarnings);
+        await this.batchWarningRepository.syncWarnings();
+        yield SyncBatchWarningsSuccess(
+            message: "Успешно ги ажуриравте податоците.");
       } catch (e) {
         yield BatchWarningError(error: 'Грешка при ажурирање на податоците');
       }

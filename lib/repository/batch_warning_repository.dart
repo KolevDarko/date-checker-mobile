@@ -7,12 +7,12 @@ import 'package:date_checker_app/database/provider.dart';
 
 class BatchWarningRepository {
   final BatchWarningApiClient batchWarningApi;
+  final AppDatabase db;
 
-  BatchWarningRepository({this.batchWarningApi});
+  BatchWarningRepository({this.db, this.batchWarningApi});
 
   Future<List<BatchWarning>> warnings() async {
-    AppDatabase db = await DbProvider.instance.database;
-    return db.batchWarningDao.allStatusChecked('NEW');
+    return this.db.batchWarningDao.allStatusChecked('NEW');
   }
 
   Future<void> updateQuantity(int quantity, BatchWarning batchWarning) async {
@@ -35,8 +35,31 @@ class BatchWarningRepository {
     }
   }
 
-  Future<List<BatchWarning>> refreshWarnings() async {
-    List<BatchWarning> warnings = await batchWarningApi.refreshWarnings();
-    return warnings;
+  Future<List<BatchWarning>> syncWarnings() async {
+    BatchWarning batchWarning;
+    List<BatchWarning> warnings = [];
+    try {
+      batchWarning = await this.db.batchWarningDao.getLast();
+    } catch (e) {
+      batchWarning = null;
+    }
+    if (batchWarning != null) {
+      warnings = await this.batchWarningApi.refreshWarnings();
+    } else {
+      warnings = await this.batchWarningApi.getAllBatchWarnings();
+    }
+
+    if (warnings.length > 0) {
+      this.saveWarningsLocally(warnings);
+    }
+  }
+
+  Future<void> saveWarningsLocally(List<BatchWarning> newWarnings) async {
+    try {
+      await this.db.batchWarningDao.saveWarnings(newWarnings);
+    } catch (e) {
+      print("here error when saving warnings from http, $e");
+      throw Exception("Error saving Batch Warnings to database.");
+    }
   }
 }

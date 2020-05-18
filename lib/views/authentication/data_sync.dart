@@ -23,11 +23,15 @@ class _DataSyncState extends State<DataSync> {
   }
 
   Future<void> _saveBatchWarnings() async {
+    BlocProvider.of<ProductBloc>(context)
+      ..add(SyncProductData())
+      ..add(FetchAllProducts());
+    BlocProvider.of<ProductBatchBloc>(context)
+      ..add(SyncProductBatchData())
+      ..add(AllProductBatch());
     BlocProvider.of<BatchWarningBloc>(context)
-      ..add(RefreshBatchWarnings())
+      ..add(SyncBatchWarnings())
       ..add(AllBatchWarnings());
-    BlocProvider.of<ProductBatchBloc>(context).add(AllProductBatch());
-    BlocProvider.of<ProductBloc>(context).add(FetchAllProducts());
   }
 
   @override

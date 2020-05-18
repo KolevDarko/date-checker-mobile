@@ -2,6 +2,7 @@ import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
 import 'package:date_checker_app/views/product_batch/all_product_batch.dart';
 import 'package:date_checker_app/views/product_warning/all_product_warnings.dart';
+import 'package:date_checker_app/views/products/products_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -63,7 +64,7 @@ class _HomePageState extends State<HomePage> {
                 BatchWarningTable(
                   scaffoldContext: context,
                 ),
-                Icon(Icons.directions_car),
+                ProductsTable(),
               ],
             );
           },
@@ -73,7 +74,9 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => AddProductBatchView(),
+                      builder: (context) => AddProductBatchView(
+                          repository: BlocProvider.of<ProductBloc>(context)
+                              .productRepository),
                     ),
                   );
                 },
@@ -82,7 +85,7 @@ class _HomePageState extends State<HomePage> {
             : FloatingActionButton(
                 onPressed: () async {
                   BlocProvider.of<BatchWarningBloc>(context)
-                    ..add(RefreshBatchWarnings())
+                    ..add(SyncBatchWarnings())
                     ..add(AllBatchWarnings());
                 },
                 child: Icon(Icons.refresh),

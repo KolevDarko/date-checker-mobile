@@ -1,7 +1,6 @@
 import 'package:date_checker_app/api/product_batch_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/database/provider.dart';
 
 class ProductBatchRepository {
   final ProductBatchApiClient productBatchApiClient;
@@ -35,8 +34,13 @@ class ProductBatchRepository {
   }
 
   Future<void> syncProductBatchesData() async {
-    List<ProductBatch> productBatches =
-        await this.productBatchApiClient.getAllProductBatches();
+    List<ProductBatch> productBatches = [];
+    try {
+      productBatches = await this.productBatchApiClient.getAllProductBatches();
+    } catch (e) {
+      print("something went wrong with product batches api GET call");
+      throw Exception("Failed to get product batches");
+    }
 
     ProductBatch productBatch;
     try {
@@ -44,8 +48,7 @@ class ProductBatchRepository {
     } catch (e) {
       productBatch = null;
     }
-    if (productBatch != null) {
-    } else {
+    if (productBatch == null) {
       this.saveProductBatchesLocally(productBatches);
     }
   }

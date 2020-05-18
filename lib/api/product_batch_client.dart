@@ -14,9 +14,11 @@ class ProductBatchApiClient {
           productBatchesUrl,
           headers: authHeaders,
         );
+
     if (productBatchesResponse.statusCode != 200) {
       throw Exception('Error getting product batches data');
     }
+
     final responseBody = jsonDecode(productBatchesResponse.body);
     final productBatchesJson = responseBody['results'];
     return this.createProductBatchesFromJson(productBatchesJson);

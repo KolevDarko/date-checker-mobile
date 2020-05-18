@@ -19,7 +19,7 @@ class EditQuantityEvent extends BatchWarningEvent {
   List<Object> get props => [batchWarning];
 }
 
-class RefreshBatchWarnings extends BatchWarningEvent {
+class SyncBatchWarnings extends BatchWarningEvent {
   @override
   List<Object> get props => null;
 }

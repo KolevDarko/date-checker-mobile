@@ -37,16 +37,10 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
                     'Успешно ја променивте количината на ${state.productName}. Сега е проверен и отстранет од табелата на внимание.'),
               ),
             );
-          } else if (state is BatchWarningRefreshSuccess) {
+          } else if (state is SyncBatchWarningsSuccess) {
             Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
-            String message;
-            if (state.newBatchWarnings.length > 0) {
-              message = 'Успешно ги ажуриравте податоците';
-            } else {
-              message = 'Нема нови податоци';
-            }
             final snackBar = SnackBar(
-              content: Text(message),
+              content: Text(state.message),
             );
             Scaffold.of(widget.scaffoldContext).showSnackBar(snackBar);
           }
