@@ -24,12 +24,8 @@ class BatchWarningApiClient {
     return this.createBatchWarningsFromJson(batchWarnings);
   }
 
-  Future<List<BatchWarning>> refreshWarnings() async {
-    List<BatchWarning> warnings = [];
-    AppDatabase db = await DbProvider.instance.database;
-    BatchWarning lastBatch = await db.batchWarningDao.getLast();
-
-    String syncBatchWarningsUrl = '$batchWarningsUrl?last_id=${lastBatch.id}';
+  Future<List<BatchWarning>> refreshWarnings(int batchWarningId) async {
+    String syncBatchWarningsUrl = '$batchWarningsUrl?last_id=$batchWarningId';
     final batchWarningResponse =
         await this.httpClient.get(syncBatchWarningsUrl, headers: authHeaders);
 

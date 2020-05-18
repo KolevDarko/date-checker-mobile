@@ -44,7 +44,7 @@ class BatchWarningRepository {
       batchWarning = null;
     }
     if (batchWarning != null) {
-      warnings = await this.batchWarningApi.refreshWarnings();
+      warnings = await this.batchWarningApi.refreshWarnings(batchWarning.id);
     } else {
       warnings = await this.batchWarningApi.getAllBatchWarnings();
     }

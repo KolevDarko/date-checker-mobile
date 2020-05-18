@@ -32,8 +32,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppDatabase db = await DbProvider.instance.database;
   List<BatchWarning> warnings = await db.batchWarningDao.all();
-  print("warnings $warnings");
-  print("kolicina ${warnings.length}");
   Client httpClient = Client();
   ProductRepository productRepository = ProductRepository(
     productsApiClient: ProductsApiClient(
