@@ -16,14 +16,13 @@ class BatchWarningRepository {
   }
 
   Future<void> updateQuantity(int quantity, BatchWarning batchWarning) async {
-    AppDatabase db = await DbProvider.instance.database;
     batchWarning.newQuantity = quantity;
     batchWarning.status = 'CHECKED';
     ProductBatch productBatch =
-        await db.productBatchDao.get(batchWarning.productBatchId);
+        await this.db.productBatchDao.get(batchWarning.productBatchId);
     productBatch.quantity = quantity;
-    await db.productBatchDao.updateProductBatch(productBatch);
-    await db.batchWarningDao.updateBatchWarning(batchWarning);
+    await this.db.productBatchDao.updateProductBatch(productBatch);
+    await this.db.batchWarningDao.updateBatchWarning(batchWarning);
     // check if we have internet connection
     try {
       final result = await InternetAddress.lookup('google.com');
@@ -32,6 +31,7 @@ class BatchWarningRepository {
       }
     } on SocketException catch (_) {
       print('not connected');
+      throw Exception("could not connect on the internet");
     }
   }
 
