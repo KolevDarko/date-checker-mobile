@@ -28,9 +28,9 @@ class ProductRepository {
     return product;
   }
 
-  Future<void> syncProducts() async {
+  Future<String> syncProducts() async {
     Product lastProduct;
-
+    List<Product> newProducts = [];
     try {
       lastProduct = await this.db.productDao.getLast();
     } catch (e) {
@@ -38,16 +38,15 @@ class ProductRepository {
     }
 
     if (lastProduct != null) {
-      List<Product> newProducts =
-          await this.productsApiClient.syncProducts(lastProduct.id);
-      if (newProducts.length > 0) {
-        await this.saveProductsLocally(newProducts);
-      }
+      newProducts = await this.productsApiClient.syncProducts(lastProduct.id);
     } else {
-      List<Product> newProducts = await this.productsApiClient.getAllProducts();
-      if (newProducts.length > 0) {
-        await this.saveProductsLocally(newProducts);
-      }
+      newProducts = await this.productsApiClient.getAllProducts();
+    }
+    if (newProducts.length > 0) {
+      await this.saveProductsLocally(newProducts);
+      return 'Успешно ги синхронизиравте продуктите.';
+    } else {
+      return 'Нема нови продукти.';
     }
   }
 

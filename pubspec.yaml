@@ -15,13 +15,19 @@ dependencies:
   flutter_typeahead: ^1.8.0
   cupertino_icons: ^0.1.2
   http: ^0.12.1
+  get_it: ^4.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   floor_generator: ^0.12.0
-  build_runner: ^1.0.0
+  build_runner: ^1.7.3
   bloc_test: ^3.0.0
+  sqflite_ffi_test:
+    git:
+      url: git://github.com/tekartik/sqflite_more
+      ref: dart2
+      path: sqflite_ffi_test
 flutter:
   uses-material-design: true
 

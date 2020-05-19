@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:date_checker_app/api/constants.dart';
+import 'package:date_checker_app/api/helper_functions.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,16 +11,22 @@ class ProductsApiClient {
   ProductsApiClient({this.httpClient});
 
   Future<List<Product>> getAllProducts() async {
-    final productResponse = await this.httpClient.get(
-          productsUrl,
-          headers: authHeaders,
-        );
-    if (productResponse.statusCode != 200) {
-      throw Exception('Error getting products data');
+    List<dynamic> productsJson = [];
+    dynamic responseBody;
+    http.Response productResponse;
+    try {
+      productResponse = await callApiEndPoint(
+        productsUrl,
+        "Error calling products end point",
+        httpClient,
+      );
+    } catch (e) {
+      print("error when calling api endpoint, error: $e");
+      throw Exception("Couldn't get products data");
     }
-    final responseBody = jsonDecode(productResponse.body);
-    final productsJson = responseBody['results'];
+    responseBody = jsonDecode(productResponse.body);
 
+    productsJson = await getAllDataFromApiPoint(responseBody, httpClient);
     return this.createProductsFromJson(productsJson);
   }
 
@@ -33,12 +40,11 @@ class ProductsApiClient {
 
   Future<List<Product>> syncProducts(int lastProductId) async {
     String url = productsSyncUrl + '$lastProductId';
-    var productsSyncResponse =
-        await this.httpClient.get(url, headers: authHeaders);
-
-    if (productsSyncResponse.statusCode != 200) {
-      throw Exception('Error getting products data');
-    }
+    http.Response productsSyncResponse = await callApiEndPoint(
+      url,
+      'Error getting products data sync',
+      this.httpClient,
+    );
     var productsJson = jsonDecode(productsSyncResponse.body);
     return this.createProductsFromJson(productsJson);
   }

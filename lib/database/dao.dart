@@ -38,6 +38,9 @@ abstract class ProductBatchDao {
   @Query('SELECT * from ProductBatch order by id desc limit 1')
   Future<ProductBatch> getLast();
 
+  @Query('SELECT * FROM ProductBatch WHERE serverId = null')
+  Future<List<ProductBatch>> getLocalProductBatches();
+
   @Query('SELECT * FROM ProductBatch WHERE name = :name')
   Future<ProductBatch> fetchByName(String name);
 
@@ -49,6 +52,9 @@ abstract class ProductBatchDao {
 
   @update
   Future<void> updateProductBatch(ProductBatch productBatch);
+
+  @update
+  Future<int> updateBatches(List<ProductBatch> productBatches);
 
   @insert
   Future<int> add(ProductBatch productBatch);

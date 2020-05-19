@@ -1,4 +1,6 @@
 import 'package:date_checker_app/bloc/bloc.dart';
+import 'package:date_checker_app/dependencies/debouncer.dart';
+import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
 import 'package:date_checker_app/views/product_batch/all_product_batch.dart';
 import 'package:date_checker_app/views/product_warning/all_product_warnings.dart';
@@ -64,33 +66,60 @@ class _HomePageState extends State<HomePage> {
                 BatchWarningTable(
                   scaffoldContext: context,
                 ),
-                ProductsTable(),
+                ProductsTable(
+                  scaffoldContext: context,
+                ),
               ],
             );
           },
         ),
-        floatingActionButton: _currentTabIndex == 0
-            ? FloatingActionButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => AddProductBatchView(
-                          repository: BlocProvider.of<ProductBloc>(context)
-                              .productRepository),
-                    ),
-                  );
-                },
-                child: Icon(Icons.add),
-              )
-            : FloatingActionButton(
-                onPressed: () async {
-                  BlocProvider.of<BatchWarningBloc>(context)
-                    ..add(SyncBatchWarnings())
-                    ..add(AllBatchWarnings());
-                },
-                child: Icon(Icons.refresh),
-              ),
+        floatingActionButton: customFloatingButton(_currentTabIndex),
       ),
     );
+  }
+
+  FloatingActionButton customFloatingButton(int _currentTabIndex) {
+    switch (_currentTabIndex) {
+      case 0:
+        {
+          return FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AddProductBatchView(
+                      repository: BlocProvider.of<ProductBloc>(context)
+                          .productRepository),
+                ),
+              );
+            },
+            child: Icon(Icons.add),
+          );
+        }
+        break;
+      case 1:
+        {
+          return FloatingActionButton(
+            onPressed: () async {
+              BlocProvider.of<BatchWarningBloc>(context)
+                ..add(SyncBatchWarnings())
+                ..add(AllBatchWarnings());
+            },
+            child: Icon(Icons.refresh),
+          );
+        }
+        break;
+      case 2:
+        {
+          return FloatingActionButton(
+            onPressed: () {
+              BlocProvider.of<ProductBloc>(context)
+                ..add(SyncProductData())
+                ..add(FetchAllProducts());
+            },
+            child: Icon(Icons.refresh),
+          );
+        }
+    }
+    return null;
   }
 }

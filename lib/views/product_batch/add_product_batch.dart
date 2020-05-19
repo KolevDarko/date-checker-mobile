@@ -158,15 +158,15 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                     onPressed: () async {
                       if (_formKey.currentState.validate()) {
                         ProductBatch productBatch = ProductBatch(
-                            null,
-                            _barCode.text,
-                            _selectedProduct.id,
-                            int.tryParse(_quantity.text),
-                            "$expirationDate",
-                            "${DateTime.now()}",
-                            "${DateTime.now()}");
-                        // AppDatabase db = await DbProvider.instance.database;
-                        // await db.productBatchDao.add(productBatch);
+                          null,
+                          null,
+                          _barCode.text,
+                          _selectedProduct.id,
+                          int.tryParse(_quantity.text),
+                          "$expirationDate",
+                          "${DateTime.now()}",
+                          "${DateTime.now()}",
+                        );
                         BlocProvider.of<ProductBatchBloc>(context)
                             .add(AddProductBatch(productBatch: productBatch));
                         BlocProvider.of<ProductBatchBloc>(context)

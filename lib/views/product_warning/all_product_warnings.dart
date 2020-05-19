@@ -1,11 +1,9 @@
-import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/custom_widgets.dart/custom_table.dart';
 
 import 'package:date_checker_app/views/product_warning/edit_product_warning.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart';
 
 class BatchWarningTable extends StatefulWidget {
   final BuildContext scaffoldContext;

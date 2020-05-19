@@ -1,4 +1,4 @@
-import 'package:date_checker_app/views/authentication/data_sync.dart';
+import 'package:date_checker_app/views/home/home_page.dart';
 import 'package:flutter/material.dart';
 
 class LoginView extends StatefulWidget {
@@ -51,7 +51,7 @@ class _LoginViewState extends State<LoginView> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (ctx) => DataSync(),
+                        builder: (ctx) => HomePage(),
                       ),
                     );
                   },

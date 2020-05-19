@@ -1,17 +1,14 @@
-import 'package:date_checker_app/api/batch_warning_client.dart';
-import 'package:date_checker_app/api/products_client.dart';
-import 'package:date_checker_app/api/product_batch_client.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/provider.dart';
+import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/views/authentication/login.dart';
 
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart';
+import 'package:get_it/get_it.dart';
 
-import 'database/models.dart';
 import 'repository/repository.dart';
 
 class InheritedDataProvider extends InheritedWidget {
@@ -31,34 +28,19 @@ class InheritedDataProvider extends InheritedWidget {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppDatabase db = await DbProvider.instance.database;
-  List<BatchWarning> warnings = await db.batchWarningDao.all();
-  Client httpClient = Client();
-  ProductRepository productRepository = ProductRepository(
-    productsApiClient: ProductsApiClient(
-      httpClient: httpClient,
-    ),
-    db: db,
-  );
-  ProductBatchRepository productBatchRepository = ProductBatchRepository(
-    productBatchApiClient: ProductBatchApiClient(
-      httpClient: httpClient,
-    ),
-    db: db,
-  );
-  BatchWarningRepository batchWarningRepository = BatchWarningRepository(
-    batchWarningApi: BatchWarningApiClient(
-      httpClient: httpClient,
-    ),
-    db: db,
-  );
+
+  setupDependencyAssembler(db: db, dependencyAssembler: dependencyAssembler);
 
   runApp(
     InheritedDataProviderHelper(
       database: db,
       child: MyApp(
-          productRepository: productRepository,
-          productBatchRepository: productBatchRepository,
-          batchWarningRepository: batchWarningRepository),
+        productRepository: dependencyAssembler.get<ProductRepository>(),
+        productBatchRepository:
+            dependencyAssembler.get<ProductBatchRepository>(),
+        batchWarningRepository:
+            dependencyAssembler.get<BatchWarningRepository>(),
+      ),
     ),
   );
 }

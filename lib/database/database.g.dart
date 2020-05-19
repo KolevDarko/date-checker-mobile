@@ -85,9 +85,9 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Product` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT, `price` REAL, `barCode` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `Product` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `name` TEXT, `price` REAL, `barCode` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productId`) REFERENCES `Product` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
+            'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `created` TEXT, `updated` TEXT)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productName` TEXT, `daysLeft` INTEGER, `expirationDate` TEXT, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productBatchId`) REFERENCES `ProductBatch` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
 
@@ -122,6 +122,7 @@ class _$ProductDao extends ProductDao {
             'Product',
             (Product item) => <String, dynamic>{
                   'id': item.id,
+                  'serverId': item.serverId,
                   'name': item.name,
                   'price': item.price,
                   'barCode': item.barCode
@@ -135,6 +136,7 @@ class _$ProductDao extends ProductDao {
 
   static final _productMapper = (Map<String, dynamic> row) => Product(
       row['id'] as int,
+      row['serverId'] as int,
       row['name'] as String,
       row['price'] as double,
       row['barCode'] as String);
@@ -206,6 +208,7 @@ class _$ProductBatchDao extends ProductBatchDao {
             'ProductBatch',
             (ProductBatch item) => <String, dynamic>{
                   'id': item.id,
+                  'serverId': item.serverId,
                   'barCode': item.barCode,
                   'productId': item.productId,
                   'quantity': item.quantity,
@@ -219,6 +222,7 @@ class _$ProductBatchDao extends ProductBatchDao {
             ['id'],
             (ProductBatch item) => <String, dynamic>{
                   'id': item.id,
+                  'serverId': item.serverId,
                   'barCode': item.barCode,
                   'productId': item.productId,
                   'quantity': item.quantity,
@@ -235,6 +239,7 @@ class _$ProductBatchDao extends ProductBatchDao {
 
   static final _productBatchMapper = (Map<String, dynamic> row) => ProductBatch(
       row['id'] as int,
+      row['serverId'] as int,
       row['barCode'] as String,
       row['productId'] as int,
       row['quantity'] as int,
@@ -256,6 +261,13 @@ class _$ProductBatchDao extends ProductBatchDao {
   Future<ProductBatch> getLast() async {
     return _queryAdapter.query(
         'SELECT * from ProductBatch order by id desc limit 1',
+        mapper: _productBatchMapper);
+  }
+
+  @override
+  Future<List<ProductBatch>> getLocalProductBatches() async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM ProductBatch WHERE serverId = null',
         mapper: _productBatchMapper);
   }
 
@@ -294,6 +306,12 @@ class _$ProductBatchDao extends ProductBatchDao {
   Future<void> updateProductBatch(ProductBatch productBatch) async {
     await _productBatchUpdateAdapter.update(
         productBatch, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<int> updateBatches(List<ProductBatch> productBatches) {
+    return _productBatchUpdateAdapter.updateListAndReturnChangedRows(
+        productBatches, sqflite.ConflictAlgorithm.abort);
   }
 
   @override

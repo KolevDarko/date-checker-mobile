@@ -45,8 +45,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     } else if (event is SyncProductData) {
       yield ProductLoading();
       try {
-        await this.productRepository.syncProducts();
-        yield ProductSyncDone(message: "Успешно ги синхронизиравте податоците");
+        String syncDataMessage = await this.productRepository.syncProducts();
+        yield ProductSyncDone(message: syncDataMessage);
       } catch (e) {
         yield ProductError(error: "Грешка при синхронизација на податоци");
       }

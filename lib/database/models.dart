@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 class Product {
   @PrimaryKey(autoGenerate: true)
   int id;
-
+  int serverId;
   String name;
   double price;
   String barCode;
 
-  Product(this.id, this.name, this.price, this.barCode);
+  Product(this.id, this.serverId, this.name, this.price, this.barCode);
 
   @override
   String toString() {
@@ -21,6 +21,7 @@ class Product {
 
   static Product fromJson(dynamic json) {
     return Product(
+      null,
       json['id'],
       json['name'],
       json['price'],
@@ -29,17 +30,12 @@ class Product {
   }
 }
 
-@Entity(foreignKeys: [
-  ForeignKey(
-    childColumns: ['productId'],
-    parentColumns: ['id'],
-    entity: Product,
-  )
-])
+@entity
 class ProductBatch {
   @PrimaryKey(autoGenerate: true)
   int id;
 
+  int serverId;
   String barCode;
   int productId;
   int quantity;
@@ -48,13 +44,13 @@ class ProductBatch {
   String created;
   String updated;
 
-  ProductBatch(
-      this.id, this.barCode, this.productId, this.quantity, this.expirationDate,
+  ProductBatch(this.id, this.serverId, this.barCode, this.productId,
+      this.quantity, this.expirationDate,
       [this.created, this.updated]);
 
   @override
   String toString() {
-    return "Product Batch $barCode, expDate: $expirationDate";
+    return "Product Batch $barCode, expDate: $expirationDate, serverId: $serverId";
   }
 
   DateTime returnDateTimeExpDate() {
@@ -67,6 +63,7 @@ class ProductBatch {
 
   static ProductBatch fromJson(dynamic json) {
     return ProductBatch(
+      null,
       json['id'],
       json['id_code'],
       json['product'],

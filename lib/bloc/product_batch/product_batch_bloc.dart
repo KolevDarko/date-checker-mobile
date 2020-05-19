@@ -60,9 +60,9 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
     } else if (event is SyncProductBatchData) {
       yield ProductBatchLoading();
       try {
-        await this.productBatchRepository.syncProductBatchesData();
-        yield SyncProductDataSuccess(
-            message: "Успешно ги синхронизиравте податоците!");
+        String message =
+            await this.productBatchRepository.syncProductBatchesData();
+        yield SyncProductDataSuccess(message: message);
       } catch (e) {
         yield ProductBatchError(
             error: "Грешка при синхронизација на податоци!");

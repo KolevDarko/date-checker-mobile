@@ -5,6 +5,10 @@ import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductsTable extends StatefulWidget {
+  final BuildContext scaffoldContext;
+
+  const ProductsTable({Key key, this.scaffoldContext}) : super(key: key);
+
   @override
   _ProductsTableState createState() => _ProductsTableState();
 }
@@ -12,23 +16,39 @@ class ProductsTable extends StatefulWidget {
 class _ProductsTableState extends State<ProductsTable> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 20.0),
-        child: BlocBuilder<ProductBloc, ProductState>(
-          builder: (context, state) {
-            if (state is ProductEmpty) {
-              return Container();
-            } else if (state is ProductLoading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state is AllProductsLoaded) {
-              return _buildProductBatchItems(state.products);
-            } else {
-              return Container();
-            }
-          },
+    return Scaffold(
+      body: BlocListener<ProductBloc, ProductState>(
+        listener: (context, state) {
+          if (state is ProductSyncDone) {
+            Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
+            Scaffold.of(widget.scaffoldContext).showSnackBar(
+              SnackBar(
+                duration: Duration(seconds: 3),
+                backgroundColor: Colors.green,
+                content: Text(state.message),
+              ),
+            );
+          }
+        },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: BlocBuilder<ProductBloc, ProductState>(
+              builder: (context, state) {
+                if (state is ProductEmpty) {
+                  return Container();
+                } else if (state is ProductLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is AllProductsLoaded) {
+                  return _buildProductBatchItems(state.products);
+                } else {
+                  return Container();
+                }
+              },
+            ),
+          ),
         ),
       ),
     );

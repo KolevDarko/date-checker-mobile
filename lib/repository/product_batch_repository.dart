@@ -33,7 +33,7 @@ class ProductBatchRepository {
     return productBatchList;
   }
 
-  Future<void> syncProductBatchesData() async {
+  Future<String> syncProductBatchesData() async {
     List<ProductBatch> productBatches = [];
     try {
       productBatches = await this.productBatchApiClient.getAllProductBatches();
@@ -41,7 +41,6 @@ class ProductBatchRepository {
       print("something went wrong with product batches api GET call");
       throw Exception("Failed to get product batches");
     }
-
     ProductBatch productBatch;
     try {
       productBatch = await this.db.productBatchDao.getLast();
@@ -50,6 +49,20 @@ class ProductBatchRepository {
     }
     if (productBatch == null) {
       this.saveProductBatchesLocally(productBatches);
+      return "Успешно ги синхронизиравте вашите податоци.";
+    }
+    return "Вашите податоци се веќе синхронизирани.";
+  }
+
+  Future<void> uploadNewProductBatches() async {
+    List<ProductBatch> localBatches =
+        await this.db.productBatchDao.getLocalProductBatches();
+    if (localBatches.length > 0) {
+      List<ProductBatch> serverResponseBatches =
+          await this.productBatchApiClient.uploadLocalBatches(localBatches);
+      await this.updateProductBatchesLocally(serverResponseBatches);
+    } else {
+      return 'Локалните податоци се синхронизирани.';
     }
   }
 
@@ -61,6 +74,17 @@ class ProductBatchRepository {
     } catch (e) {
       print("here error when saving product batches locally");
       print(e);
+    }
+  }
+
+  Future<void> updateProductBatchesLocally(
+      List<ProductBatch> productBatches) async {
+    try {
+      int updatedItems =
+          await this.db.productBatchDao.updateBatches(productBatches);
+    } catch (e) {
+      throw Exception(
+          "Something went wrong when tried to update product batches.");
     }
   }
 }
