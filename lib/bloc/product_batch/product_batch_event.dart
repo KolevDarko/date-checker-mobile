@@ -37,3 +37,8 @@ class SyncProductBatchData extends ProductBatchEvent {
   @override
   List<Object> get props => null;
 }
+
+class UploadProductBatchData extends ProductBatchEvent {
+  @override
+  List<Object> get props => null;
+}

@@ -156,6 +156,12 @@ class _$ProductDao extends ProductDao {
   }
 
   @override
+  Future<Product> getByServerId(int serverId) async {
+    return _queryAdapter.query('SELECT * FROM Product WHERE serverId = ?',
+        arguments: <dynamic>[serverId], mapper: _productMapper);
+  }
+
+  @override
   Future<Product> fetchByName(String name) async {
     return _queryAdapter.query('SELECT * FROM Product WHERE name = ?',
         arguments: <dynamic>[name], mapper: _productMapper);
@@ -165,6 +171,13 @@ class _$ProductDao extends ProductDao {
   Future<Product> get(int id) async {
     return _queryAdapter.query('SELECT * FROM Product WHERE id = ?',
         arguments: <dynamic>[id], mapper: _productMapper);
+  }
+
+  @override
+  Future<Product> getProductWithLastServerId() async {
+    return _queryAdapter.query(
+        'SELECT * FROM Product ORDER BY serverId DESC LIMIT 1',
+        mapper: _productMapper);
   }
 
   @override

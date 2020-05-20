@@ -54,3 +54,9 @@ class SyncProductDataSuccess extends ProductBatchState {
 
   SyncProductDataSuccess({this.message});
 }
+
+class UploadProductBatchesSuccess extends ProductBatchState {
+  final String message;
+
+  UploadProductBatchesSuccess({this.message});
+}

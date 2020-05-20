@@ -67,6 +67,16 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
         yield ProductBatchError(
             error: "Грешка при синхронизација на податоци!");
       }
+    } else if (event is UploadProductBatchData) {
+      yield ProductBatchLoading();
+      try {
+        String message =
+            await this.productBatchRepository.uploadNewProductBatches();
+        yield UploadProductBatchesSuccess(message: message);
+      } catch (e) {
+        yield ProductBatchError(
+            error: "Грешка при снимање податоци на серверот!");
+      }
     }
   }
 }

@@ -15,6 +15,12 @@ class ProductsTable extends StatefulWidget {
 
 class _ProductsTableState extends State<ProductsTable> {
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    BlocProvider.of<ProductBloc>(context).add(FetchAllProducts());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<ProductBloc, ProductState>(

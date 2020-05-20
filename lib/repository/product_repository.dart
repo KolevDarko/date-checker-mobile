@@ -29,16 +29,15 @@ class ProductRepository {
   }
 
   Future<String> syncProducts() async {
-    Product lastProduct;
+    int lastProductId;
     List<Product> newProducts = [];
     try {
-      lastProduct = await this.db.productDao.getLast();
+      lastProductId = await this.db.productDao.getLastServerId();
     } catch (e) {
-      lastProduct = null;
+      lastProductId = null;
     }
-
-    if (lastProduct != null) {
-      newProducts = await this.productsApiClient.syncProducts(lastProduct.id);
+    if (lastProductId != null) {
+      newProducts = await this.productsApiClient.syncProducts(lastProductId);
     } else {
       newProducts = await this.productsApiClient.getAllProducts();
     }
@@ -51,21 +50,12 @@ class ProductRepository {
   }
 
   Future<void> saveProductsLocally(List<Product> newProducts) async {
-    if (newProducts != null) {
-      try {
-        await this.db.productDao.saveProducts(newProducts);
-      } catch (e) {
-        print("here error when saving warnings from http");
-        print(e);
-      }
-    } else {
-      try {
-        List<Product> warnings = await this.getAllProducts();
-        await this.db.productDao.saveProducts(warnings);
-      } catch (e) {
-        print("here error when saving warnings from http, full request");
-        print(e);
-      }
+    try {
+      await this.db.productDao.saveProducts(newProducts);
+    } catch (e) {
+      print("here error when saving warnings from http");
+      print(e);
+      throw Exception("Error when saving products to the database");
     }
   }
 }

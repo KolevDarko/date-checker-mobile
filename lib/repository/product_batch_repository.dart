@@ -54,13 +54,14 @@ class ProductBatchRepository {
     return "Вашите податоци се веќе синхронизирани.";
   }
 
-  Future<void> uploadNewProductBatches() async {
+  Future<String> uploadNewProductBatches() async {
     List<ProductBatch> localBatches =
         await this.db.productBatchDao.getLocalProductBatches();
     if (localBatches.length > 0) {
       List<ProductBatch> serverResponseBatches =
           await this.productBatchApiClient.uploadLocalBatches(localBatches);
       await this.updateProductBatchesLocally(serverResponseBatches);
+      return "Успешна синхронизација на податоците.";
     } else {
       return 'Локалните податоци се синхронизирани.';
     }

@@ -62,6 +62,7 @@ class _HomePageState extends State<HomePage> {
                 ProductBatchTable(
                   orderByDate: orderByExpiry,
                   callBack: toggleOrderByExpiry,
+                  scaffoldContext: context,
                 ),
                 BatchWarningTable(
                   scaffoldContext: context,

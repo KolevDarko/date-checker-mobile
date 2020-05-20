@@ -9,11 +9,22 @@ abstract class ProductDao {
   @Query('SELECT * from Product order by id desc limit 1')
   Future<Product> getLast();
 
+  @Query('SELECT * FROM Product WHERE serverId = :serverId')
+  Future<Product> getByServerId(int serverId);
+
   @Query('SELECT * FROM Product WHERE name = :name')
   Future<Product> fetchByName(String name);
 
   @Query('SELECT * FROM Product WHERE id = :id')
   Future<Product> get(int id);
+
+  @Query('SELECT * FROM Product ORDER BY serverId DESC LIMIT 1')
+  Future<Product> getProductWithLastServerId();
+
+  Future<int> getLastServerId() async {
+    Product lastProduct = await this.getProductWithLastServerId();
+    return lastProduct.serverId;
+  }
 
   @Query('DELETE FROM Product WHERE id = :id')
   Future<void> delete(int id);

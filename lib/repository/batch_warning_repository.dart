@@ -35,7 +35,7 @@ class BatchWarningRepository {
     }
   }
 
-  Future<List<BatchWarning>> syncWarnings() async {
+  Future<void> syncWarnings() async {
     BatchWarning batchWarning;
     List<BatchWarning> warnings = [];
     try {

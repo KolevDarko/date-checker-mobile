@@ -1,6 +1,7 @@
 import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/api/product_batch_client.dart';
 import 'package:date_checker_app/database/database.dart';
+import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/dependencies/debouncer.dart';
 import 'package:date_checker_app/repository/repository.dart';
 import 'package:date_checker_app/api/products_client.dart';
