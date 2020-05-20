@@ -35,7 +35,7 @@ class BatchWarningRepository {
     }
   }
 
-  Future<void> syncWarnings() async {
+  Future<String> syncWarnings() async {
     BatchWarning batchWarning;
     List<BatchWarning> warnings = [];
     try {
@@ -51,7 +51,9 @@ class BatchWarningRepository {
 
     if (warnings.length > 0) {
       this.saveWarningsLocally(warnings);
+      return 'Успешно ги синхронизиравте податоците.';
     }
+    return 'Нема нови податоци.';
   }
 
   Future<void> saveWarningsLocally(List<BatchWarning> newWarnings) async {

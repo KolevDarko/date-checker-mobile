@@ -34,9 +34,8 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
     } else if (event is SyncBatchWarnings) {
       yield BatchWarningLoading();
       try {
-        await this.batchWarningRepository.syncWarnings();
-        yield SyncBatchWarningsSuccess(
-            message: "Успешно ги ажуриравте податоците.");
+        String message = await this.batchWarningRepository.syncWarnings();
+        yield SyncBatchWarningsSuccess(message: message);
       } catch (e) {
         yield BatchWarningError(error: 'Грешка при ажурирање на податоците');
       }

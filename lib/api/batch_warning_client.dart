@@ -26,7 +26,6 @@ class BatchWarningApiClient {
     String syncBatchWarningsUrl = '$batchWarningsUrl?last_id=$batchWarningId';
     final batchWarningResponse =
         await this.httpClient.get(syncBatchWarningsUrl, headers: authHeaders);
-
     if (batchWarningResponse.statusCode != 200) {
       throw Exception('Error getting new batches');
     }
