@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/database/provider.dart';
 
 class BatchWarningRepository {
   final BatchWarningApiClient batchWarningApi;
@@ -15,23 +12,28 @@ class BatchWarningRepository {
     return this.db.batchWarningDao.allStatusChecked('NEW');
   }
 
-  Future<void> updateQuantity(int quantity, BatchWarning batchWarning) async {
+  Future<String> updateQuantity(int quantity, BatchWarning batchWarning) async {
     batchWarning.newQuantity = quantity;
     batchWarning.status = 'CHECKED';
-    ProductBatch productBatch =
-        await this.db.productBatchDao.get(batchWarning.productBatchId);
-    productBatch.quantity = quantity;
-    await this.db.productBatchDao.updateProductBatch(productBatch);
-    await this.db.batchWarningDao.updateBatchWarning(batchWarning);
-    // check if we have internet connection
     try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        await batchWarningApi.updateQuantity(quantity, batchWarning);
+      ProductBatch productBatch = await this
+          .db
+          .productBatchDao
+          .getByServerId(batchWarning.productBatchId);
+      productBatch.quantity = quantity;
+      productBatch.synced = false;
+      await this.db.productBatchDao.updateProductBatch(productBatch);
+      await this.db.batchWarningDao.updateBatchWarning(batchWarning);
+      // bool saved = await batchWarningApi.updateQuantity(quantity, productBatch);
+      bool saved;
+      if (saved == true) {
+        productBatch.synced = false;
+        await this.db.productBatchDao.updateProductBatch(productBatch);
+        return 'Успешно ги снимавте податоците на серверот.';
       }
-    } on SocketException catch (_) {
-      print('not connected');
-      throw Exception("could not connect on the internet");
+      return 'Успешно ги снимавте податоците локално. Ве молиме синхронизирајте ги податоците за пратки.';
+    } catch (e) {
+      throw Exception("Something went wrong while saving on the database.");
     }
   }
 
@@ -60,7 +62,6 @@ class BatchWarningRepository {
     try {
       await this.db.batchWarningDao.saveWarnings(newWarnings);
     } catch (e) {
-      print("here error when saving warnings from http, $e");
       throw Exception("Error saving Batch Warnings to database.");
     }
   }

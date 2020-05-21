@@ -15,7 +15,12 @@ class ProductBatchRepository {
   }
 
   Future<int> addProductBatch(ProductBatch productBatch) async {
-    int productBatchId = await this.db.productBatchDao.add(productBatch);
+    int productBatchId;
+    try {
+      productBatchId = await this.db.productBatchDao.add(productBatch);
+    } catch (e) {
+      throw Exception("Error saving product batch to database.");
+    }
     return productBatchId;
   }
 
@@ -38,7 +43,6 @@ class ProductBatchRepository {
     try {
       productBatches = await this.productBatchApiClient.getAllProductBatches();
     } catch (e) {
-      print("something went wrong with product batches api GET call");
       throw Exception("Failed to get product batches");
     }
     ProductBatch productBatch;
@@ -55,15 +59,20 @@ class ProductBatchRepository {
   }
 
   Future<String> uploadNewProductBatches() async {
-    List<ProductBatch> localBatches =
-        await this.db.productBatchDao.getLocalProductBatches();
-    if (localBatches.length > 0) {
-      List<ProductBatch> serverResponseBatches =
-          await this.productBatchApiClient.uploadLocalBatches(localBatches);
-      await this.updateProductBatchesLocally(serverResponseBatches);
-      return "Успешна синхронизација на податоците.";
-    } else {
-      return 'Локалните податоци се синхронизирани.';
+    try {
+      List<ProductBatch> localBatches =
+          await this.db.productBatchDao.getLocalProductBatches();
+      if (localBatches.length > 0) {
+        List<ProductBatch> serverResponseBatches =
+            await this.productBatchApiClient.uploadLocalBatches(localBatches);
+        await this.updateProductBatchesLocally(serverResponseBatches);
+        return "Успешна синхронизација на податоците.";
+      } else {
+        return 'Локалните податоци се синхронизирани.';
+      }
+    } catch (e) {
+      throw Exception(
+          "Something went wrong when tried to update product batches");
     }
   }
 
@@ -73,8 +82,7 @@ class ProductBatchRepository {
     try {
       await this.db.productBatchDao.saveProductBatches(productBatches);
     } catch (e) {
-      print("here error when saving product batches locally");
-      print(e);
+      throw Exception("here error when saving product batches to the databse.");
     }
   }
 
@@ -85,7 +93,7 @@ class ProductBatchRepository {
           await this.db.productBatchDao.updateBatches(productBatches);
     } catch (e) {
       throw Exception(
-          "Something went wrong when tried to update product batches.");
+          "Something went wrong when tried to update product batches in the database.");
     }
   }
 }

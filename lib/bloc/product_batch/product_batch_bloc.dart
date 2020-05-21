@@ -34,7 +34,7 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
         yield ProductBatchAdded(productBatchId: productBatchId);
       } catch (e) {
         yield ProductBatchError(
-            error: "Something went wrong when saving the product.");
+            error: "Грешка при зачувување нова пратка. Пробајте повторно.");
       }
     } else if (event is AllProductBatch) {
       yield ProductBatchLoading();

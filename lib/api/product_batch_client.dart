@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:date_checker_app/api/constants.dart';
 import 'package:date_checker_app/api/helper_functions.dart';
@@ -22,7 +21,6 @@ class ProductBatchApiClient {
         httpClient,
       );
     } catch (e) {
-      print("error when calling api endpoint, error: $e");
       throw Exception("Couldn't get products data");
     }
     responseBody = jsonDecode(productBatchesResponse.body);
@@ -41,14 +39,19 @@ class ProductBatchApiClient {
   Future<List<ProductBatch>> uploadLocalBatches(
     List<ProductBatch> localBatches,
   ) async {
-    http.Response uploadResponse = await this.httpClient.post(
-          syncBatchesUrl,
-          headers: uploadBatchHeaders,
-          body: jsonEncode(localBatches),
-        );
-    if (uploadResponse.statusCode != 201) {
+    try {
+      http.Response uploadResponse = await this.httpClient.post(
+            syncBatchesUrl,
+            headers: uploadBatchHeaders,
+            body: json.encode(ProductBatch.toJsonList(localBatches)),
+          );
+      if (uploadResponse.statusCode != 201) {
+        throw Exception("Bad request!");
+      }
+      return this
+          .createProductBatchesFromJson(json.decode(uploadResponse.body));
+    } catch (e) {
       throw Exception("Error saving data on the server");
     }
-    return this.createProductBatchesFromJson(json.decode(uploadResponse.body));
   }
 }

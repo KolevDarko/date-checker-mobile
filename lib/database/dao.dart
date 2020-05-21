@@ -49,7 +49,8 @@ abstract class ProductBatchDao {
   @Query('SELECT * from ProductBatch order by id desc limit 1')
   Future<ProductBatch> getLast();
 
-  @Query('SELECT * FROM ProductBatch WHERE serverId = null')
+  @Query(
+      'SELECT DISTINCT * FROM ProductBatch WHERE serverId IS NULL OR NOT synced')
   Future<List<ProductBatch>> getLocalProductBatches();
 
   @Query('SELECT * FROM ProductBatch WHERE name = :name')
@@ -57,6 +58,9 @@ abstract class ProductBatchDao {
 
   @Query('SELECT * FROM ProductBatch WHERE id = :id')
   Future<ProductBatch> get(int id);
+
+  @Query('SELECT * FROM ProductBatch WHERE serverId = :id')
+  Future<ProductBatch> getByServerId(int id);
 
   @Query('DELETE FROM ProductBatch WHERE id = :id')
   Future<void> delete(int id);

@@ -80,6 +80,8 @@ class _QuantityEditState extends State<QuantityEdit> {
                       );
                       BlocProvider.of<BatchWarningBloc>(context)
                           .add(AllBatchWarnings());
+                      BlocProvider.of<ProductBatchBloc>(context)
+                          .add(AllProductBatch());
                       Navigator.pop(context);
                     }
                   }

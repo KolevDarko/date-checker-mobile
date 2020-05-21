@@ -41,11 +41,12 @@ class ProductBatch {
   int quantity;
   String expirationDate;
 
+  bool synced;
   String created;
   String updated;
 
   ProductBatch(this.id, this.serverId, this.barCode, this.productId,
-      this.quantity, this.expirationDate,
+      this.quantity, this.expirationDate, this.synced,
       [this.created, this.updated]);
 
   @override
@@ -69,9 +70,27 @@ class ProductBatch {
       json['product'],
       json['quantity'],
       json['expiration_date'],
+      true,
       DateTime.parse(json['created_on']).toString(),
       DateTime.parse(json['updated_on']).toString(),
     );
+  }
+
+  static Map<String, dynamic> toJson(ProductBatch productBatch) =>
+      <String, dynamic>{
+        "id": productBatch.id,
+        "serverId": productBatch.serverId,
+        "barCode": productBatch.barCode,
+        "productId": productBatch.productId,
+        "quantity": productBatch.quantity,
+        "expirationDate": productBatch.expirationDate,
+        "created": productBatch.created,
+        "updated": productBatch.updated,
+      };
+
+  static List<Map<String, dynamic>> toJsonList(
+      List<ProductBatch> productBatches) {
+    return productBatches.map((elem) => toJson(elem)).toList();
   }
 }
 

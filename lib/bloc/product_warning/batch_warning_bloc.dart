@@ -25,9 +25,9 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
       }
     } else if (event is EditQuantityEvent) {
       try {
-        await batchWarningRepository.updateQuantity(
+        String message = await batchWarningRepository.updateQuantity(
             event.quantity, event.batchWarning);
-        yield Success(productName: event.batchWarning.productName);
+        yield Success(message: message);
       } catch (e) {
         yield BatchWarningError(error: 'Грешка при зачувување на промени.');
       }

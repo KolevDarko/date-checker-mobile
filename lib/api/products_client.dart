@@ -21,7 +21,6 @@ class ProductsApiClient {
         httpClient,
       );
     } catch (e) {
-      print("error when calling api endpoint, error: $e");
       throw Exception("Couldn't get products data");
     }
     responseBody = jsonDecode(productResponse.body);

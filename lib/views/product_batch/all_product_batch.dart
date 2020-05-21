@@ -21,12 +21,11 @@ class ProductBatchTable extends StatefulWidget {
   _ProductBatchTableState createState() => _ProductBatchTableState();
 }
 
-class _ProductBatchTableState extends State<ProductBatchTable>
-    with AutomaticKeepAliveClientMixin {
+class _ProductBatchTableState extends State<ProductBatchTable> {
   bool orderByDate;
   AppDatabase db;
   @override
-  bool get wantKeepAlive => true;
+  // bool get wantKeepAlive => true;
 
   @override
   void didChangeDependencies() {
@@ -51,6 +50,32 @@ class _ProductBatchTableState extends State<ProductBatchTable>
                     duration: Duration(seconds: 3),
                     backgroundColor: Colors.green,
                     content: Text(state.message),
+                  ),
+                );
+              } else if (state is UploadProductBatchesSuccess) {
+                Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
+                Scaffold.of(widget.scaffoldContext).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 3),
+                    backgroundColor: Colors.green,
+                    content: Text(state.message),
+                  ),
+                );
+              } else if (state is ProductBatchError) {
+                Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
+                Scaffold.of(widget.scaffoldContext).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 3),
+                    backgroundColor: Colors.redAccent,
+                    content: Text(state.error),
+                  ),
+                );
+              } else if (state is ProductBatchAdded) {
+                Scaffold.of(widget.scaffoldContext).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 3),
+                    backgroundColor: Colors.greenAccent,
+                    content: Text("Успешно додадовте нова пратка."),
                   ),
                 );
               }
@@ -104,7 +129,11 @@ class _ProductBatchTableState extends State<ProductBatchTable>
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: OutlineButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    BlocProvider.of<ProductBatchBloc>(context)
+                      ..add(UploadProductBatchData())
+                      ..add(AllProductBatch());
+                  },
                   child: Text(
                     'Снимај податоци на сервер',
                     textAlign: TextAlign.center,
@@ -154,9 +183,13 @@ class _ProductBatchTableState extends State<ProductBatchTable>
               .map(
                 (_batch) => DataRow(
                   cells: [
-                    DataCell(Container(
-                        child: Text(_batch.formatDateTime()),
-                        width: cellWidth)),
+                    DataCell(
+                      Container(
+                          child: Text(_batch.formatDateTime()),
+                          width: cellWidth,
+                          color:
+                              !_batch.synced ? Colors.red : Colors.transparent),
+                    ),
                     DataCell(
                       CustomDataCell(
                         db: db,

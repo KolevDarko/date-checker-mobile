@@ -161,9 +161,10 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                           null,
                           null,
                           _barCode.text,
-                          _selectedProduct.id,
+                          _selectedProduct.serverId,
                           int.tryParse(_quantity.text),
                           "$expirationDate",
+                          false,
                           "${DateTime.now()}",
                           "${DateTime.now()}",
                         );

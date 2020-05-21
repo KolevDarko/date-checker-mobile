@@ -53,8 +53,6 @@ class ProductRepository {
     try {
       await this.db.productDao.saveProducts(newProducts);
     } catch (e) {
-      print("here error when saving warnings from http");
-      print(e);
       throw Exception("Error when saving products to the database");
     }
   }

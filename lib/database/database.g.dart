@@ -87,7 +87,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Product` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `name` TEXT, `price` REAL, `barCode` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `created` TEXT, `updated` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `synced` INTEGER, `created` TEXT, `updated` TEXT)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productName` TEXT, `daysLeft` INTEGER, `expirationDate` TEXT, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productBatchId`) REFERENCES `ProductBatch` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
 
@@ -226,6 +226,7 @@ class _$ProductBatchDao extends ProductBatchDao {
                   'productId': item.productId,
                   'quantity': item.quantity,
                   'expirationDate': item.expirationDate,
+                  'synced': item.synced ? 1 : 0,
                   'created': item.created,
                   'updated': item.updated
                 }),
@@ -240,6 +241,7 @@ class _$ProductBatchDao extends ProductBatchDao {
                   'productId': item.productId,
                   'quantity': item.quantity,
                   'expirationDate': item.expirationDate,
+                  'synced': item.synced ? 1 : 0,
                   'created': item.created,
                   'updated': item.updated
                 });
@@ -257,6 +259,7 @@ class _$ProductBatchDao extends ProductBatchDao {
       row['productId'] as int,
       row['quantity'] as int,
       row['expirationDate'] as String,
+      (row['synced'] as int) != 0,
       row['created'] as String,
       row['updated'] as String);
 
@@ -280,7 +283,7 @@ class _$ProductBatchDao extends ProductBatchDao {
   @override
   Future<List<ProductBatch>> getLocalProductBatches() async {
     return _queryAdapter.queryList(
-        'SELECT * FROM ProductBatch WHERE serverId = null',
+        'SELECT DISTINCT * FROM ProductBatch WHERE serverId IS NULL OR NOT synced',
         mapper: _productBatchMapper);
   }
 
@@ -293,6 +296,12 @@ class _$ProductBatchDao extends ProductBatchDao {
   @override
   Future<ProductBatch> get(int id) async {
     return _queryAdapter.query('SELECT * FROM ProductBatch WHERE id = ?',
+        arguments: <dynamic>[id], mapper: _productBatchMapper);
+  }
+
+  @override
+  Future<ProductBatch> getByServerId(int id) async {
+    return _queryAdapter.query('SELECT * FROM ProductBatch WHERE serverId = ?',
         arguments: <dynamic>[id], mapper: _productBatchMapper);
   }
 

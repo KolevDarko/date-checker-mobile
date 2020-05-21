@@ -29,10 +29,9 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
             Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
             Scaffold.of(widget.scaffoldContext).showSnackBar(
               SnackBar(
-                duration: Duration(seconds: 3),
+                duration: Duration(seconds: 4),
                 backgroundColor: Colors.green,
-                content: Text(
-                    'Успешно ја променивте количината на ${state.productName}. Сега е проверен и отстранет од табелата на внимание.'),
+                content: Text(state.message),
               ),
             );
           } else if (state is SyncBatchWarningsSuccess) {
