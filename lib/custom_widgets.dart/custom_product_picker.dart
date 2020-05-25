@@ -21,7 +21,7 @@ class ProductPickerField extends FormField<Product> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return ProductPickerDialog(
+                        return ItemPickerDialog(
                           items: products,
                           label: "Продукт",
                         );
@@ -66,20 +66,20 @@ class ProductPickerField extends FormField<Product> {
             });
 }
 
-class ProductPickerDialog<T> extends StatefulWidget {
+class ItemPickerDialog<T> extends StatefulWidget {
   final List<T> items;
   final String label;
 
-  const ProductPickerDialog({
+  const ItemPickerDialog({
     Key key,
     this.items,
     this.label,
   }) : super(key: key);
   @override
-  _ProductPickerDialogState createState() => _ProductPickerDialogState();
+  _ItemPickerDialogState createState() => _ItemPickerDialogState();
 }
 
-class _ProductPickerDialogState<T> extends State<ProductPickerDialog> {
+class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
   TextEditingController inputController = TextEditingController();
   List<T> filteredItems = [];
   List<T> allItems;

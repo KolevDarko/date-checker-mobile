@@ -121,7 +121,7 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                       showDialog(
                           context: context,
                           builder: (context) {
-                            return ProductPickerDialog(
+                            return ItemPickerDialog(
                               items: productBatchList,
                               label: "Пратка",
                             );
