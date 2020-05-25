@@ -56,6 +56,9 @@ abstract class ProductBatchDao {
   @Query('SELECT * FROM ProductBatch WHERE name = :name')
   Future<ProductBatch> fetchByName(String name);
 
+  @Query('SELECT * FROM ProductBatch WHERE barCode = :barCode')
+  Future<List<ProductBatch>> getByBarCode(String barCode);
+
   @Query('SELECT * FROM ProductBatch WHERE id = :id')
   Future<ProductBatch> get(int id);
 

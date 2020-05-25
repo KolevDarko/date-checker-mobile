@@ -122,10 +122,14 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                           context: context,
                           builder: (context) {
                             return ItemPickerDialog(
-                              items: productBatchList,
                               label: "Пратка",
+                              database: db,
                             );
-                          }).then((value) {});
+                          });
+
+                      //   .then((value) {
+                      // BlocProvider.of<ProductBatchBloc>(context)
+                      //     .add(FilterProductBatch(productBatch: value));
                     },
                     child: Text("Пребарај пратки"),
                   ),

@@ -1,3 +1,4 @@
+import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/debouncer.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
@@ -71,11 +72,13 @@ class ProductPickerField extends FormField<Product> {
 class ItemPickerDialog<T> extends StatefulWidget {
   final List<T> items;
   final String label;
+  final AppDatabase database;
 
   const ItemPickerDialog({
     Key key,
     this.items,
     this.label,
+    this.database,
   }) : super(key: key);
   @override
   _ItemPickerDialogState createState() => _ItemPickerDialogState();
@@ -83,17 +86,19 @@ class ItemPickerDialog<T> extends StatefulWidget {
 
 class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
   TextEditingController inputController = TextEditingController();
-  List<T> filteredItems = [];
-  List<T> allItems;
+  List<dynamic> filteredItems = [];
+  List<dynamic> allItems;
   Debouncer debouncer = dependencyAssembler.get<Debouncer>();
 
   @override
   void initState() {
-    allItems = List.from(widget.items);
-    filteredItems = allItems;
+    if (widget.items != null) {
+      allItems = List.from(widget.items);
+      filteredItems = allItems;
+    }
     inputController.addListener(() {
-      debouncer.run(() {
-        filterItems();
+      debouncer.run(() async {
+        await filterItems();
       });
     });
     super.initState();
@@ -114,6 +119,7 @@ class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             TextField(
+              decoration: InputDecoration(hintText: "Внесете филтер"),
               controller: inputController,
             ),
             Column(
@@ -125,46 +131,57 @@ class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
     );
   }
 
-  filterItems() {
+  filterItems() async {
+    List<dynamic> filtered = [];
     if (inputController.text.length > 0) {
-      setState(() {
-        filteredItems = allItems.where((item) {
+      if (widget.items != null) {
+        filtered = allItems.where((item) {
           if (item is Product) {
             return item.barCode.contains(inputController.text) ||
                 item.name.contains(inputController.text);
-          } else if (item is ProductBatch) {
-            return item.barCode.contains(inputController.text);
           }
           return null;
         }).toList();
-      });
+      }
+      filtered = await widget.database.productBatchDao
+          .getByBarCode(inputController.text);
     }
+    setState(() {
+      filteredItems = filtered;
+    });
   }
 
   List<Widget> _buildDialogItems(List<T> filteredItems) {
     List<Widget> dialogItems = [];
-    for (var item in filteredItems) {
-      dialogItems.add(GestureDetector(
-        onTap: () {
-          Navigator.pop(context, item);
-        },
-        child: Container(
-          padding: EdgeInsets.all(10.0),
-          decoration:
-              BoxDecoration(border: Border(bottom: BorderSide(width: 1.0))),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  "${item.toString()}",
-                  overflow: TextOverflow.ellipsis,
+    if (filteredItems.length > 0) {
+      for (var item in filteredItems) {
+        dialogItems.add(GestureDetector(
+          onTap: () {
+            Navigator.pop(context, item);
+          },
+          child: Container(
+            padding: EdgeInsets.all(10.0),
+            decoration:
+                BoxDecoration(border: Border(bottom: BorderSide(width: 1.0))),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    "${item.toString()}",
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ));
+      }
+    } else {
+      dialogItems.add(Container(
+        child: Text("Нема пратки со внесениот бар код"),
       ));
     }
+
     return dialogItems;
   }
 }

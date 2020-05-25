@@ -42,3 +42,11 @@ class UploadProductBatchData extends ProductBatchEvent {
   @override
   List<Object> get props => null;
 }
+
+class FilterProductBatch extends ProductBatchEvent {
+  final ProductBatch productBatch;
+
+  FilterProductBatch({this.productBatch});
+  @override
+  List<Object> get props => [productBatch];
+}

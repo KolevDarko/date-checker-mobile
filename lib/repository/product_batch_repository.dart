@@ -29,6 +29,17 @@ class ProductBatchRepository {
     return productBatchList;
   }
 
+  Future<List<ProductBatch>> getFilteredProductBatches(
+      ProductBatch productBatch) async {
+    try {
+      List<ProductBatch> productBatches =
+          await this.db.productBatchDao.getByBarCode(productBatch.barCode);
+      return productBatches;
+    } catch (e) {
+      throw Exception("Error fetching items from the db, error: $e");
+    }
+  }
+
   Future<List<ProductBatch>> orderedByExpiryDateList() async {
     List<ProductBatch> productBatchList = await allProductBatchList();
 

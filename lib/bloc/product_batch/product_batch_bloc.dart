@@ -77,6 +77,16 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
         yield ProductBatchError(
             error: "Грешка при снимање податоци на серверот!");
       }
+    } else if (event is FilterProductBatch) {
+      yield ProductBatchLoading();
+      try {
+        List<ProductBatch> productBatches = await this
+            .productBatchRepository
+            .getFilteredProductBatches(event.productBatch);
+        yield AllProductBatchLoaded(productBatchList: productBatches);
+      } catch (e) {
+        yield ProductBatchError(error: "Грешка при филтрирање на пратки");
+      }
     }
   }
 }

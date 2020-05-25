@@ -294,6 +294,14 @@ class _$ProductBatchDao extends ProductBatchDao {
   }
 
   @override
+  Future<List<ProductBatch>> getByBarCode(String barCode) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM ProductBatch WHERE barCode = ?',
+        arguments: <dynamic>[barCode],
+        mapper: _productBatchMapper);
+  }
+
+  @override
   Future<ProductBatch> get(int id) async {
     return _queryAdapter.query('SELECT * FROM ProductBatch WHERE id = ?',
         arguments: <dynamic>[id], mapper: _productBatchMapper);
