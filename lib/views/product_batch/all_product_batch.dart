@@ -1,4 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
+import 'package:date_checker_app/custom_widgets.dart/custom_product_picker.dart';
 import 'package:date_checker_app/custom_widgets.dart/custom_table.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
@@ -107,6 +108,32 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
     var cellWidth = MediaQuery.of(context).size.width / 4;
     return Column(
       children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                child: ButtonTheme(
+                  buttonColor: Colors.white,
+                  child: RaisedButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return ProductPickerDialog(
+                              items: productBatchList,
+                              label: "Пратка",
+                            );
+                          }).then((value) {});
+                    },
+                    child: Text("Пребарај пратки"),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
         Row(
           children: <Widget>[
             Expanded(

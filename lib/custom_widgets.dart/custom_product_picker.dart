@@ -22,7 +22,8 @@ class ProductPickerField extends FormField<Product> {
                       context: context,
                       builder: (context) {
                         return ProductPickerDialog(
-                          products: products,
+                          items: products,
+                          label: "Продукт",
                         );
                       }).then((val) {
                     state.didChange(val);
@@ -33,12 +34,13 @@ class ProductPickerField extends FormField<Product> {
                   children: <Widget>[
                     Container(
                       decoration: BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(
-                                  width: 1.0,
-                                  color: state.hasError
-                                      ? Colors.red
-                                      : Colors.black))),
+                        border: Border(
+                          bottom: BorderSide(
+                              width: 1.0,
+                              color:
+                                  state.hasError ? Colors.red : Colors.black),
+                        ),
+                      ),
                       alignment: Alignment.centerLeft,
                       height: 50.0,
                       child: state.value != null
@@ -64,25 +66,31 @@ class ProductPickerField extends FormField<Product> {
             });
 }
 
-class ProductPickerDialog extends StatefulWidget {
-  final List<Product> products;
+class ProductPickerDialog<T> extends StatefulWidget {
+  final List<T> items;
+  final String label;
 
-  const ProductPickerDialog({Key key, this.products}) : super(key: key);
+  const ProductPickerDialog({
+    Key key,
+    this.items,
+    this.label,
+  }) : super(key: key);
   @override
   _ProductPickerDialogState createState() => _ProductPickerDialogState();
 }
 
-class _ProductPickerDialogState extends State<ProductPickerDialog> {
+class _ProductPickerDialogState<T> extends State<ProductPickerDialog> {
   TextEditingController inputController = TextEditingController();
-  List<Product> filteredProducts = [];
-  List<Product> allProducts;
+  List<T> filteredItems = [];
+  List<T> allItems;
 
   @override
   void initState() {
-    allProducts = List.from(widget.products);
-    filteredProducts = allProducts;
+    print(widget.items);
+    allItems = List.from(widget.items);
+    filteredItems = allItems;
     inputController.addListener(() {
-      filterProducts();
+      filterItems();
     });
     super.initState();
   }
@@ -90,7 +98,7 @@ class _ProductPickerDialogState extends State<ProductPickerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Pick a Product'),
+      title: Text('Избери ${widget.label}'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.max,
@@ -99,7 +107,7 @@ class _ProductPickerDialogState extends State<ProductPickerDialog> {
               controller: inputController,
             ),
             Column(
-              children: _buildDialogItems(filteredProducts),
+              children: _buildDialogItems(filteredItems),
             ),
           ],
         ),
@@ -107,24 +115,28 @@ class _ProductPickerDialogState extends State<ProductPickerDialog> {
     );
   }
 
-  filterProducts() {
+  filterItems() {
     if (inputController.text.length > 0) {
       setState(() {
-        filteredProducts = allProducts
-            .where((product) =>
-                product.barCode.contains(inputController.text) ||
-                product.name.contains(inputController.text))
-            .toList();
+        filteredItems = allItems.where((item) {
+          if (item is Product) {
+            return item.barCode.contains(inputController.text) ||
+                item.name.contains(inputController.text);
+          } else if (item is ProductBatch) {
+            return item.barCode.contains(inputController.text);
+          }
+          return null;
+        }).toList();
       });
     }
   }
 
-  List<Widget> _buildDialogItems(List<Product> productList) {
+  List<Widget> _buildDialogItems(List<T> filteredItems) {
     List<Widget> dialogItems = [];
-    for (Product product in filteredProducts) {
+    for (var item in filteredItems) {
       dialogItems.add(GestureDetector(
         onTap: () {
-          Navigator.pop(context, product);
+          Navigator.pop(context, item);
         },
         child: Container(
           padding: EdgeInsets.all(10.0),
@@ -132,9 +144,12 @@ class _ProductPickerDialogState extends State<ProductPickerDialog> {
               BoxDecoration(border: Border(bottom: BorderSide(width: 1.0))),
           child: Row(
             children: <Widget>[
-              SizedBox(width: 8.0),
-              Text("${product.toString()}"),
-              SizedBox(width: 8.0),
+              Expanded(
+                child: Text(
+                  "${item.toString()}",
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ),
