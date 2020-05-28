@@ -23,3 +23,12 @@ class SyncBatchWarnings extends BatchWarningEvent {
   @override
   List<Object> get props => null;
 }
+
+class BWProductBatchClosed extends BatchWarningEvent {
+  final String message;
+
+  BWProductBatchClosed(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

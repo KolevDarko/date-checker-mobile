@@ -3,12 +3,59 @@ import 'dart:convert';
 import 'package:date_checker_app/api/constants.dart';
 import 'package:http/http.dart' as http;
 
+enum HttpAction { GET, POST, PUT, DELETE }
+
 Future<http.Response> callApiEndPoint(
-    String url, String errorMessage, http.Client httpClient) async {
-  final response = await httpClient.get(url, headers: authHeaders);
-  if (response.statusCode != 200) {
-    throw Exception(errorMessage);
+  HttpAction action,
+  String url,
+  String errorMessage,
+  http.Client httpClient, {
+  dynamic body,
+}) async {
+  http.Response response;
+  switch (action) {
+    case HttpAction.GET:
+      {
+        response = await httpClient.get(url, headers: authHeaders);
+        if (response.statusCode != 200) {
+          throw Exception(errorMessage);
+        }
+      }
+      break;
+    case HttpAction.POST:
+      {
+        response = await httpClient.post(
+          url,
+          headers: uploadBatchHeaders,
+          body: body,
+        );
+        if (response.statusCode != 201) {
+          throw Exception(errorMessage);
+        }
+      }
+      break;
+    case HttpAction.PUT:
+      {
+        response = await httpClient.put(
+          url,
+          headers: uploadBatchHeaders,
+          body: body,
+        );
+        if (response.statusCode != 204) {
+          throw Exception(errorMessage);
+        }
+      }
+      break;
+    case HttpAction.DELETE:
+      {
+        response = await httpClient.delete(url, headers: uploadBatchHeaders);
+        if (response.statusCode != 204) {
+          throw Exception(errorMessage);
+        }
+      }
+      break;
   }
+
   return response;
 }
 
@@ -25,6 +72,7 @@ Future<List> getAllDataFromApiPoint(
     while (localResponseBody['next'] != null) {
       dataJson.addAll(localResponseBody['results']);
       dataResponse = await callApiEndPoint(
+        HttpAction.GET,
         localResponseBody['next'],
         "Error calling products end point",
         httpClient,

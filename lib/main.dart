@@ -1,4 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
+import 'package:date_checker_app/bloc_delegate.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
@@ -28,7 +29,7 @@ class InheritedDataProvider extends InheritedWidget {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppDatabase db = await DbProvider.instance.database;
-
+  BlocSupervisor.delegate = SimpleBlocDelegate();
   setupDependencyAssembler(db: db, dependencyAssembler: dependencyAssembler);
 
   runApp(
@@ -97,6 +98,7 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<BatchWarningBloc>(
           create: (BuildContext context) => BatchWarningBloc(
+            productBatchBloc: BlocProvider.of<ProductBatchBloc>(context),
             batchWarningRepository: batchWarningRepository,
           ),
         ),

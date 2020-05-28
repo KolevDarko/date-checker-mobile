@@ -15,17 +15,18 @@ class ProductBatchRepository {
   }
 
   Future<int> addProductBatch(ProductBatch productBatch) async {
-    int productBatchId;
     try {
-      productBatchId = await this.db.productBatchDao.add(productBatch);
+      int productBatchId = await this.db.productBatchDao.add(productBatch);
+      return productBatchId;
     } catch (e) {
       throw Exception("Error saving product batch to database.");
     }
-    return productBatchId;
   }
 
   Future<List<ProductBatch>> allProductBatchList() async {
     List<ProductBatch> productBatchList = await this.db.productBatchDao.all();
+    productBatchList.sort((a, b) =>
+        b.returnDateTimeUpdated().compareTo(a.returnDateTimeUpdated()));
     return productBatchList;
   }
 
@@ -67,6 +68,32 @@ class ProductBatchRepository {
       return "Успешно ги синхронизиравте вашите податоци.";
     }
     return "Вашите податоци се веќе синхронизирани.";
+  }
+
+  Future<String> closeProductBatch(BatchWarning warning) async {
+    try {
+      // delete product warning
+      await this.db.batchWarningDao.delete(warning.id);
+      ProductBatch productBatch =
+          await this.db.productBatchDao.getByServerId(warning.productBatchId);
+      productBatch.quantity = 0;
+      productBatch.synced = false;
+      productBatch.updated = DateTime.now().toString();
+      await this.db.productBatchDao.updateProductBatch(productBatch);
+      String message;
+      // try to update online
+      try {
+        // await this.productBatchApiClient.updateProductBatch(productBatch);
+        // await this.db.productBatchDao.delete(warning.productBatchId);
+        message = "Успешно ја избришавте пратката на серверот!";
+      } catch (e) {
+        message =
+            "Успешно ја избришавте пратката од базата на податоци. Ве молиме синхронизирајте со серверот.";
+      }
+      return message;
+    } catch (e) {
+      throw Exception("Error while deleting batch locally.");
+    }
   }
 
   Future<String> uploadNewProductBatches() async {

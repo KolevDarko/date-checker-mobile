@@ -17,6 +17,7 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    BlocProvider.of<BatchWarningBloc>(context).add(AllBatchWarnings());
   }
 
   @override
@@ -37,9 +38,20 @@ class _BatchWarningTableState extends State<BatchWarningTable> {
           } else if (state is SyncBatchWarningsSuccess) {
             Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
             final snackBar = SnackBar(
+              duration: Duration(seconds: 4),
+              backgroundColor: Colors.green,
               content: Text(state.message),
             );
             Scaffold.of(widget.scaffoldContext).showSnackBar(snackBar);
+          } else if (state is BatchWarningError) {
+            Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
+            Scaffold.of(widget.scaffoldContext).showSnackBar(
+              SnackBar(
+                duration: Duration(seconds: 4),
+                backgroundColor: Colors.redAccent,
+                content: Text(state.error),
+              ),
+            );
           }
         },
         child: BlocBuilder<BatchWarningBloc, BatchWarningState>(

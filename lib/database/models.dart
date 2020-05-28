@@ -45,9 +45,17 @@ class ProductBatch {
   String created;
   String updated;
 
-  ProductBatch(this.id, this.serverId, this.barCode, this.productId,
-      this.quantity, this.expirationDate, this.synced,
-      [this.created, this.updated]);
+  ProductBatch(
+    this.id,
+    this.serverId,
+    this.barCode,
+    this.productId,
+    this.quantity,
+    this.expirationDate,
+    this.synced, [
+    this.created,
+    this.updated,
+  ]);
 
   @override
   String toString() {
@@ -56,6 +64,10 @@ class ProductBatch {
 
   DateTime returnDateTimeExpDate() {
     return DateTime.parse(this.expirationDate);
+  }
+
+  DateTime returnDateTimeUpdated() {
+    return DateTime.parse(this.updated);
   }
 
   String formatDateTime() {
@@ -94,13 +106,7 @@ class ProductBatch {
   }
 }
 
-@Entity(foreignKeys: [
-  ForeignKey(
-    childColumns: ['productBatchId'],
-    parentColumns: ['id'],
-    entity: ProductBatch,
-  )
-])
+@entity
 class BatchWarning {
   @PrimaryKey(autoGenerate: true)
   int id;

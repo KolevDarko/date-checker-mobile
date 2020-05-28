@@ -11,21 +11,55 @@ class ProductBatchApiClient {
   ProductBatchApiClient({this.httpClient});
 
   Future<List<ProductBatch>> getAllProductBatches() async {
-    List<dynamic> productBatchesJson = [];
-    dynamic responseBody;
-    http.Response productBatchesResponse;
     try {
-      productBatchesResponse = await callApiEndPoint(
+      http.Response productBatchesResponse = await callApiEndPoint(
+        HttpAction.GET,
         productBatchesUrl,
         "Error calling products end point",
         httpClient,
       );
+      final responseBody = jsonDecode(productBatchesResponse.body);
+      List<dynamic> productBatchesJson = await getAllDataFromApiPoint(
+        responseBody,
+        httpClient,
+      );
+      return this.createProductBatchesFromJson(productBatchesJson);
     } catch (e) {
       throw Exception("Couldn't get products data");
     }
-    responseBody = jsonDecode(productBatchesResponse.body);
-    productBatchesJson = await getAllDataFromApiPoint(responseBody, httpClient);
-    return this.createProductBatchesFromJson(productBatchesJson);
+  }
+
+  Future<String> updateProductBatch(ProductBatch productBatch) async {
+    try {
+      await callApiEndPoint(
+        HttpAction.PUT,
+        syncBatchesUrl,
+        "Bad request, failed to update api.",
+        this.httpClient,
+        body: json.encode(ProductBatch.toJson(productBatch)),
+      );
+      return 'Successfully updated product batch';
+    } catch (e) {
+      throw Exception("Failed to update product batch on the server.");
+    }
+  }
+
+  Future<List<ProductBatch>> uploadLocalBatches(
+    List<ProductBatch> localBatches,
+  ) async {
+    try {
+      http.Response uploadResponse = await callApiEndPoint(
+        HttpAction.POST,
+        syncBatchesUrl,
+        "Bad request, post call.",
+        this.httpClient,
+        body: json.encode(ProductBatch.toJsonList(localBatches)),
+      );
+      return this
+          .createProductBatchesFromJson(json.decode(uploadResponse.body));
+    } catch (e) {
+      throw Exception("Error saving data on the server");
+    }
   }
 
   List<ProductBatch> createProductBatchesFromJson(var productBatchesJson) {
@@ -34,24 +68,5 @@ class ProductBatchApiClient {
       productBatches.add(ProductBatch.fromJson(productBatchJson));
     }
     return productBatches;
-  }
-
-  Future<List<ProductBatch>> uploadLocalBatches(
-    List<ProductBatch> localBatches,
-  ) async {
-    try {
-      http.Response uploadResponse = await this.httpClient.post(
-            syncBatchesUrl,
-            headers: uploadBatchHeaders,
-            body: json.encode(ProductBatch.toJsonList(localBatches)),
-          );
-      if (uploadResponse.statusCode != 201) {
-        throw Exception("Bad request!");
-      }
-      return this
-          .createProductBatchesFromJson(json.decode(uploadResponse.body));
-    } catch (e) {
-      throw Exception("Error saving data on the server");
-    }
   }
 }

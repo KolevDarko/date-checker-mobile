@@ -1,6 +1,4 @@
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/dependencies/debouncer.dart';
-import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
 import 'package:date_checker_app/views/product_batch/all_product_batch.dart';
 import 'package:date_checker_app/views/product_warning/all_product_warnings.dart';
@@ -26,7 +24,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    BlocProvider.of<BatchWarningBloc>(context).add(AllBatchWarnings());
   }
 
   toggleOrderByExpiry() {

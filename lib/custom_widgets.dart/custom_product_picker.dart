@@ -181,7 +181,6 @@ class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
         child: Text("Нема пратки со внесениот бар код"),
       ));
     }
-
     return dialogItems;
   }
 }

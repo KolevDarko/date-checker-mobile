@@ -17,6 +17,8 @@ class Debouncer {
   }
 
   dispose() {
-    _timer.cancel();
+    if (_timer != null) {
+      _timer.cancel();
+    }
   }
 }

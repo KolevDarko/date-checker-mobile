@@ -47,16 +47,31 @@ class ProductBatchError extends ProductBatchState {
   final String error;
 
   ProductBatchError({this.error});
+  @override
+  List<Object> get props => [error];
 }
 
 class SyncProductDataSuccess extends ProductBatchState {
   final String message;
 
   SyncProductDataSuccess({this.message});
+  @override
+  List<Object> get props => [message];
 }
 
 class UploadProductBatchesSuccess extends ProductBatchState {
   final String message;
 
   UploadProductBatchesSuccess({this.message});
+  @override
+  List<Object> get props => [message];
+}
+
+class ProductBatchClosedState extends ProductBatchState {
+  final String message;
+
+  ProductBatchClosedState({this.message});
+
+  @override
+  List<Object> get props => [message];
 }

@@ -1,5 +1,7 @@
+import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/views/home/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -51,7 +53,14 @@ class _LoginViewState extends State<LoginView> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (ctx) => HomePage(),
+                        builder: (ctx) =>
+                            BlocProvider<UnsyncedProductBatchBloc>(
+                          create: (context) => UnsyncedProductBatchBloc(
+                            productBatchBloc:
+                                BlocProvider.of<ProductBatchBloc>(context),
+                          ),
+                          child: HomePage(),
+                        ),
                       ),
                     );
                   },

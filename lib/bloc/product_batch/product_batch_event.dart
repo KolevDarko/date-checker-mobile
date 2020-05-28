@@ -50,3 +50,12 @@ class FilterProductBatch extends ProductBatchEvent {
   @override
   List<Object> get props => [productBatch];
 }
+
+class RemoveProductBatch extends ProductBatchEvent {
+  final BatchWarning warning;
+
+  RemoveProductBatch({this.warning});
+
+  @override
+  List<Object> get props => [warning];
+}

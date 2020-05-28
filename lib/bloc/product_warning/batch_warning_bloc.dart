@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/bloc/product_warning/batch_warning_event.dart';
 import 'package:date_checker_app/bloc/product_warning/batch_warning_state.dart';
 import 'package:date_checker_app/database/models.dart';
@@ -6,8 +9,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
   final BatchWarningRepository batchWarningRepository;
+  final ProductBatchBloc productBatchBloc;
+  StreamSubscription productBatchSubscription;
 
-  BatchWarningBloc({this.batchWarningRepository});
+  BatchWarningBloc({this.productBatchBloc, this.batchWarningRepository}) {
+    productBatchSubscription = productBatchBloc.listen((state) {
+      if (state is ProductBatchClosedState) {
+        add(BWProductBatchClosed(
+            (productBatchBloc.state as ProductBatchClosedState).message));
+        add(AllBatchWarnings());
+      }
+    });
+  }
 
   @override
   BatchWarningState get initialState => BatchWarningEmpty();
@@ -39,6 +52,15 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
       } catch (e) {
         yield BatchWarningError(error: 'Грешка при ажурирање на податоците');
       }
+    } else if (event is BWProductBatchClosed) {
+      yield Success(message: event.message);
     }
+  }
+
+  @override
+  Future<void> close() {
+    print("this 1");
+    productBatchSubscription.cancel();
+    return super.close();
   }
 }

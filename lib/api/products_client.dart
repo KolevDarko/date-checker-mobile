@@ -16,6 +16,7 @@ class ProductsApiClient {
     http.Response productResponse;
     try {
       productResponse = await callApiEndPoint(
+        HttpAction.GET,
         productsUrl,
         "Error calling products end point",
         httpClient,
@@ -40,6 +41,7 @@ class ProductsApiClient {
   Future<List<Product>> syncProducts(int lastProductId) async {
     String url = productsSyncUrl + '$lastProductId';
     http.Response productsSyncResponse = await callApiEndPoint(
+      HttpAction.GET,
       url,
       'Error getting products data sync',
       this.httpClient,

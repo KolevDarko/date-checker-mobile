@@ -13,27 +13,49 @@ class BatchWarningRepository {
   }
 
   Future<String> updateQuantity(int quantity, BatchWarning batchWarning) async {
-    batchWarning.newQuantity = quantity;
-    batchWarning.status = 'CHECKED';
     try {
       ProductBatch productBatch = await this
           .db
           .productBatchDao
           .getByServerId(batchWarning.productBatchId);
       productBatch.quantity = quantity;
+      productBatch.updated = DateTime.now().toString();
       productBatch.synced = false;
       await this.db.productBatchDao.updateProductBatch(productBatch);
-      await this.db.batchWarningDao.updateBatchWarning(batchWarning);
-      // bool saved = await batchWarningApi.updateQuantity(quantity, productBatch);
-      bool saved;
-      if (saved == true) {
-        productBatch.synced = false;
-        await this.db.productBatchDao.updateProductBatch(productBatch);
-        return 'Успешно ги снимавте податоците на серверот.';
-      }
-      return 'Успешно ги снимавте податоците локално. Ве молиме синхронизирајте ги податоците за пратки.';
+      await this.deleteCheckedWarning(batchWarning);
+
+      // check if we can update batch warning online
+      // String message =
+      //     await this.syncUpdatedQuantityOnline(quantity, productBatch);
+      // if (message != null) {
+      //   return message;
+      // }
+      return 'Успешно ја зачувавте промената на количина локално.';
     } catch (e) {
-      throw Exception("Something went wrong while saving on the database.");
+      throw Exception("Something went wrong while saving in the database.");
+    }
+  }
+
+  Future<String> syncUpdatedQuantityOnline(
+      int quantity, ProductBatch productBatch) async {
+    try {
+      bool saved = await batchWarningApi.updateQuantity(quantity, productBatch);
+      if (saved == true) {
+        productBatch.synced = true;
+        await this.db.productBatchDao.updateProductBatch(productBatch);
+        return 'Успешно ја зачувавте количината на серверот.';
+      }
+      return null;
+    } catch (e) {
+      throw Exception("Failed to update quantity online");
+    }
+  }
+
+  Future<void> deleteCheckedWarning(BatchWarning batchWarning) async {
+    try {
+      await this.db.batchWarningDao.delete(batchWarning.id);
+    } catch (e) {
+      throw Exception("Error while deleting batch warning, error: $e");
     }
   }
 
@@ -52,17 +74,9 @@ class BatchWarningRepository {
     }
 
     if (warnings.length > 0) {
-      this.saveWarningsLocally(warnings);
+      await this.db.batchWarningDao.saveWarnings(warnings);
       return 'Успешно ги синхронизиравте податоците.';
     }
     return 'Нема нови податоци.';
-  }
-
-  Future<void> saveWarningsLocally(List<BatchWarning> newWarnings) async {
-    try {
-      await this.db.batchWarningDao.saveWarnings(newWarnings);
-    } catch (e) {
-      throw Exception("Error saving Batch Warnings to database.");
-    }
   }
 }

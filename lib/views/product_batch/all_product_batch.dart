@@ -4,6 +4,7 @@ import 'package:date_checker_app/custom_widgets.dart/custom_table.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/main.dart';
+import 'package:date_checker_app/views/product_batch/unsynced_components_tracker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,7 +26,7 @@ class ProductBatchTable extends StatefulWidget {
 class _ProductBatchTableState extends State<ProductBatchTable> {
   bool orderByDate;
   AppDatabase db;
-  @override
+  // @override
   // bool get wantKeepAlive => true;
 
   @override
@@ -81,22 +82,84 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                 );
               }
             },
-            child: BlocBuilder<ProductBatchBloc, ProductBatchState>(
-              builder: (context, state) {
-                if (state is ProductBatchEmpty) {
-                  return Container();
-                } else if (state is ProductBatchLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (state is AllProductBatchLoaded) {
-                  return _buildProductBatchItems(state.productBatchList);
-                } else if (state is OrderedByExpiryDate) {
-                  return _buildProductBatchItems(state.productBatchList);
-                } else {
-                  return Container();
-                }
-              },
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Expanded(
+                      child: ButtonTheme(
+                        buttonColor: Colors.white,
+                        child: RaisedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return ItemPickerDialog(
+                                  label: "Пратка",
+                                  database: db,
+                                );
+                              },
+                            );
+                          },
+                          child: Text("Пребарај пратки"),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: OutlineButton(
+                          onPressed: () {
+                            BlocProvider.of<ProductBatchBloc>(context)
+                              ..add(SyncProductBatchData())
+                              ..add(AllProductBatch());
+                          },
+                          child: Text(
+                            'Синхронизирај податоци',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: UnsyncedBatchTracker(
+                        callback: () {
+                          BlocProvider.of<ProductBatchBloc>(context)
+                            ..add(UploadProductBatchData())
+                            ..add(AllProductBatch());
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: UnsavedWarningsTracker(),
+                    ),
+                  ],
+                ),
+                BlocBuilder<ProductBatchBloc, ProductBatchState>(
+                  builder: (context, state) {
+                    if (state is ProductBatchEmpty) {
+                      return Container();
+                    } else if (state is ProductBatchLoading) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (state is AllProductBatchLoaded) {
+                      return _buildProductBatchItems(state.productBatchList);
+                    } else if (state is OrderedByExpiryDate) {
+                      return _buildProductBatchItems(state.productBatchList);
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+              ],
             ),
           ),
         ),
@@ -106,142 +169,75 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
 
   Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
     var cellWidth = MediaQuery.of(context).size.width / 4;
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                child: ButtonTheme(
-                  buttonColor: Colors.white,
-                  child: RaisedButton(
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return ItemPickerDialog(
-                              label: "Пратка",
-                              database: db,
-                            );
-                          });
-
-                      //   .then((value) {
-                      // BlocProvider.of<ProductBatchBloc>(context)
-                      //     .add(FilterProductBatch(productBatch: value));
-                    },
-                    child: Text("Пребарај пратки"),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: customDataTable(
+        context: context,
+        columns: [
+          DataColumn(
+            label: Container(
+              width: cellWidth,
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    child: Text(
+                      'Датум истек',
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
+                  orderByDate
+                      ? Icon(Icons.arrow_drop_down)
+                      : Icon(Icons.arrow_drop_up),
+                ],
               ),
-            ],
+            ),
+            onSort: (i, b) {
+              widget.callBack();
+              if (!orderByDate) {
+                BlocProvider.of<ProductBatchBloc>(context).add(
+                  OrderByExpiryDateEvent(),
+                );
+              } else {
+                BlocProvider.of<ProductBatchBloc>(context)
+                    .add(AllProductBatch());
+              }
+            },
           ),
-        ),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: OutlineButton(
-                  onPressed: () {
-                    BlocProvider.of<ProductBatchBloc>(context)
-                      ..add(SyncProductBatchData())
-                      ..add(AllProductBatch());
-                  },
-                  child: Text(
-                    'Синхронизирај податоци',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: OutlineButton(
-                  onPressed: () {
-                    BlocProvider.of<ProductBatchBloc>(context)
-                      ..add(UploadProductBatchData())
-                      ..add(AllProductBatch());
-                  },
-                  child: Text(
-                    'Снимај податоци на сервер',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        customDataTable(
-          context: context,
-          columns: [
-            DataColumn(
-              label: Container(
-                width: cellWidth,
-                child: Row(
-                  children: <Widget>[
+          DataColumn(label: Text('Производ')),
+          DataColumn(label: Text('Количина')),
+          DataColumn(label: Text('Баркод')),
+        ],
+        rows: productBatchList
+            .map(
+              (_batch) => DataRow(
+                cells: [
+                  DataCell(
                     Container(
+                        child: Text(_batch.formatDateTime()),
+                        width: cellWidth,
+                        color:
+                            !_batch.synced ? Colors.red : Colors.transparent),
+                  ),
+                  DataCell(
+                    CustomDataCell(
+                      db: db,
+                      width: cellWidth,
+                      productId: _batch.productId,
+                    ),
+                  ),
+                  DataCell(Container(
+                      child: Text("${_batch.quantity}"), width: cellWidth)),
+                  DataCell(Container(
                       child: Text(
-                        'Датум истек',
+                        _batch.barCode,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    orderByDate
-                        ? Icon(Icons.arrow_drop_down)
-                        : Icon(Icons.arrow_drop_up),
-                  ],
-                ),
+                      width: cellWidth)),
+                ],
               ),
-              onSort: (i, b) {
-                widget.callBack();
-                if (!orderByDate) {
-                  BlocProvider.of<ProductBatchBloc>(context).add(
-                    OrderByExpiryDateEvent(),
-                  );
-                } else {
-                  BlocProvider.of<ProductBatchBloc>(context)
-                      .add(AllProductBatch());
-                }
-              },
-            ),
-            DataColumn(label: Text('Производ')),
-            DataColumn(label: Text('Количина')),
-            DataColumn(label: Text('Баркод')),
-          ],
-          rows: productBatchList
-              .map(
-                (_batch) => DataRow(
-                  cells: [
-                    DataCell(
-                      Container(
-                          child: Text(_batch.formatDateTime()),
-                          width: cellWidth,
-                          color:
-                              !_batch.synced ? Colors.red : Colors.transparent),
-                    ),
-                    DataCell(
-                      CustomDataCell(
-                        db: db,
-                        width: cellWidth,
-                        productId: _batch.productId,
-                      ),
-                    ),
-                    DataCell(Container(
-                        child: Text("${_batch.quantity}"), width: cellWidth)),
-                    DataCell(Container(
-                        child: Text(
-                          _batch.barCode,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        width: cellWidth)),
-                  ],
-                ),
-              )
-              .toList(),
-        ),
-      ],
+            )
+            .toList(),
+      ),
     );
   }
 }
@@ -289,7 +285,7 @@ class _CustomDataCellState extends State<CustomDataCell> {
               return Container();
             case ConnectionState.waiting:
               return Container(
-                child: CircularProgressIndicator(),
+                child: Container(),
                 width: widget.width,
               );
             case ConnectionState.active:

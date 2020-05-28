@@ -1,4 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
+import 'package:date_checker_app/custom_widgets.dart/confirmation_dialog.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -64,28 +65,63 @@ class _QuantityEditState extends State<QuantityEdit> {
               SizedBox(
                 height: 20.0,
               ),
-              RaisedButton(
-                child: Text('Зачувај промени'),
-                onPressed: () {
-                  if (_formKey.currentState.validate()) {
-                    int quantity = int.tryParse(_quantity.value.text);
-                    if (widget.oldQuantity == quantity) {
-                      Navigator.pop(context);
-                    } else {
-                      BlocProvider.of<BatchWarningBloc>(context).add(
-                        EditQuantityEvent(
-                          quantity: quantity,
-                          batchWarning: widget.batchWarning,
-                        ),
-                      );
-                      BlocProvider.of<BatchWarningBloc>(context)
-                          .add(AllBatchWarnings());
-                      BlocProvider.of<ProductBatchBloc>(context)
-                          .add(AllProductBatch());
-                      Navigator.pop(context);
-                    }
-                  }
-                },
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: RaisedButton(
+                        color: Colors.greenAccent,
+                        child: Text('Зачувај промени'),
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            int quantity = int.tryParse(_quantity.value.text);
+                            if (widget.oldQuantity == quantity) {
+                              Navigator.pop(context);
+                            } else {
+                              BlocProvider.of<BatchWarningBloc>(context).add(
+                                EditQuantityEvent(
+                                  quantity: quantity,
+                                  batchWarning: widget.batchWarning,
+                                ),
+                              );
+                              BlocProvider.of<BatchWarningBloc>(context)
+                                  .add(AllBatchWarnings());
+                              BlocProvider.of<ProductBatchBloc>(context)
+                                  .add(AllProductBatch());
+                              Navigator.pop(context);
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: RaisedButton(
+                        color: Colors.redAccent,
+                        onPressed: () async {
+                          bool confirmed = await confirmationDialog(
+                            context,
+                            'Важно',
+                            'Дали сте сигурни дека сакате да ја отстраните оваа пратка од базата на податоци?',
+                          );
+                          if (confirmed) {
+                            BlocProvider.of<ProductBatchBloc>(context).add(
+                              RemoveProductBatch(
+                                warning: widget.batchWarning,
+                              ),
+                            );
+
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: Text('Елиминирај пратка'),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
