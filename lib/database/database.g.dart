@@ -309,6 +309,14 @@ class _$ProductBatchDao extends ProductBatchDao {
   }
 
   @override
+  Future<List<ProductBatch>> searchQuery(String inputString) async {
+    return _queryAdapter.queryList(
+        'SELECT id, barCode, expirationDate, quantity, productId, synced, serverId, INSTR(barCode, ?) inputString FROM ProductBatch WHERE inputString > 0',
+        arguments: <dynamic>[inputString],
+        mapper: _productBatchMapper);
+  }
+
+  @override
   Future<ProductBatch> get(int id) async {
     return _queryAdapter.query('SELECT * FROM ProductBatch WHERE id = ?',
         arguments: <dynamic>[id], mapper: _productBatchMapper);

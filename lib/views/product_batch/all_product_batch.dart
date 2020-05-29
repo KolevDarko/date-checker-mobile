@@ -3,6 +3,8 @@ import 'package:date_checker_app/custom_widgets.dart/custom_product_picker.dart'
 import 'package:date_checker_app/custom_widgets.dart/custom_table.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
+import 'package:date_checker_app/dependencies/debouncer.dart';
+import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/main.dart';
 import 'package:date_checker_app/views/product_batch/unsynced_components_tracker.dart';
 import 'package:flutter/material.dart';
@@ -106,7 +108,13 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                     ),
                   ],
                 ),
-                Container(),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  child: SearchInputWidget(),
+                ),
                 BlocBuilder<ProductBatchBloc, ProductBatchState>(
                   builder: (context, state) {
                     if (state is ProductBatchEmpty) {
@@ -303,6 +311,69 @@ class _CustomDataCellState extends State<CustomDataCell> {
         }
         return null;
       },
+    );
+  }
+}
+
+class SearchInputWidget extends StatefulWidget {
+  @override
+  _SearchInputWidgetState createState() => _SearchInputWidgetState();
+}
+
+class _SearchInputWidgetState extends State<SearchInputWidget> {
+  final _controller = TextEditingController();
+  Debouncer debouncer = dependencyAssembler.get<Debouncer>();
+
+  @override
+  void initState() {
+    _controller.addListener(() {
+      if (_controller.text.length >= 3) {
+        debouncer.run(() {
+          BlocProvider.of<ProductBatchBloc>(context).add(
+            FilterProductBatch(
+              inputValue: _controller.text,
+            ),
+          );
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        TextField(
+          controller: _controller,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: 'Пребарајте пратка',
+            suffixIcon: IconButton(
+              icon: Icon(
+                Icons.close,
+                color: Colors.red,
+              ),
+              onPressed: () {
+                _controller.clear();
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+                BlocProvider.of<ProductBatchBloc>(context).add(
+                  AllProductBatch(),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

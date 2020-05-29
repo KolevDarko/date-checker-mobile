@@ -86,6 +86,15 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
         yield ProductBatchError(
             error: "Грешка при отстранувањето на пратката.");
       }
+    } else if (event is FilterProductBatch) {
+      try {
+        List<ProductBatch> productBatches = await this
+            .productBatchRepository
+            .getFilteredProductBatches(event.inputValue);
+        yield AllProductBatchLoaded(productBatchList: productBatches);
+      } catch (e) {
+        yield ProductBatchError(error: "Грешка при филтрирање на податоци.");
+      }
     }
   }
 }

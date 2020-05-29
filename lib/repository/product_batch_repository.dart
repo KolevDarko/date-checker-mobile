@@ -31,10 +31,11 @@ class ProductBatchRepository {
   }
 
   Future<List<ProductBatch>> getFilteredProductBatches(
-      ProductBatch productBatch) async {
+    String inputValue,
+  ) async {
     try {
       List<ProductBatch> productBatches =
-          await this.db.productBatchDao.getByBarCode(productBatch.barCode);
+          await this.db.productBatchDao.searchQuery(inputValue);
       return productBatches;
     } catch (e) {
       throw Exception("Error fetching items from the db, error: $e");

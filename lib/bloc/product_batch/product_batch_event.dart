@@ -45,10 +45,11 @@ class UploadProductBatchData extends ProductBatchEvent {
 
 class FilterProductBatch extends ProductBatchEvent {
   final ProductBatch productBatch;
+  final String inputValue;
 
-  FilterProductBatch({this.productBatch});
+  FilterProductBatch({this.productBatch, this.inputValue});
   @override
-  List<Object> get props => [productBatch];
+  List<Object> get props => [productBatch, inputValue];
 }
 
 class RemoveProductBatch extends ProductBatchEvent {
