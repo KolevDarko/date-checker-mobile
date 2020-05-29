@@ -85,63 +85,28 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
             child: Column(
               children: <Widget>[
                 Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Expanded(
-                      child: ButtonTheme(
-                        buttonColor: Colors.white,
-                        child: RaisedButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return ItemPickerDialog(
-                                  label: "Пратка",
-                                  database: db,
-                                );
-                              },
-                            );
-                          },
-                          child: Text("Пребарај пратки"),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
                   children: <Widget>[
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: OutlineButton(
-                          onPressed: () {
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: UnsyncedBatchTracker(
+                          callback: () {
                             BlocProvider.of<ProductBatchBloc>(context)
-                              ..add(SyncProductBatchData())
+                              ..add(UploadProductBatchData())
                               ..add(AllProductBatch());
                           },
-                          child: Text(
-                            'Синхронизирај податоци',
-                            textAlign: TextAlign.center,
-                          ),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                      child: UnsyncedBatchTracker(
-                        callback: () {
-                          BlocProvider.of<ProductBatchBloc>(context)
-                            ..add(UploadProductBatchData())
-                            ..add(AllProductBatch());
-                        },
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: UnsavedWarningsTracker(),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                      child: UnsavedWarningsTracker(),
                     ),
                   ],
                 ),
+                Container(),
                 BlocBuilder<ProductBatchBloc, ProductBatchState>(
                   builder: (context, state) {
                     if (state is ProductBatchEmpty) {
@@ -213,24 +178,41 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                 cells: [
                   DataCell(
                     Container(
-                        child: Text(_batch.formatDateTime()),
-                        width: cellWidth,
-                        color:
-                            !_batch.synced ? Colors.red : Colors.transparent),
+                      child: Text(
+                        _batch.formatDateTime(),
+                        style: TextStyle(
+                          color: _textColor(_batch),
+                        ),
+                      ),
+                      width: cellWidth,
+                    ),
                   ),
                   DataCell(
                     CustomDataCell(
                       db: db,
                       width: cellWidth,
                       productId: _batch.productId,
+                      color: _textColor(_batch),
                     ),
                   ),
-                  DataCell(Container(
-                      child: Text("${_batch.quantity}"), width: cellWidth)),
+                  DataCell(
+                    Container(
+                      child: Text(
+                        "${_batch.quantity}",
+                        style: TextStyle(
+                          color: _textColor(_batch),
+                        ),
+                      ),
+                      width: cellWidth,
+                    ),
+                  ),
                   DataCell(Container(
                       child: Text(
                         _batch.barCode,
                         overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _textColor(_batch),
+                        ),
                       ),
                       width: cellWidth)),
                 ],
@@ -240,14 +222,32 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
       ),
     );
   }
+
+  Color _textColor(ProductBatch batch) {
+    if (batch.serverId == null) {
+      return Colors.green;
+    } else if (batch.synced == false && batch.serverId == null) {
+      return Colors.green;
+    } else if (batch.synced == false) {
+      return Colors.red;
+    } else {
+      return Colors.black;
+    }
+  }
 }
 
 class CustomDataCell extends StatefulWidget {
   final int productId;
   final double width;
   final AppDatabase db;
-  const CustomDataCell({Key key, this.productId, this.width, this.db})
-      : super(key: key);
+  final Color color;
+  const CustomDataCell({
+    Key key,
+    this.productId,
+    this.width,
+    this.db,
+    this.color,
+  }) : super(key: key);
 
   @override
   _CustomDataCellState createState() => _CustomDataCellState();
@@ -273,28 +273,36 @@ class _CustomDataCellState extends State<CustomDataCell> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-        future: getProductName,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasError) {
+      future: getProductName,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.hasError) {
+          return Container(
+            child: Text("Something went wrong..."),
+          );
+        }
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+            return Container();
+          case ConnectionState.waiting:
             return Container(
-              child: Text("Something went wrong..."),
+              child: Container(),
+              width: widget.width,
             );
-          }
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return Container();
-            case ConnectionState.waiting:
-              return Container(
-                child: Container(),
-                width: widget.width,
-              );
-            case ConnectionState.active:
-              return Container(
-                  child: CircularProgressIndicator(), width: widget.width);
-            case ConnectionState.done:
-              return Container(child: Text(snapshot.data), width: widget.width);
-          }
-          return null;
-        });
+          case ConnectionState.active:
+            return Container(
+                child: CircularProgressIndicator(), width: widget.width);
+          case ConnectionState.done:
+            return Container(
+                child: Text(
+                  snapshot.data,
+                  style: TextStyle(
+                    color: widget.color,
+                  ),
+                ),
+                width: widget.width);
+        }
+        return null;
+      },
+    );
   }
 }

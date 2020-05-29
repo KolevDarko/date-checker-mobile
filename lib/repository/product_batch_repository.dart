@@ -99,7 +99,7 @@ class ProductBatchRepository {
   Future<String> uploadNewProductBatches() async {
     try {
       List<ProductBatch> localBatches =
-          await this.db.productBatchDao.getLocalProductBatches();
+          await this.db.productBatchDao.getNewProductBatches();
       if (localBatches.length > 0) {
         List<ProductBatch> serverResponseBatches =
             await this.productBatchApiClient.uploadLocalBatches(localBatches);

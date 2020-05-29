@@ -281,9 +281,16 @@ class _$ProductBatchDao extends ProductBatchDao {
   }
 
   @override
-  Future<List<ProductBatch>> getLocalProductBatches() async {
+  Future<List<ProductBatch>> getNewProductBatches() async {
     return _queryAdapter.queryList(
-        'SELECT DISTINCT * FROM ProductBatch WHERE serverId IS NULL OR NOT synced',
+        'SELECT * FROM ProductBatch WHERE serverId IS NULL',
+        mapper: _productBatchMapper);
+  }
+
+  @override
+  Future<List<ProductBatch>> getUnsyncedProductBatches() async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM ProductBatch WHERE NOT sync AND serverId NOT NULL',
         mapper: _productBatchMapper);
   }
 

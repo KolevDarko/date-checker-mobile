@@ -25,7 +25,7 @@ void main() {
       await productBatchDao.add(productBatch2);
 
       List<ProductBatch> savedBatches =
-          await productBatchDao.getLocalProductBatches();
+          await productBatchDao.getNewProductBatches();
 
       print("SAVED BATCHES, : $savedBatches");
 

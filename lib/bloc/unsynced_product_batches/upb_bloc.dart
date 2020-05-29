@@ -58,7 +58,8 @@ class UnsyncedProductBatchBloc
   List<ProductBatch> _mapProductBatchToUnsynced(
       List<ProductBatch> productBatches) {
     return productBatches
-        .where((productBatch) => productBatch.synced == false)
+        .where((productBatch) =>
+            productBatch.synced == false && productBatch.serverId != null)
         .toList();
   }
 

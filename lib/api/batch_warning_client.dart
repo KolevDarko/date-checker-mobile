@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:date_checker_app/api/constants.dart';
+import 'package:date_checker_app/api/helper_functions.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,11 +25,13 @@ class BatchWarningApiClient {
 
   Future<List<BatchWarning>> refreshWarnings(int batchWarningId) async {
     String syncBatchWarningsUrl = '$batchWarningsUrl?last_id=$batchWarningId';
-    final batchWarningResponse =
-        await this.httpClient.get(syncBatchWarningsUrl, headers: authHeaders);
-    if (batchWarningResponse.statusCode != 200) {
-      throw Exception('Error getting new batches');
-    }
+    http.Response batchWarningResponse = await callApiEndPoint(
+      HttpAction.GET,
+      syncBatchWarningsUrl,
+      "Error getting new batches",
+      httpClient,
+    );
+
     final batchWarnings = jsonDecode(batchWarningResponse.body);
     return this.createBatchWarningsFromJson(batchWarnings);
   }
