@@ -6,7 +6,6 @@ import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/debouncer.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/main.dart';
-import 'package:date_checker_app/views/product_batch/unsynced_components_tracker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
