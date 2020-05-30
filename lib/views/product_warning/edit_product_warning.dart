@@ -1,5 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/custom_widgets.dart/confirmation_dialog.dart';
+import 'package:date_checker_app/custom_widgets/confirmation_dialog.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -113,7 +113,9 @@ class _QuantityEditState extends State<QuantityEdit> {
                                 warning: widget.batchWarning,
                               ),
                             );
-
+                            BlocProvider.of<ProductBatchBloc>(context).add(
+                              AllProductBatch(),
+                            );
                             Navigator.of(context).pop();
                           }
                         },

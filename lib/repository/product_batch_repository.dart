@@ -73,25 +73,17 @@ class ProductBatchRepository {
 
   Future<String> closeProductBatch(BatchWarning warning) async {
     try {
-      // delete product warning
-      await this.db.batchWarningDao.delete(warning.id);
+      warning.newQuantity = 0;
+      warning.updated = DateTime.now().toString();
+      warning.status = BatchWarning.batchWarningStatus()[1];
+      await this.db.batchWarningDao.updateBatchWarning(warning);
       ProductBatch productBatch =
           await this.db.productBatchDao.getByServerId(warning.productBatchId);
       productBatch.quantity = 0;
       productBatch.synced = false;
       productBatch.updated = DateTime.now().toString();
       await this.db.productBatchDao.updateProductBatch(productBatch);
-      String message;
-      // try to update online
-      try {
-        // await this.productBatchApiClient.updateProductBatch(productBatch);
-        // await this.db.productBatchDao.delete(warning.productBatchId);
-        message = "Успешно ја избришавте пратката на серверот!";
-      } catch (e) {
-        message =
-            "Успешно ја избришавте пратката од базата на податоци. Ве молиме синхронизирајте со серверот.";
-      }
-      return message;
+      return "Успешно ја елиминиравте пратката од базата на податоци. Ве молиме синхронизирајте со серверот!";
     } catch (e) {
       throw Exception("Error while deleting batch locally.");
     }

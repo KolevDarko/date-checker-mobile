@@ -102,6 +102,15 @@ class MyApp extends StatelessWidget {
             batchWarningRepository: batchWarningRepository,
           ),
         ),
+        BlocProvider<UnsyncedProductBatchBloc>(
+          create: (BuildContext context) => UnsyncedProductBatchBloc(
+            productBatchBloc: BlocProvider.of<ProductBatchBloc>(context),
+          ),
+        ),
+        BlocProvider<UnsyncWarningBloc>(
+          create: (BuildContext context) => UnsyncWarningBloc(
+              batchWarningBloc: BlocProvider.of<BatchWarningBloc>(context)),
+        ),
       ],
       child: MaterialApp(title: "Date Checker App", home: LoginView()),
     );

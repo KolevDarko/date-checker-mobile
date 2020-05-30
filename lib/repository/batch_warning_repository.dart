@@ -9,7 +9,7 @@ class BatchWarningRepository {
   BatchWarningRepository({this.db, this.batchWarningApi});
 
   Future<List<BatchWarning>> warnings() async {
-    return this.db.batchWarningDao.allStatusChecked('NEW');
+    return this.db.batchWarningDao.all();
   }
 
   Future<String> updateQuantity(int quantity, BatchWarning batchWarning) async {
@@ -21,8 +21,11 @@ class BatchWarningRepository {
       productBatch.quantity = quantity;
       productBatch.updated = DateTime.now().toString();
       productBatch.synced = false;
+      batchWarning.status = 'CHECKED';
+      batchWarning.updated = DateTime.now().toString();
+      batchWarning.newQuantity = quantity;
+      await this.db.batchWarningDao.updateBatchWarning(batchWarning);
       await this.db.productBatchDao.updateProductBatch(productBatch);
-      await this.deleteCheckedWarning(batchWarning);
 
       // check if we can update batch warning online
       // String message =
@@ -30,7 +33,7 @@ class BatchWarningRepository {
       // if (message != null) {
       //   return message;
       // }
-      return 'Успешно ја зачувавте промената на количина локално.';
+      return 'Успешно ја променивте количина на пратката.';
     } catch (e) {
       throw Exception("Something went wrong while saving in the database.");
     }

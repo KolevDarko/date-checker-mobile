@@ -1,4 +1,4 @@
-import 'package:date_checker_app/custom_widgets.dart/custom_table.dart';
+import 'package:date_checker_app/custom_widgets/custom_table.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:flutter/material.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
@@ -17,7 +17,6 @@ class _ProductsTableState extends State<ProductsTable> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    BlocProvider.of<ProductBloc>(context).add(FetchAllProducts());
   }
 
   @override

@@ -72,7 +72,6 @@ class UnsyncedProductBatchBloc
 
   @override
   Future<void> close() {
-    print("this 2");
     productBatchSubscription.cancel();
     return super.close();
   }

@@ -1,5 +1,6 @@
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/custom_widgets.dart/custom_table.dart';
+import 'package:date_checker_app/custom_widgets/button_with_indicator.dart';
+import 'package:date_checker_app/custom_widgets/custom_table.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/debouncer.dart';
@@ -34,7 +35,6 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     db = InheritedDataProviderHelper.of(context).database;
-    BlocProvider.of<ProductBatchBloc>(context).add(AllProductBatch());
   }
 
   @override
@@ -90,7 +90,8 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: UnsyncedBatchTracker(
+                        child: ButtonWithIndicator(
+                          buttonIndicator: ButtonIndicator.EditedBatches,
                           callback: () {
                             BlocProvider.of<ProductBatchBloc>(context)
                               ..add(UploadProductBatchData())
@@ -102,7 +103,9 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: UnsavedWarningsTracker(),
+                        child: ButtonWithIndicator(
+                          buttonIndicator: ButtonIndicator.NewUnsavedBatches,
+                        ),
                       ),
                     ),
                   ],

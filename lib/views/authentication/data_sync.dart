@@ -1,9 +1,7 @@
-import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/views/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart';
 
 class DataSync extends StatefulWidget {
   @override
@@ -29,9 +27,6 @@ class _DataSyncState extends State<DataSync> {
     BlocProvider.of<ProductBatchBloc>(context)
       ..add(SyncProductBatchData())
       ..add(AllProductBatch());
-    BlocProvider.of<BatchWarningBloc>(context)
-      ..add(SyncBatchWarnings())
-      ..add(AllBatchWarnings());
   }
 
   @override

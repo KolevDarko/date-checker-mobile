@@ -1,5 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/custom_widgets.dart/custom_product_picker.dart';
+import 'package:date_checker_app/custom_widgets/custom_product_picker.dart';
 
 import 'package:date_checker_app/database/models.dart';
 
