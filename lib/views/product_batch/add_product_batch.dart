@@ -4,25 +4,34 @@ import 'package:date_checker_app/custom_widgets/custom_product_picker.dart';
 import 'package:date_checker_app/database/models.dart';
 
 import 'package:date_checker_app/repository/product_repository.dart';
+import 'package:date_checker_app/views/product_batch/get_product_batch.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
-class AddProductBatchView extends StatefulWidget {
+class AddOrEditProductBatchView extends StatefulWidget {
   final ProductRepository repository;
+  final ProductBatch productBatch;
+  final Product product;
 
-  const AddProductBatchView({Key key, this.repository}) : super(key: key);
+  const AddOrEditProductBatchView({
+    Key key,
+    this.repository,
+    this.productBatch,
+    this.product,
+  }) : super(key: key);
   @override
-  _AddProductBatchViewState createState() => _AddProductBatchViewState();
+  _AddOrEditProductBatchViewState createState() =>
+      _AddOrEditProductBatchViewState();
 }
 
-class _AddProductBatchViewState extends State<AddProductBatchView> {
+class _AddOrEditProductBatchViewState extends State<AddOrEditProductBatchView> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _barCode = TextEditingController();
-  final TextEditingController _quantity = TextEditingController();
-  final TextEditingController _expirationDate = TextEditingController();
+  TextEditingController _barCode;
+  TextEditingController _quantity;
+  TextEditingController _expirationDate;
 
   Product _selectedProduct;
 
@@ -30,27 +39,28 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
   FocusNode _quantityNode = FocusNode();
   FocusNode _expirationDateNode = FocusNode();
 
-  List<Product> products;
   DateTime expirationDate;
+
+  ProductBatch productBatch;
 
   @override
   void initState() {
-    loadProducts();
+    productBatch = widget.productBatch ?? null;
+    _barCode = TextEditingController(text: productBatch?.barCode ?? '');
+    _quantity = TextEditingController(
+        text: productBatch != null ? productBatch.quantity.toString() : '');
+    _expirationDate = TextEditingController(
+        text: productBatch?.formatDateTime(shortYear: false) ?? '');
     super.initState();
-  }
-
-  loadProducts() async {
-    List<Product> products123 = await widget.repository.getAllProducts();
-    setState(() {
-      products = products123;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Product Batch"),
+        title: productBatch == null
+            ? Text("Додај нова пратка")
+            : Text("Промени пратка"),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -62,16 +72,15 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                 focusNode: _barCodeNode,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                  labelText: 'Bar Code',
+                  labelText: 'Бар код',
                 ),
                 onFieldSubmitted: (val) {
                   FocusScope.of(context).requestFocus(_quantityNode);
                 },
                 validator: (value) {
                   if (value.length < 2) {
-                    return 'Bar Code must be atleast 2 characters.';
+                    return 'Бар кодот мора да биде најмалку 2 карактери.';
                   }
-
                   return null;
                 },
               ),
@@ -81,7 +90,7 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                  labelText: 'Quantity',
+                  labelText: 'Количина',
                 ),
                 onFieldSubmitted: (val) {
                   FocusScope.of(context).requestFocus(_expirationDateNode);
@@ -90,9 +99,9 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                   var parsedStringNumber = int.tryParse(value);
 
                   if (value.length == 0) {
-                    return 'Field is required';
+                    return 'Ова поле не може да биде празно.';
                   } else if (parsedStringNumber.runtimeType != int) {
-                    return 'Quantity must be a number';
+                    return 'Количината мора да биде број';
                   }
                   return null;
                 },
@@ -104,7 +113,7 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                  labelText: 'Expiry Date',
+                  labelText: 'Датум на истекување',
                 ),
                 onFieldSubmitted: (val) {
                   FocusScope.of(context).requestFocus(_expirationDateNode);
@@ -128,22 +137,22 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                 },
                 validator: (value) {
                   if (value.length == 0) {
-                    return 'Field is required';
+                    return 'Ова поле не може да биде празно.';
                   } else if (value.length < 2) {
-                    return 'Bar Code must be atleast 2 characters.';
+                    return 'Ова поле мора да биде најмалку 2 карактери.';
                   }
                   return null;
                 },
               ),
               ProductPickerField(
-                products: products,
+                initialValue: widget.product ?? '',
                 context: context,
                 onSaved: (val) {
                   _selectedProduct = val;
                 },
                 validator: (val) {
                   if (val == null) {
-                    return 'This field cannot be empty';
+                    return 'Ова поле не може да биде празно.';
                   }
                   return null;
                 },
@@ -155,21 +164,37 @@ class _AddProductBatchViewState extends State<AddProductBatchView> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: RaisedButton(
+                    color: Colors.green,
                     onPressed: () async {
                       if (_formKey.currentState.validate()) {
-                        ProductBatch productBatch = ProductBatch(
-                          null,
-                          null,
-                          _barCode.text,
-                          _selectedProduct.serverId,
-                          int.tryParse(_quantity.text),
-                          "$expirationDate",
-                          false,
-                          "${DateTime.now()}",
-                          "${DateTime.now()}",
-                        );
-                        BlocProvider.of<ProductBatchBloc>(context)
-                            .add(AddProductBatch(productBatch: productBatch));
+                        if (productBatch == null) {
+                          ProductBatch productBatch = ProductBatch(
+                            null,
+                            null,
+                            _barCode.text,
+                            _selectedProduct.serverId,
+                            int.tryParse(_quantity.text),
+                            expirationDate.toString(),
+                            false,
+                            "${DateTime.now()}",
+                            "${DateTime.now()}",
+                          );
+                          BlocProvider.of<ProductBatchBloc>(context).add(
+                            AddProductBatch(productBatch: productBatch),
+                          );
+                        } else {
+                          productBatch.productId = _selectedProduct.serverId;
+                          productBatch.barCode = _barCode.text;
+                          productBatch.quantity = int.tryParse(_quantity.text);
+                          productBatch.expirationDate =
+                              expirationDate.toString();
+                          productBatch.synced = false;
+                          productBatch.updated = DateTime.now().toString();
+                          // BlocProvider.of<ProductBatchBloc>(context).add(
+                          //   EditProductBatch(productBatch: productBatch),
+                          // );
+                        }
+
                         BlocProvider.of<ProductBatchBloc>(context)
                             .add(AllProductBatch());
                         Navigator.of(context).pop();

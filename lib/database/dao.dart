@@ -21,6 +21,9 @@ abstract class ProductDao {
   @Query('SELECT * FROM Product ORDER BY serverId DESC LIMIT 1')
   Future<Product> getProductWithLastServerId();
 
+  @Query('SELECT * FROM Product WHERE instr(name, :inputString) > 0')
+  Future<List<Product>> getProductsBySearchTerm(String inputString);
+
   Future<int> getLastServerId() async {
     Product lastProduct = await this.getProductWithLastServerId();
     return lastProduct.serverId;

@@ -181,6 +181,14 @@ class _$ProductDao extends ProductDao {
   }
 
   @override
+  Future<List<Product>> getProductsBySearchTerm(String inputString) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM Product WHERE instr(name, ?) > 0',
+        arguments: <dynamic>[inputString],
+        mapper: _productMapper);
+  }
+
+  @override
   Future<void> delete(int id) async {
     await _queryAdapter.queryNoReturn('DELETE FROM Product WHERE id = ?',
         arguments: <dynamic>[id]);

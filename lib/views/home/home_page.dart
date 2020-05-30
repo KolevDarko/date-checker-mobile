@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => AddProductBatchView(
+                  builder: (context) => AddOrEditProductBatchView(
                       repository: BlocProvider.of<ProductBloc>(context)
                           .productRepository),
                 ),

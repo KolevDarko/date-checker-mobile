@@ -6,6 +6,7 @@ import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/debouncer.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/main.dart';
+import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -184,6 +185,21 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
         rows: productBatchList
             .map(
               (_batch) => DataRow(
+                onSelectChanged: (val) async {
+                  Product product =
+                      await this.db.productDao.getByServerId(_batch.productId);
+                  if (val) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => AddOrEditProductBatchView(
+                          productBatch: _batch,
+                          product: product,
+                        ),
+                      ),
+                    );
+                  }
+                },
                 cells: [
                   DataCell(
                     Container(
@@ -215,15 +231,17 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                       width: cellWidth,
                     ),
                   ),
-                  DataCell(Container(
-                      child: Text(
-                        _batch.barCode,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: _textColor(_batch),
+                  DataCell(
+                    Container(
+                        child: Text(
+                          _batch.barCode,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: _textColor(_batch),
+                          ),
                         ),
-                      ),
-                      width: cellWidth)),
+                        width: cellWidth),
+                  ),
                 ],
               ),
             )

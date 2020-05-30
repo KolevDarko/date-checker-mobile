@@ -1,5 +1,3 @@
-import 'package:date_checker_app/database/database.dart';
-import 'package:equatable/equatable.dart';
 import 'package:floor/floor.dart';
 import 'package:flutter/material.dart';
 
@@ -70,7 +68,10 @@ class ProductBatch {
     return DateTime.parse(this.updated);
   }
 
-  String formatDateTime() {
+  String formatDateTime({bool shortYear = true}) {
+    if (!shortYear) {
+      return '${this.returnDateTimeExpDate().day}/${this.returnDateTimeExpDate().month}/${this.returnDateTimeExpDate().year}';
+    }
     return '${this.returnDateTimeExpDate().day}/${this.returnDateTimeExpDate().month}/${this.returnDateTimeExpDate().year.remainder(100)}';
   }
 

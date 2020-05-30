@@ -2,18 +2,18 @@ import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/debouncer.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
+import 'package:date_checker_app/main.dart';
 import 'package:flutter/material.dart';
 
 class ProductPickerField extends FormField<Product> {
   final BuildContext context;
-  final List<Product> products;
 
   ProductPickerField({
     FormFieldSetter<Product> onSaved,
     FormFieldValidator<Product> validator,
     bool autovalidate = false,
     this.context,
-    this.products,
+    initialValue = '',
   }) : super(
           onSaved: onSaved,
           validator: validator,
@@ -25,7 +25,6 @@ class ProductPickerField extends FormField<Product> {
                     context: context,
                     builder: (context) {
                       return ItemPickerDialog(
-                        items: products,
                         label: "Продукт",
                       );
                     }).then((val) {
@@ -36,23 +35,25 @@ class ProductPickerField extends FormField<Product> {
               child: Column(
                 children: <Widget>[
                   Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                            width: 1.0,
-                            color: state.hasError ? Colors.red : Colors.black),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                              width: 1.0,
+                              color:
+                                  state.hasError ? Colors.red : Colors.black),
+                        ),
                       ),
-                    ),
-                    alignment: Alignment.centerLeft,
-                    height: 50.0,
-                    child: state.value != null
-                        ? Text(state.value.toString())
-                        : Text(
-                            'Product',
-                            style: TextStyle(
-                                color: Colors.grey[600], fontSize: 16.0),
-                          ),
-                  ),
+                      alignment: Alignment.centerLeft,
+                      height: 50.0,
+                      child: state.value != null
+                          ? Text(state.value.toString())
+                          : Text(
+                              initialValue != ''
+                                  ? initialValue.name
+                                  : 'Продукт',
+                              style: TextStyle(
+                                  color: Colors.grey[600], fontSize: 16.0),
+                            )),
                   state.hasError
                       ? Container(
                           padding: EdgeInsets.only(top: 5.0),
@@ -70,13 +71,11 @@ class ProductPickerField extends FormField<Product> {
 }
 
 class ItemPickerDialog<T> extends StatefulWidget {
-  final List<T> items;
   final String label;
   final AppDatabase database;
 
   const ItemPickerDialog({
     Key key,
-    this.items,
     this.label,
     this.database,
   }) : super(key: key);
@@ -85,18 +84,15 @@ class ItemPickerDialog<T> extends StatefulWidget {
 }
 
 class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
-  TextEditingController inputController = TextEditingController();
+  TextEditingController _controller = TextEditingController();
   List<dynamic> filteredItems = [];
+  AppDatabase db;
   List<dynamic> allItems;
   Debouncer debouncer = dependencyAssembler.get<Debouncer>();
 
   @override
   void initState() {
-    if (widget.items != null) {
-      allItems = List.from(widget.items);
-      filteredItems = allItems;
-    }
-    inputController.addListener(() {
+    _controller.addListener(() {
       debouncer.run(() async {
         await filterItems();
       });
@@ -105,8 +101,15 @@ class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
   }
 
   @override
+  void didChangeDependencies() {
+    db = InheritedDataProviderHelper.of(context).database;
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     debouncer.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -119,8 +122,8 @@ class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             TextField(
-              decoration: InputDecoration(hintText: "Внесете филтер"),
-              controller: inputController,
+              decoration: InputDecoration(hintText: "Внесете име на производ."),
+              controller: _controller,
             ),
             Column(
               children: _buildDialogItems(filteredItems),
@@ -133,18 +136,9 @@ class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
 
   filterItems() async {
     List<dynamic> filtered = [];
-    if (inputController.text.length > 0) {
-      if (widget.items != null) {
-        filtered = allItems.where((item) {
-          if (item is Product) {
-            return item.barCode.contains(inputController.text) ||
-                item.name.contains(inputController.text);
-          }
-          return null;
-        }).toList();
-      }
-      filtered = await widget.database.productBatchDao
-          .getByBarCode(inputController.text);
+    if (_controller.text.length > 0) {
+      filtered =
+          await this.db.productDao.getProductsBySearchTerm(_controller.text);
     }
     setState(() {
       filteredItems = filtered;
@@ -155,30 +149,32 @@ class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
     List<Widget> dialogItems = [];
     if (filteredItems.length > 0) {
       for (var item in filteredItems) {
-        dialogItems.add(GestureDetector(
-          onTap: () {
-            Navigator.pop(context, item);
-          },
-          child: Container(
-            padding: EdgeInsets.all(10.0),
-            decoration:
-                BoxDecoration(border: Border(bottom: BorderSide(width: 1.0))),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    "${item.toString()}",
-                    overflow: TextOverflow.ellipsis,
+        dialogItems.add(
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context, item);
+            },
+            child: Container(
+              padding: EdgeInsets.all(10.0),
+              decoration:
+                  BoxDecoration(border: Border(bottom: BorderSide(width: 1.0))),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      "${item.toString()}",
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ));
+        );
       }
     } else {
       dialogItems.add(Container(
-        child: Text("Нема пратки со внесениот бар код"),
+        child: Text("Нема производи со внесениот внесениот израз."),
       ));
     }
     return dialogItems;
