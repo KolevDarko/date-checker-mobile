@@ -4,7 +4,6 @@ import 'package:date_checker_app/custom_widgets/custom_product_picker.dart';
 import 'package:date_checker_app/database/models.dart';
 
 import 'package:date_checker_app/repository/product_repository.dart';
-import 'package:date_checker_app/views/product_batch/get_product_batch.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,13 +32,12 @@ class _AddOrEditProductBatchViewState extends State<AddOrEditProductBatchView> {
   TextEditingController _quantity;
   TextEditingController _expirationDate;
 
-  Product _selectedProduct;
-
   FocusNode _barCodeNode = FocusNode();
   FocusNode _quantityNode = FocusNode();
   FocusNode _expirationDateNode = FocusNode();
 
   DateTime expirationDate;
+  Product _selectedProduct;
 
   ProductBatch productBatch;
 
@@ -51,7 +49,20 @@ class _AddOrEditProductBatchViewState extends State<AddOrEditProductBatchView> {
         text: productBatch != null ? productBatch.quantity.toString() : '');
     _expirationDate = TextEditingController(
         text: productBatch?.formatDateTime(shortYear: false) ?? '');
+    _selectedProduct = widget.product ?? null;
+    expirationDate = productBatch?.returnDateTimeExpDate() ?? null;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _barCodeNode.dispose();
+    _quantityNode.dispose();
+    _expirationDateNode.dispose();
+    _barCode.dispose();
+    _quantity.dispose();
+    _expirationDate.dispose();
+    super.dispose();
   }
 
   @override
@@ -145,7 +156,7 @@ class _AddOrEditProductBatchViewState extends State<AddOrEditProductBatchView> {
                 },
               ),
               ProductPickerField(
-                initialValue: widget.product ?? '',
+                initialValue: widget.product ?? null,
                 context: context,
                 onSaved: (val) {
                   _selectedProduct = val;
@@ -178,21 +189,23 @@ class _AddOrEditProductBatchViewState extends State<AddOrEditProductBatchView> {
                             false,
                             "${DateTime.now()}",
                             "${DateTime.now()}",
+                            _selectedProduct.name,
                           );
                           BlocProvider.of<ProductBatchBloc>(context).add(
                             AddProductBatch(productBatch: productBatch),
                           );
                         } else {
                           productBatch.productId = _selectedProduct.serverId;
+                          productBatch.productName = _selectedProduct.name;
                           productBatch.barCode = _barCode.text;
                           productBatch.quantity = int.tryParse(_quantity.text);
                           productBatch.expirationDate =
                               expirationDate.toString();
                           productBatch.synced = false;
                           productBatch.updated = DateTime.now().toString();
-                          // BlocProvider.of<ProductBatchBloc>(context).add(
-                          //   EditProductBatch(productBatch: productBatch),
-                          // );
+                          BlocProvider.of<ProductBatchBloc>(context).add(
+                            EditProductBatch(productBatch: productBatch),
+                          );
                         }
 
                         BlocProvider.of<ProductBatchBloc>(context)

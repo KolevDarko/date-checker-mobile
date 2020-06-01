@@ -54,6 +54,15 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
       }
     } else if (event is BWProductBatchClosed) {
       yield Success(message: event.message);
+    } else if (event is UploadEditedWarnings) {
+      yield BatchWarningLoading();
+      try {
+        await this.batchWarningRepository.uploadEditedWarnings(event.warnings);
+        yield Success(message: 'Успешно ги снимавте истекувањата на серверот');
+      } catch (e) {
+        yield BatchWarningError(
+            error: 'Грешка при снимањето на истекувањата на серверот');
+      }
     }
   }
 

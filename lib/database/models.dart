@@ -38,6 +38,7 @@ class ProductBatch {
   int productId;
   int quantity;
   String expirationDate;
+  String productName;
 
   bool synced;
   String created;
@@ -53,6 +54,7 @@ class ProductBatch {
     this.synced, [
     this.created,
     this.updated,
+    this.productName,
   ]);
 
   @override
@@ -80,12 +82,13 @@ class ProductBatch {
       null,
       json['id'],
       json['id_code'],
-      json['product'],
+      json['product']['id'],
       json['quantity'],
       json['expiration_date'],
       true,
       DateTime.parse(json['created_on']).toString(),
       DateTime.parse(json['updated_on']).toString(),
+      json['product']['name'],
     );
   }
 
@@ -168,6 +171,20 @@ class BatchWarning {
       "${DateTime.now()}",
       "${DateTime.now()}",
     );
+  }
+
+  static Map<String, dynamic> toJson(BatchWarning warning) {
+    return {
+      'id': warning.id,
+      'quantity': warning.newQuantity,
+      'productBatchId': warning.productBatchId,
+    };
+  }
+
+  static Map<String, List<dynamic>> toJsonMap(List<BatchWarning> warnings) {
+    List<dynamic> jsonWarnings =
+        warnings.map((warning) => toJson(warning)).toList();
+    return {'batchWarnings': jsonWarnings};
   }
 
   @override

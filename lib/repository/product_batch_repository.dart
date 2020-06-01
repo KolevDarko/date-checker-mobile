@@ -89,21 +89,28 @@ class ProductBatchRepository {
     }
   }
 
-  Future<String> uploadNewProductBatches() async {
+  Future<String> uploadNewProductBatches(List<ProductBatch> newBatches) async {
     try {
-      List<ProductBatch> localBatches =
-          await this.db.productBatchDao.getNewProductBatches();
-      if (localBatches.length > 0) {
-        List<ProductBatch> serverResponseBatches =
-            await this.productBatchApiClient.uploadLocalBatches(localBatches);
-        await this.updateProductBatchesLocally(serverResponseBatches);
-        return "Успешна синхронизација на податоците.";
-      } else {
-        return 'Локалните податоци се синхронизирани.';
-      }
+      List<ProductBatch> serverResponseBatches =
+          await this.productBatchApiClient.uploadLocalBatches(newBatches);
+      await this.updateProductBatchesLocally(serverResponseBatches);
+      return "Успешна синхронизација на податоците.";
     } catch (e) {
       throw Exception(
           "Something went wrong when tried to update product batches");
+    }
+  }
+
+  Future<void> uploadEditedProductBatches(
+      List<ProductBatch> editedBatches) async {
+    List<ProductBatch> synced = editedBatches;
+    var responseBody =
+        await this.productBatchApiClient.callEditBatch(editedBatches);
+    if (responseBody['success']) {
+      for (ProductBatch batch in synced) {
+        batch.synced = true;
+      }
+      await this.updateProductBatchesLocally(synced);
     }
   }
 
@@ -126,5 +133,9 @@ class ProductBatchRepository {
       throw Exception(
           "Something went wrong when tried to update product batches in the database.");
     }
+  }
+
+  Future<void> updateProductBatch(ProductBatch productBatch) async {
+    await this.db.productBatchDao.updateProductBatch(productBatch);
   }
 }

@@ -36,19 +36,19 @@ class BatchWarningApiClient {
     return this.createBatchWarningsFromJson(batchWarnings);
   }
 
-  Future<bool> updateQuantity(int quantity, ProductBatch productBatch) async {
+  Future<dynamic> updateWarnings(List<BatchWarning> warnings) async {
     try {
-      http.Response updateResponse = await this.httpClient.put(syncBatchesUrl,
-          headers: uploadBatchHeaders,
-          body: json.encode(
-            ProductBatch.toJson(productBatch),
-          ));
+      http.Response updateResponse = await this.httpClient.put(
+            batchWarningsUrl,
+            headers: uploadBatchHeaders,
+            body: json.encode(BatchWarning.toJsonMap(warnings)),
+          );
+
       if (updateResponse.statusCode != 204) {
         throw Exception(
             "Failed to update server data, status code: ${updateResponse.statusCode}");
-      } else {
-        return true;
       }
+      return updateResponse.body;
     } catch (e) {
       throw Exception("Something went wrong when doing update on the server");
     }

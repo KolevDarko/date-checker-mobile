@@ -27,28 +27,24 @@ class BatchWarningRepository {
       await this.db.batchWarningDao.updateBatchWarning(batchWarning);
       await this.db.productBatchDao.updateProductBatch(productBatch);
 
-      // check if we can update batch warning online
-      // String message =
-      //     await this.syncUpdatedQuantityOnline(quantity, productBatch);
-      // if (message != null) {
-      //   return message;
-      // }
       return 'Успешно ја променивте количина на пратката.';
     } catch (e) {
       throw Exception("Something went wrong while saving in the database.");
     }
   }
 
-  Future<String> syncUpdatedQuantityOnline(
-      int quantity, ProductBatch productBatch) async {
+  Future<void> uploadEditedWarnings(List<BatchWarning> warnings) async {
     try {
-      bool saved = await batchWarningApi.updateQuantity(quantity, productBatch);
-      if (saved == true) {
-        productBatch.synced = true;
-        await this.db.productBatchDao.updateProductBatch(productBatch);
-        return 'Успешно ја зачувавте количината на серверот.';
+      var responseBody = await batchWarningApi.updateWarnings(warnings);
+      if (responseBody['success']) {
+        for (BatchWarning warning in warnings) {
+          ProductBatch batch =
+              await this.db.productBatchDao.get(warning.productBatchId);
+          batch.synced = true;
+          await this.db.productBatchDao.updateProductBatch(batch);
+          await this.db.batchWarningDao.delete(warning.id);
+        }
       }
-      return null;
     } catch (e) {
       throw Exception("Failed to update quantity online");
     }

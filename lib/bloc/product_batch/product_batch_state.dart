@@ -75,3 +75,12 @@ class ProductBatchClosedState extends ProductBatchState {
   @override
   List<Object> get props => [message];
 }
+
+class ProductBatchEditSuccess extends ProductBatchState {
+  final String message;
+
+  ProductBatchEditSuccess({this.message});
+
+  @override
+  List<Object> get props => [message];
+}

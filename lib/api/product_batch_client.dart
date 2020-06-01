@@ -62,6 +62,18 @@ class ProductBatchApiClient {
     }
   }
 
+  Future<dynamic> callEditBatch(List<ProductBatch> editedBatches) async {
+    http.Response uploadResponse = await callApiEndPoint(
+      HttpAction.PUT,
+      syncBatchesUrl,
+      "Error uploading edited batches.",
+      httpClient,
+      body: json.encode(ProductBatch.toJsonList(editedBatches)),
+    );
+
+    return json.decode(uploadResponse.body);
+  }
+
   List<ProductBatch> createProductBatchesFromJson(var productBatchesJson) {
     List<ProductBatch> productBatches = [];
     for (var productBatchJson in productBatchesJson) {

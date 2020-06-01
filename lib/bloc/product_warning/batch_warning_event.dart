@@ -32,3 +32,12 @@ class BWProductBatchClosed extends BatchWarningEvent {
   @override
   List<Object> get props => [message];
 }
+
+class UploadEditedWarnings extends BatchWarningEvent {
+  final List<BatchWarning> warnings;
+
+  UploadEditedWarnings({this.warnings});
+
+  @override
+  List<Object> get props => [warnings];
+}

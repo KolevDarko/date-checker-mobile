@@ -81,6 +81,15 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                     content: Text("Успешно додадовте нова пратка."),
                   ),
                 );
+              } else if (state is ProductBatchEditSuccess) {
+                Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
+                Scaffold.of(widget.scaffoldContext).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 4),
+                    backgroundColor: Colors.greenAccent,
+                    content: Text(state.message),
+                  ),
+                );
               }
             },
             child: Column(
@@ -93,9 +102,7 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                         child: ButtonWithIndicator(
                           buttonIndicator: ButtonIndicator.EditedBatches,
                           callback: () {
-                            BlocProvider.of<ProductBatchBloc>(context)
-                              ..add(UploadProductBatchData())
-                              ..add(AllProductBatch());
+                            print("here 1");
                           },
                         ),
                       ),

@@ -13,11 +13,12 @@ class ProductPickerField extends FormField<Product> {
     FormFieldValidator<Product> validator,
     bool autovalidate = false,
     this.context,
-    initialValue = '',
+    initialValue,
   }) : super(
           onSaved: onSaved,
           validator: validator,
           autovalidate: autovalidate,
+          initialValue: initialValue,
           builder: (FormFieldState<Product> state) {
             return GestureDetector(
               onTap: () {
@@ -35,25 +36,23 @@ class ProductPickerField extends FormField<Product> {
               child: Column(
                 children: <Widget>[
                   Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                              width: 1.0,
-                              color:
-                                  state.hasError ? Colors.red : Colors.black),
-                        ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                            width: 1.0,
+                            color: state.hasError ? Colors.red : Colors.black),
                       ),
-                      alignment: Alignment.centerLeft,
-                      height: 50.0,
-                      child: state.value != null
-                          ? Text(state.value.toString())
-                          : Text(
-                              initialValue != ''
-                                  ? initialValue.name
-                                  : 'Продукт',
-                              style: TextStyle(
-                                  color: Colors.grey[600], fontSize: 16.0),
-                            )),
+                    ),
+                    alignment: Alignment.centerLeft,
+                    height: 50.0,
+                    child: state.value != null
+                        ? Text(state.value.toString())
+                        : Text(
+                            'Продукт',
+                            style: TextStyle(
+                                color: Colors.grey[600], fontSize: 16.0),
+                          ),
+                  ),
                   state.hasError
                       ? Container(
                           padding: EdgeInsets.only(top: 5.0),

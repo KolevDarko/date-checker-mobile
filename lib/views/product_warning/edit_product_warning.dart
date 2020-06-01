@@ -26,6 +26,13 @@ class _QuantityEditState extends State<QuantityEdit> {
   }
 
   @override
+  void dispose() {
+    _quantity.dispose();
+    _quantityNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

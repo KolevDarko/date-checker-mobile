@@ -14,6 +14,15 @@ class AddProductBatch extends ProductBatchEvent {
   List<Object> get props => [productBatch];
 }
 
+class EditProductBatch extends ProductBatchEvent {
+  final ProductBatch productBatch;
+
+  EditProductBatch({this.productBatch});
+
+  @override
+  List<Object> get props => [productBatch];
+}
+
 class GetProductBatch extends ProductBatchEvent {
   final int id;
 
@@ -39,8 +48,19 @@ class SyncProductBatchData extends ProductBatchEvent {
 }
 
 class UploadProductBatchData extends ProductBatchEvent {
+  final List<ProductBatch> newBatches;
+
+  UploadProductBatchData({this.newBatches});
   @override
-  List<Object> get props => null;
+  List<Object> get props => [newBatches];
+}
+
+class UploadEditedProductBatches extends ProductBatchEvent {
+  final List<ProductBatch> editedProductBatches;
+
+  UploadEditedProductBatches({this.editedProductBatches});
+  @override
+  List<Object> get props => [editedProductBatches];
 }
 
 class FilterProductBatch extends ProductBatchEvent {

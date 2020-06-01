@@ -36,7 +36,9 @@ class _ButtonWithIndicatorState extends State<ButtonWithIndicator> {
                   textColor: Colors.redAccent,
                   borderSide: BorderSide(color: Colors.redAccent),
                   onPressed: () {
-                    widget.callback();
+                    // BlocProvider.of<ProductBatchBloc>(context)
+                    //   ..add(UploadEditedProductBatches(editedProductBatches: state.unsyncProductBatches))
+                    //   ..add(AllProductBatch());
                   },
                   text: 'Променети',
                   icon: GFBadge(
@@ -63,7 +65,9 @@ class _ButtonWithIndicatorState extends State<ButtonWithIndicator> {
                   textColor: Colors.green,
                   borderSide: BorderSide(color: Colors.green),
                   onPressed: () {
-                    widget.callback();
+                    // BlocProvider.of<ProductBatchBloc>(context)
+                    //   ..add(UploadProductBatchData(newBatches: state.unsavedProductBatches))
+                    //   ..add(AllProductBatch());
                   },
                   text: 'Нови',
                   icon: GFBadge(
@@ -89,7 +93,9 @@ class _ButtonWithIndicatorState extends State<ButtonWithIndicator> {
                   textColor: Colors.orange,
                   borderSide: BorderSide(color: Colors.orange),
                   onPressed: () {
-                    widget.callback();
+                    // BlocProvider.of<BatchWarningBloc>(context)
+                    //   ..add(UploadEditedWarnings(warnings: state.unsyncWarnings))
+                    //   ..add(AllBatchWarnings());
                   },
                   text: 'Проверени',
                   icon: GFBadge(

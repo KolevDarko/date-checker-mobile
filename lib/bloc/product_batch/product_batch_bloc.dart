@@ -70,8 +70,9 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
     } else if (event is UploadProductBatchData) {
       yield ProductBatchLoading();
       try {
-        String message =
-            await this.productBatchRepository.uploadNewProductBatches();
+        String message = await this
+            .productBatchRepository
+            .uploadNewProductBatches(event.newBatches);
         yield UploadProductBatchesSuccess(message: message);
       } catch (e) {
         yield ProductBatchError(
@@ -94,6 +95,29 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
         yield AllProductBatchLoaded(productBatchList: productBatches);
       } catch (e) {
         yield ProductBatchError(error: "Грешка при филтрирање на податоци.");
+      }
+    } else if (event is EditProductBatch) {
+      try {
+        await this
+            .productBatchRepository
+            .updateProductBatch(event.productBatch);
+        yield ProductBatchEditSuccess(
+            message: 'Успешно ја променивте пратката.');
+      } catch (e) {
+        yield ProductBatchError(error: "Грешка при снимањето на пратката.");
+      }
+    } else if (event is UploadEditedProductBatches) {
+      yield ProductBatchLoading();
+      try {
+        await this
+            .productBatchRepository
+            .uploadEditedProductBatches(event.editedProductBatches);
+        yield UploadProductBatchesSuccess(
+            message: "Успешно ги снимавте променетите пратки на серверот.");
+      } catch (e) {
+        yield ProductBatchError(
+            error:
+                "Грешка при синхронизација со серверот. Ве молиме пробајте повторно.");
       }
     }
   }
