@@ -86,14 +86,15 @@ class _QuantityEditState extends State<QuantityEdit> {
                             if (widget.oldQuantity == quantity) {
                               Navigator.pop(context);
                             } else {
-                              BlocProvider.of<BatchWarningBloc>(context).add(
-                                EditQuantityEvent(
-                                  quantity: quantity,
-                                  batchWarning: widget.batchWarning,
-                                ),
-                              );
                               BlocProvider.of<BatchWarningBloc>(context)
-                                  .add(AllBatchWarnings());
+                                ..add(
+                                  EditQuantityEvent(
+                                    quantity: quantity,
+                                    batchWarning: widget.batchWarning,
+                                  ),
+                                )
+                                ..add(AllBatchWarnings());
+                              BlocProvider.of<BatchWarningBloc>(context);
                               BlocProvider.of<ProductBatchBloc>(context)
                                   .add(AllProductBatch());
                               Navigator.pop(context);
@@ -123,7 +124,6 @@ class _QuantityEditState extends State<QuantityEdit> {
                             BlocProvider.of<ProductBatchBloc>(context).add(
                               AllProductBatch(),
                             );
-                            Navigator.of(context).pop();
                           }
                         },
                         child: Text('Елиминирај пратка'),

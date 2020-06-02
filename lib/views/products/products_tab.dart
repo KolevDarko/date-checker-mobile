@@ -5,19 +5,21 @@ import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductsTable extends StatefulWidget {
-  final BuildContext scaffoldContext;
-
-  const ProductsTable({Key key, this.scaffoldContext}) : super(key: key);
+  const ProductsTable({Key key}) : super(key: key);
 
   @override
   _ProductsTableState createState() => _ProductsTableState();
 }
 
-class _ProductsTableState extends State<ProductsTable> {
+class _ProductsTableState extends State<ProductsTable>
+    with AutomaticKeepAliveClientMixin {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +27,8 @@ class _ProductsTableState extends State<ProductsTable> {
       body: BlocListener<ProductBloc, ProductState>(
         listener: (context, state) {
           if (state is ProductSyncDone) {
-            Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
-            Scaffold.of(widget.scaffoldContext).showSnackBar(
+            Scaffold.of(context).removeCurrentSnackBar();
+            Scaffold.of(context).showSnackBar(
               SnackBar(
                 duration: Duration(seconds: 3),
                 backgroundColor: Colors.green,

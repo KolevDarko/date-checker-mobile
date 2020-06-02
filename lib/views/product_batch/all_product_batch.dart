@@ -3,33 +3,24 @@ import 'package:date_checker_app/custom_widgets/button_with_indicator.dart';
 import 'package:date_checker_app/custom_widgets/custom_table.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/dependencies/debouncer.dart';
-import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/main.dart';
+import 'package:date_checker_app/views/product_batch/_search_component.dart';
 import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductBatchTable extends StatefulWidget {
-  final bool orderByDate;
-  final Function callBack;
-  final BuildContext scaffoldContext;
-
   const ProductBatchTable({
     Key key,
-    this.orderByDate,
-    this.callBack,
-    this.scaffoldContext,
   }) : super(key: key);
   @override
   _ProductBatchTableState createState() => _ProductBatchTableState();
 }
 
-class _ProductBatchTableState extends State<ProductBatchTable> {
-  bool orderByDate;
+class _ProductBatchTableState extends State<ProductBatchTable>
+    with AutomaticKeepAliveClientMixin {
+  bool orderByDate = false;
   AppDatabase db;
-  // @override
-  // bool get wantKeepAlive => true;
 
   @override
   void didChangeDependencies() {
@@ -38,52 +29,49 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    orderByDate = widget.orderByDate;
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(top: 20.0),
           child: BlocListener<ProductBatchBloc, ProductBatchState>(
             listener: (context, state) {
-              if (state is SyncProductDataSuccess) {
-                Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
-                Scaffold.of(widget.scaffoldContext).showSnackBar(
+              if (state is UploadProductBatchesSuccess) {
+                Scaffold.of(context).removeCurrentSnackBar();
+                Scaffold.of(context).showSnackBar(
                   SnackBar(
-                    duration: Duration(seconds: 3),
-                    backgroundColor: Colors.green,
-                    content: Text(state.message),
-                  ),
-                );
-              } else if (state is UploadProductBatchesSuccess) {
-                Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
-                Scaffold.of(widget.scaffoldContext).showSnackBar(
-                  SnackBar(
-                    duration: Duration(seconds: 3),
+                    duration: Duration(seconds: 4),
                     backgroundColor: Colors.green,
                     content: Text(state.message),
                   ),
                 );
               } else if (state is ProductBatchError) {
-                Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
-                Scaffold.of(widget.scaffoldContext).showSnackBar(
+                Scaffold.of(context).removeCurrentSnackBar();
+
+                Scaffold.of(context).showSnackBar(
                   SnackBar(
-                    duration: Duration(seconds: 3),
+                    duration: Duration(seconds: 4),
                     backgroundColor: Colors.redAccent,
                     content: Text(state.error),
                   ),
                 );
               } else if (state is ProductBatchAdded) {
-                Scaffold.of(widget.scaffoldContext).showSnackBar(
+                Scaffold.of(context).removeCurrentSnackBar();
+
+                Scaffold.of(context).showSnackBar(
                   SnackBar(
-                    duration: Duration(seconds: 3),
+                    duration: Duration(seconds: 4),
                     backgroundColor: Colors.greenAccent,
                     content: Text("Успешно додадовте нова пратка."),
                   ),
                 );
               } else if (state is ProductBatchEditSuccess) {
-                Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
-                Scaffold.of(widget.scaffoldContext).showSnackBar(
+                Scaffold.of(context).removeCurrentSnackBar();
+
+                Scaffold.of(context).showSnackBar(
                   SnackBar(
                     duration: Duration(seconds: 4),
                     backgroundColor: Colors.greenAccent,
@@ -99,19 +87,30 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: ButtonWithIndicator(
-                          buttonIndicator: ButtonIndicator.EditedBatches,
-                          callback: () {
-                            print("here 1");
-                          },
+                        child: BlocProvider<UnsyncedProductBatchBloc>(
+                          create: (BuildContext context) =>
+                              UnsyncedProductBatchBloc(
+                            productBatchBloc:
+                                BlocProvider.of<ProductBatchBloc>(context),
+                          ),
+                          child: ButtonWithIndicator(
+                            buttonIndicator: ButtonIndicator.EditedBatches,
+                          ),
                         ),
                       ),
                     ),
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: ButtonWithIndicator(
-                          buttonIndicator: ButtonIndicator.NewUnsavedBatches,
+                        child: BlocProvider<UnsyncedProductBatchBloc>(
+                          create: (BuildContext context) =>
+                              UnsyncedProductBatchBloc(
+                            productBatchBloc:
+                                BlocProvider.of<ProductBatchBloc>(context),
+                          ),
+                          child: ButtonWithIndicator(
+                            buttonIndicator: ButtonIndicator.NewUnsavedBatches,
+                          ),
                         ),
                       ),
                     ),
@@ -174,7 +173,6 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
               ),
             ),
             onSort: (i, b) {
-              widget.callBack();
               if (!orderByDate) {
                 BlocProvider.of<ProductBatchBloc>(context).add(
                   OrderByExpiryDateEvent(),
@@ -183,6 +181,9 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                 BlocProvider.of<ProductBatchBloc>(context)
                     .add(AllProductBatch());
               }
+              setState(() {
+                orderByDate = !orderByDate;
+              });
             },
           ),
           DataColumn(label: Text('Производ')),
@@ -220,11 +221,14 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
                     ),
                   ),
                   DataCell(
-                    CustomDataCell(
-                      db: db,
+                    Container(
+                      child: Text(
+                        "${_batch.productName}",
+                        style: TextStyle(
+                          color: _textColor(_batch),
+                        ),
+                      ),
                       width: cellWidth,
-                      productId: _batch.productId,
-                      color: _textColor(_batch),
                     ),
                   ),
                   DataCell(
@@ -267,139 +271,5 @@ class _ProductBatchTableState extends State<ProductBatchTable> {
     } else {
       return Colors.black;
     }
-  }
-}
-
-class CustomDataCell extends StatefulWidget {
-  final int productId;
-  final double width;
-  final AppDatabase db;
-  final Color color;
-  const CustomDataCell({
-    Key key,
-    this.productId,
-    this.width,
-    this.db,
-    this.color,
-  }) : super(key: key);
-
-  @override
-  _CustomDataCellState createState() => _CustomDataCellState();
-}
-
-class _CustomDataCellState extends State<CustomDataCell> {
-  Future<String> getProductName;
-
-  @override
-  void didChangeDependencies() {
-    getProductName = _getProduct();
-    super.didChangeDependencies();
-  }
-
-  Future<String> _getProduct() async {
-    Product product;
-    try {
-      product = await widget.db.productDao.getByServerId(widget.productId);
-    } catch (e) {}
-    return product.name;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: getProductName,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            child: Text("Something went wrong..."),
-          );
-        }
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-            return Container();
-          case ConnectionState.waiting:
-            return Container(
-              child: Container(),
-              width: widget.width,
-            );
-          case ConnectionState.active:
-            return Container(
-                child: CircularProgressIndicator(), width: widget.width);
-          case ConnectionState.done:
-            return Container(
-                child: Text(
-                  snapshot.data,
-                  style: TextStyle(
-                    color: widget.color,
-                  ),
-                ),
-                width: widget.width);
-        }
-        return null;
-      },
-    );
-  }
-}
-
-class SearchInputWidget extends StatefulWidget {
-  @override
-  _SearchInputWidgetState createState() => _SearchInputWidgetState();
-}
-
-class _SearchInputWidgetState extends State<SearchInputWidget> {
-  final _controller = TextEditingController();
-  Debouncer debouncer = dependencyAssembler.get<Debouncer>();
-
-  @override
-  void initState() {
-    _controller.addListener(() {
-      if (_controller.text.length >= 3) {
-        debouncer.run(() {
-          BlocProvider.of<ProductBatchBloc>(context).add(
-            FilterProductBatch(
-              inputValue: _controller.text,
-            ),
-          );
-        });
-      }
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        TextField(
-          controller: _controller,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: 'Пребарајте пратка',
-            suffixIcon: IconButton(
-              icon: Icon(
-                Icons.close,
-                color: Colors.red,
-              ),
-              onPressed: () {
-                _controller.clear();
-                FocusScopeNode currentFocus = FocusScope.of(context);
-                if (!currentFocus.hasPrimaryFocus) {
-                  currentFocus.unfocus();
-                }
-                BlocProvider.of<ProductBatchBloc>(context).add(
-                  AllProductBatch(),
-                );
-              },
-            ),
-          ),
-        ),
-      ],
-    );
   }
 }

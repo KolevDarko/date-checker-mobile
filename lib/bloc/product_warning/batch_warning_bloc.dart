@@ -40,6 +40,7 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
       try {
         String message = await batchWarningRepository.updateQuantity(
             event.quantity, event.batchWarning);
+        productBatchBloc.add(AllProductBatch());
         yield Success(message: message);
       } catch (e) {
         yield BatchWarningError(error: 'Грешка при зачувување на промени.');

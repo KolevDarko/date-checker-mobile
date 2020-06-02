@@ -26,7 +26,6 @@ class BatchWarningRepository {
       batchWarning.newQuantity = quantity;
       await this.db.batchWarningDao.updateBatchWarning(batchWarning);
       await this.db.productBatchDao.updateProductBatch(productBatch);
-
       return 'Успешно ја променивте количина на пратката.';
     } catch (e) {
       throw Exception("Something went wrong while saving in the database.");

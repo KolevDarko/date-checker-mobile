@@ -65,9 +65,7 @@ abstract class ProductBatchDao {
   Future<List<ProductBatch>> getByBarCode(String barCode);
 
   @Query(
-      """SELECT id, barCode, expirationDate, quantity, productId, synced, serverId, INSTR(barCode, :inputString) inputString FROM ProductBatch
-         WHERE inputString > 0
-      """)
+      "SELECT * FROM ProductBatch WHERE INSTR(productName, :inputString) > 0")
   Future<List<ProductBatch>> searchQuery(String inputString);
 
   @Query('SELECT * FROM ProductBatch WHERE id = :id')

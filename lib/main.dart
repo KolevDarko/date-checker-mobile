@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<ProductBloc>(
+          BlocProvider<ProductBloc>(
           create: (BuildContext context) =>
               ProductBloc(productRepository: productRepository),
         ),
@@ -102,17 +102,11 @@ class MyApp extends StatelessWidget {
             batchWarningRepository: batchWarningRepository,
           ),
         ),
-        BlocProvider<UnsyncedProductBatchBloc>(
-          create: (BuildContext context) => UnsyncedProductBatchBloc(
-            productBatchBloc: BlocProvider.of<ProductBatchBloc>(context),
-          ),
-        ),
-        BlocProvider<UnsyncWarningBloc>(
-          create: (BuildContext context) => UnsyncWarningBloc(
-              batchWarningBloc: BlocProvider.of<BatchWarningBloc>(context)),
-        ),
       ],
-      child: MaterialApp(title: "Date Checker App", home: LoginView()),
+      child: MaterialApp(
+        title: "Date Checker App",
+        home: LoginView(),
+      ),
     );
   }
 }

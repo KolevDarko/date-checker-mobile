@@ -12,7 +12,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool orderByExpiry = false;
   int _currentTabIndex = 0;
   BuildContext scaffoldContext;
 
@@ -26,52 +25,40 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
   }
 
-  toggleOrderByExpiry() {
-    setState(() {
-      orderByExpiry = !orderByExpiry;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-            bottom: TabBar(
-              onTap: (int currentTabIndex) {
-                setState(() {
-                  _currentTabIndex = currentTabIndex;
-                });
-              },
-              tabs: [
-                Tab(icon: Text('Пратки')),
-                Tab(icon: Text('Истекување')),
-                Tab(icon: Text("Производи")),
-              ],
-            ),
-            title: Text('Date Checker Tabs')),
-        body: Builder(
-          builder: (BuildContext context) {
-            scaffoldContext = context;
-            return TabBarView(
-              children: [
-                ProductBatchTable(
-                  orderByDate: orderByExpiry,
-                  callBack: toggleOrderByExpiry,
-                  scaffoldContext: context,
-                ),
-                BatchWarningTable(
-                  scaffoldContext: context,
-                ),
-                ProductsTable(
-                  scaffoldContext: context,
-                ),
-              ],
-            );
-          },
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+              bottom: TabBar(
+                onTap: (int currentTabIndex) {
+                  setState(() {
+                    _currentTabIndex = currentTabIndex;
+                  });
+                },
+                tabs: [
+                  Tab(icon: Text('Пратки')),
+                  Tab(icon: Text('Истекување')),
+                  Tab(icon: Text("Производи")),
+                ],
+              ),
+              title: Text('Date Checker Tabs')),
+          body: Builder(
+            builder: (BuildContext context) {
+              return TabBarView(
+                children: [
+                  ProductBatchTable(),
+                  BatchWarningTable(),
+                  ProductsTable(),
+                ],
+              );
+            },
+          ),
+          floatingActionButton: customFloatingButton(_currentTabIndex),
         ),
-        floatingActionButton: customFloatingButton(_currentTabIndex),
       ),
     );
   }
@@ -84,9 +71,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => AddOrEditProductBatchView(
-                      repository: BlocProvider.of<ProductBloc>(context)
-                          .productRepository),
+                  builder: (context) => AddOrEditProductBatchView(),
                 ),
               );
             },

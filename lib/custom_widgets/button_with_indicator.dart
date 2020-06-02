@@ -65,9 +65,10 @@ class _ButtonWithIndicatorState extends State<ButtonWithIndicator> {
                   textColor: Colors.green,
                   borderSide: BorderSide(color: Colors.green),
                   onPressed: () {
-                    // BlocProvider.of<ProductBatchBloc>(context)
-                    //   ..add(UploadProductBatchData(newBatches: state.unsavedProductBatches))
-                    //   ..add(AllProductBatch());
+                    BlocProvider.of<ProductBatchBloc>(context)
+                      ..add(UploadProductBatchData(
+                          newBatches: state.unsavedProductBatches))
+                      ..add(AllProductBatch());
                   },
                   text: 'Нови',
                   icon: GFBadge(

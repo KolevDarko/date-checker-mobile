@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:floor/floor.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +30,7 @@ class Product {
 }
 
 @entity
-class ProductBatch {
+class ProductBatch extends Equatable {
   @PrimaryKey(autoGenerate: true)
   int id;
 
@@ -108,6 +109,20 @@ class ProductBatch {
       List<ProductBatch> productBatches) {
     return productBatches.map((elem) => toJson(elem)).toList();
   }
+
+  @override
+  List<Object> get props => [
+        id,
+        serverId,
+        barCode,
+        productId,
+        quantity,
+        expirationDate,
+        synced,
+        created,
+        updated,
+        productName
+      ];
 }
 
 @entity

@@ -87,7 +87,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Product` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `name` TEXT, `price` REAL, `barCode` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `synced` INTEGER, `created` TEXT, `updated` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `productName` TEXT, `synced` INTEGER, `created` TEXT, `updated` TEXT)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productName` TEXT, `daysLeft` INTEGER, `expirationDate` TEXT, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT)');
 
@@ -234,6 +234,7 @@ class _$ProductBatchDao extends ProductBatchDao {
                   'productId': item.productId,
                   'quantity': item.quantity,
                   'expirationDate': item.expirationDate,
+                  'productName': item.productName,
                   'synced': item.synced ? 1 : 0,
                   'created': item.created,
                   'updated': item.updated
@@ -249,6 +250,7 @@ class _$ProductBatchDao extends ProductBatchDao {
                   'productId': item.productId,
                   'quantity': item.quantity,
                   'expirationDate': item.expirationDate,
+                  'productName': item.productName,
                   'synced': item.synced ? 1 : 0,
                   'created': item.created,
                   'updated': item.updated
@@ -269,7 +271,8 @@ class _$ProductBatchDao extends ProductBatchDao {
       row['expirationDate'] as String,
       (row['synced'] as int) != 0,
       row['created'] as String,
-      row['updated'] as String);
+      row['updated'] as String,
+      row['productName'] as String);
 
   final InsertionAdapter<ProductBatch> _productBatchInsertionAdapter;
 
@@ -319,7 +322,7 @@ class _$ProductBatchDao extends ProductBatchDao {
   @override
   Future<List<ProductBatch>> searchQuery(String inputString) async {
     return _queryAdapter.queryList(
-        'SELECT id, barCode, expirationDate, quantity, productId, synced, serverId, INSTR(barCode, ?) inputString FROM ProductBatch WHERE inputString > 0',
+        'SELECT * FROM ProductBatch WHERE INSTR(productName, ?) > 0',
         arguments: <dynamic>[inputString],
         mapper: _productBatchMapper);
   }

@@ -11,13 +11,11 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
 class AddOrEditProductBatchView extends StatefulWidget {
-  final ProductRepository repository;
   final ProductBatch productBatch;
   final Product product;
 
   const AddOrEditProductBatchView({
     Key key,
-    this.repository,
     this.productBatch,
     this.product,
   }) : super(key: key);
