@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/views/home/home_page.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +12,11 @@ class DataSync extends StatefulWidget {
 
 class _DataSyncState extends State<DataSync> {
   Future<void> saveBatchWarnings;
+  StreamSubscription productBatchSubscription;
 
   @override
   void initState() {
     super.initState();
-
-    Future(() {
-      Navigator.push(context, MaterialPageRoute(builder: (ctx) => HomePage()));
-    });
   }
 
   Future<void> _saveBatchWarnings() async {
@@ -30,8 +29,21 @@ class _DataSyncState extends State<DataSync> {
   }
 
   @override
+  void dispose() {
+    productBatchSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
   void didChangeDependencies() {
     saveBatchWarnings = _saveBatchWarnings();
+    productBatchSubscription =
+        BlocProvider.of<ProductBatchBloc>(context).listen((state) {
+      if (state is AllProductBatchLoaded) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (ctx) => HomePage()));
+      }
+    });
     super.didChangeDependencies();
   }
 
@@ -42,22 +54,8 @@ class _DataSyncState extends State<DataSync> {
         title: Text('Data Sync'),
         centerTitle: true,
       ),
-      body: FutureBuilder(
-        future: saveBatchWarnings,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasError) {
-            return Text('Something went wrong');
-          }
-          if (snapshot.connectionState == ConnectionState.none) {
-            return Container();
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.connectionState == ConnectionState.done) {
-            return Container();
-          }
-        },
+      body: Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }
