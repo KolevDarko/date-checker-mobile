@@ -16,25 +16,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   @override
   Stream<ProductState> mapEventToState(ProductEvent event) async* {
-    if (event is FetchProduct) {
-      yield ProductLoading();
-      try {
-        final Product product = await productRepository.getProduct(event.id);
-        yield ProductLoaded(product: product);
-      } catch (_) {
-        yield ProductError(error: "Something went wrong");
-      }
-    } else if (event is AddProductEvent) {
-      yield ProductLoading();
-      try {
-        // int productId = await productRepository.addProduct(event.storeId,
-        //     event.productName, event.price, event.quantity, event.expiryDate);
-        // yield ProductAdded(productId: productId);
-      } catch (e) {
-        yield ProductError(
-            error: "Something went wrong when saving the product.");
-      }
-    } else if (event is FetchAllProducts) {
+    if (event is FetchAllProducts) {
       yield ProductLoading();
       try {
         final List<Product> products = await productRepository.getAllProducts();
@@ -45,8 +27,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     } else if (event is SyncProductData) {
       yield ProductLoading();
       try {
-        String syncDataMessage = await this.productRepository.syncProducts();
-        yield ProductSyncDone(message: syncDataMessage);
+        int productsLength = await this.productRepository.syncProducts();
+        if (productsLength == 0) {
+          yield ProductSyncDone(message: 'Нема нови продукти.');
+        } else {
+          yield ProductSyncDone(
+              message: 'Успешно ги синхронизиравте продуктите.');
+        }
+        this.add(FetchAllProducts());
       } catch (e) {
         yield ProductError(error: "Грешка при синхронизација на податоци");
       }

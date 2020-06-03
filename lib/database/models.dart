@@ -27,10 +27,18 @@ class Product {
       json['id_code'],
     );
   }
+
+  static List<Product> productsListFromJson(var productsJson) {
+    List<Product> products = [];
+    for (var productJson in productsJson) {
+      products.add(Product.fromJson(productJson));
+    }
+    return products;
+  }
 }
 
 @entity
-class ProductBatch extends Equatable {
+class ProductBatch {
   @PrimaryKey(autoGenerate: true)
   int id;
 
@@ -109,20 +117,6 @@ class ProductBatch extends Equatable {
       List<ProductBatch> productBatches) {
     return productBatches.map((elem) => toJson(elem)).toList();
   }
-
-  @override
-  List<Object> get props => [
-        id,
-        serverId,
-        barCode,
-        productId,
-        quantity,
-        expirationDate,
-        synced,
-        created,
-        updated,
-        productName
-      ];
 }
 
 @entity

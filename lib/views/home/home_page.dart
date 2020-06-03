@@ -95,9 +95,7 @@ class _HomePageState extends State<HomePage> {
         {
           return FloatingActionButton(
             onPressed: () {
-              BlocProvider.of<ProductBloc>(context)
-                ..add(SyncProductData())
-                ..add(FetchAllProducts());
+              BlocProvider.of<ProductBloc>(context).add(SyncProductData());
             },
             child: Icon(Icons.refresh),
           );

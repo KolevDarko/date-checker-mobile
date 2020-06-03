@@ -25,17 +25,8 @@ class ProductsApiClient {
       throw Exception("Couldn't get products data");
     }
     responseBody = jsonDecode(productResponse.body);
-
     productsJson = await getAllDataFromApiPoint(responseBody, httpClient);
-    return this.createProductsFromJson(productsJson);
-  }
-
-  List<Product> createProductsFromJson(var productsJson) {
-    List<Product> products = [];
-    for (var productJson in productsJson) {
-      products.add(Product.fromJson(productJson));
-    }
-    return products;
+    return Product.productsListFromJson(productsJson);
   }
 
   Future<List<Product>> syncProducts(int lastProductId) async {
@@ -47,6 +38,6 @@ class ProductsApiClient {
       this.httpClient,
     );
     var productsJson = jsonDecode(productsSyncResponse.body);
-    return this.createProductsFromJson(productsJson);
+    return Product.productsListFromJson(productsJson);
   }
 }

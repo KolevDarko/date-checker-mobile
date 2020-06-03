@@ -12,23 +12,7 @@ class ProductRepository {
     return this.db.productDao.all();
   }
 
-  Future<List<Product>> getSuggestions(String pattern) async {
-    List<Product> products = await getAllProducts();
-    List<Product> suggested = [];
-    for (Product product in products) {
-      if (product.barCode.toLowerCase().contains(pattern.toLowerCase())) {
-        suggested.add(product);
-      }
-    }
-    return suggested;
-  }
-
-  Future<Product> getProduct(int productId) async {
-    Product product = await this.db.productDao.get(productId);
-    return product;
-  }
-
-  Future<String> syncProducts() async {
+  Future<int> syncProducts() async {
     int lastProductId;
     List<Product> newProducts = [];
     try {
@@ -41,12 +25,11 @@ class ProductRepository {
     } else {
       newProducts = await this.productsApiClient.getAllProducts();
     }
-    if (newProducts.length > 0) {
+    int newProductsLength = newProducts.length;
+    if (newProductsLength > 0) {
       await this.saveProductsLocally(newProducts);
-      return 'Успешно ги синхронизиравте продуктите.';
-    } else {
-      return 'Нема нови продукти.';
     }
+    return newProductsLength;
   }
 
   Future<void> saveProductsLocally(List<Product> newProducts) async {
