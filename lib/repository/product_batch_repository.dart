@@ -8,12 +8,6 @@ class ProductBatchRepository {
 
   ProductBatchRepository({this.productBatchApiClient, this.db});
 
-  Future<ProductBatch> getProductBatch(int productBatchId) async {
-    ProductBatch productBatch =
-        await this.db.productBatchDao.get(productBatchId);
-    return productBatch;
-  }
-
   Future<int> addProductBatch(ProductBatch productBatch) async {
     try {
       int productBatchId = await this.db.productBatchDao.add(productBatch);
@@ -44,7 +38,6 @@ class ProductBatchRepository {
 
   Future<List<ProductBatch>> orderedByExpiryDateList() async {
     List<ProductBatch> productBatchList = await allProductBatchList();
-
     productBatchList.sort((a, b) =>
         a.returnDateTimeExpDate().compareTo(b.returnDateTimeExpDate()));
 

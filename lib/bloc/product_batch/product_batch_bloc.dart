@@ -17,16 +17,7 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
 
   @override
   Stream<ProductBatchState> mapEventToState(ProductBatchEvent event) async* {
-    if (event is GetProductBatch) {
-      yield ProductBatchLoading();
-      try {
-        final ProductBatch productBatch =
-            await productBatchRepository.getProductBatch(event.id);
-        yield ProductBatchLoaded(productBatch: productBatch);
-      } catch (_) {
-        yield ProductBatchError(error: "Something went wrong");
-      }
-    } else if (event is AddProductBatch) {
+    if (event is AddProductBatch) {
       yield ProductBatchLoading();
       try {
         int productBatchId =

@@ -23,15 +23,6 @@ class EditProductBatch extends ProductBatchEvent {
   List<Object> get props => [productBatch];
 }
 
-class GetProductBatch extends ProductBatchEvent {
-  final int id;
-
-  GetProductBatch(this.id);
-
-  @override
-  List<Object> get props => [id];
-}
-
 class OrderByExpiryDateEvent extends ProductBatchEvent {
   @override
   List<Object> get props => null;
