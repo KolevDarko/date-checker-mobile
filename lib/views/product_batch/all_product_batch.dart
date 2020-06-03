@@ -3,6 +3,7 @@ import 'package:date_checker_app/custom_widgets/button_with_indicator.dart';
 import 'package:date_checker_app/custom_widgets/custom_table.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
+import 'package:date_checker_app/dependencies/date_time_formatter.dart';
 import 'package:date_checker_app/main.dart';
 import 'package:date_checker_app/views/product_batch/_search_component.dart';
 import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
@@ -212,7 +213,7 @@ class _ProductBatchTableState extends State<ProductBatchTable>
                   DataCell(
                     Container(
                       child: Text(
-                        _batch.formatDateTime(),
+                        DateTimeFormatter.formatDateDMY(_batch.expirationDate),
                         style: TextStyle(
                           color: _textColor(_batch),
                         ),

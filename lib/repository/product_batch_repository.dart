@@ -1,6 +1,7 @@
 import 'package:date_checker_app/api/product_batch_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
+import 'package:date_checker_app/dependencies/date_time_formatter.dart';
 
 class ProductBatchRepository {
   final ProductBatchApiClient productBatchApiClient;
@@ -19,8 +20,8 @@ class ProductBatchRepository {
 
   Future<List<ProductBatch>> allProductBatchList() async {
     List<ProductBatch> productBatchList = await this.db.productBatchDao.all();
-    productBatchList.sort((a, b) =>
-        b.returnDateTimeUpdated().compareTo(a.returnDateTimeUpdated()));
+    productBatchList.sort((a, b) => DateTimeFormatter.dateTimeParser(b.updated)
+        .compareTo(DateTimeFormatter.dateTimeParser(a.updated)));
     return productBatchList;
   }
 
@@ -39,7 +40,8 @@ class ProductBatchRepository {
   Future<List<ProductBatch>> orderedByExpiryDateList() async {
     List<ProductBatch> productBatchList = await allProductBatchList();
     productBatchList.sort((a, b) =>
-        a.returnDateTimeExpDate().compareTo(b.returnDateTimeExpDate()));
+        DateTimeFormatter.dateTimeParser(a.expirationDate)
+            .compareTo(DateTimeFormatter.dateTimeParser(b.expirationDate)));
 
     return productBatchList;
   }

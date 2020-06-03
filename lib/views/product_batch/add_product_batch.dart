@@ -2,6 +2,7 @@ import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/custom_widgets/custom_product_picker.dart';
 
 import 'package:date_checker_app/database/models.dart';
+import 'package:date_checker_app/dependencies/date_time_formatter.dart';
 
 import 'package:date_checker_app/repository/product_repository.dart';
 
@@ -46,9 +47,14 @@ class _AddOrEditProductBatchViewState extends State<AddOrEditProductBatchView> {
     _quantity = TextEditingController(
         text: productBatch != null ? productBatch.quantity.toString() : '');
     _expirationDate = TextEditingController(
-        text: productBatch?.formatDateTime(shortYear: false) ?? '');
+      text: DateTimeFormatter.formatDateDMY(
+        productBatch?.expirationDate ?? '',
+        shortYear: false,
+      ),
+    );
     _selectedProduct = widget.product ?? null;
-    expirationDate = productBatch?.returnDateTimeExpDate() ?? null;
+    expirationDate =
+        DateTimeFormatter.dateTimeParser(productBatch?.expirationDate ?? null);
     super.initState();
   }
 

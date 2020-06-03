@@ -1,6 +1,7 @@
 import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
+import 'package:date_checker_app/dependencies/date_time_formatter.dart';
 
 class BatchWarningRepository {
   final BatchWarningApiClient batchWarningApi;
@@ -9,7 +10,10 @@ class BatchWarningRepository {
   BatchWarningRepository({this.db, this.batchWarningApi});
 
   Future<List<BatchWarning>> warnings() async {
-    return this.db.batchWarningDao.all();
+    List<BatchWarning> warnings = await this.db.batchWarningDao.all();
+    warnings.sort(((a, b) => DateTimeFormatter.dateTimeParser(b.updated)
+        .compareTo(DateTimeFormatter.dateTimeParser(a.updated))));
+    return warnings;
   }
 
   Future<String> updateQuantity(int quantity, BatchWarning batchWarning) async {
