@@ -27,7 +27,7 @@ class _BatchWarningTableState extends State<BatchWarningTable>
 
   @override
   Widget build(BuildContext context) {
-    var cellWidth = MediaQuery.of(context).size.width / 4;
+    var cellWidth = MediaQuery.of(context).size.width / 3;
 
     return BlocListener<BatchWarningBloc, BatchWarningState>(
       listener: (context, state) {
@@ -95,12 +95,22 @@ class _BatchWarningTableState extends State<BatchWarningTable>
                     DataColumn(
                       label: Text('Количина'),
                     ),
-                    DataColumn(
-                      label: Text(''),
-                    ),
                   ],
                   rows: state.allBatchWarning.map((warning) {
                     return DataRow(
+                      onSelectChanged: (selected) {
+                        if (selected) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => QuantityEdit(
+                                oldQuantity: warning.newQuantity,
+                                batchWarning: warning,
+                              ),
+                            ),
+                          );
+                        }
+                      },
                       cells: [
                         DataCell(
                           Container(
@@ -130,23 +140,6 @@ class _BatchWarningTableState extends State<BatchWarningTable>
                               ),
                               width: cellWidth,
                             ),
-                          ),
-                        ),
-                        DataCell(
-                          RaisedButton(
-                            color: Colors.greenAccent,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => QuantityEdit(
-                                    oldQuantity: warning.newQuantity,
-                                    batchWarning: warning,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text('Промени'),
                           ),
                         ),
                       ],
