@@ -6,7 +6,7 @@ import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/date_time_formatter.dart';
 import 'package:date_checker_app/main.dart';
 import 'package:date_checker_app/views/product_batch/_search_component.dart';
-import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
+import 'package:date_checker_app/views/product_batch/add_edit_product_batch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

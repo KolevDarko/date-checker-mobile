@@ -1,5 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/views/product_batch/add_product_batch.dart';
+import 'package:date_checker_app/views/product_batch/add_edit_product_batch.dart';
 import 'package:date_checker_app/views/product_batch/all_product_batch.dart';
 import 'package:date_checker_app/views/product_warning/all_product_warnings.dart';
 import 'package:date_checker_app/views/products/products_tab.dart';

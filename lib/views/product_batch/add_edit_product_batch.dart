@@ -146,7 +146,10 @@ class _AddOrEditProductBatchViewState extends State<AddOrEditProductBatchView> {
                         expirationDate = date;
                       });
                     },
-                    currentTime: DateTime.now(),
+                    currentTime: productBatch != null
+                        ? DateTimeFormatter.dateTimeParser(
+                            productBatch.expirationDate)
+                        : DateTime.now(),
                     locale: LocaleType.en,
                   );
                 },
