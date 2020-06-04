@@ -18,7 +18,7 @@ class ProductBatchApiClient {
         "Error calling products end point",
         httpClient,
       );
-      final responseBody = jsonDecode(productBatchesResponse.body);
+      final responseBody = json.decode(productBatchesResponse.body);
       List<dynamic> productBatchesJson = await getAllDataFromApiPoint(
         responseBody,
         httpClient,
@@ -70,7 +70,6 @@ class ProductBatchApiClient {
       httpClient,
       body: json.encode(ProductBatch.toJsonList(editedBatches)),
     );
-
     return json.decode(uploadResponse.body);
   }
 

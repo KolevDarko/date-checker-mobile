@@ -29,7 +29,7 @@ Future<http.Response> callApiEndPoint(
           headers: uploadBatchHeaders,
           body: body,
         );
-        if (response.statusCode != 201) {
+        if (response.statusCode != 200) {
           throw Exception(errorMessage);
         }
       }
@@ -41,7 +41,8 @@ Future<http.Response> callApiEndPoint(
           headers: uploadBatchHeaders,
           body: body,
         );
-        if (response.statusCode != 204) {
+
+        if (response.statusCode != 200) {
           throw Exception(errorMessage);
         }
       }
@@ -55,7 +56,6 @@ Future<http.Response> callApiEndPoint(
       }
       break;
   }
-
   return response;
 }
 
@@ -64,13 +64,15 @@ Future<List> getAllDataFromApiPoint(
   dynamic responseBody,
   http.Client httpClient,
 ) async {
+  print("here");
   List<dynamic> dataJson = [];
   http.Response dataResponse;
   var localResponseBody = responseBody;
 
+  dataJson = localResponseBody['results'];
+
   if (localResponseBody['next'] != null) {
     while (localResponseBody['next'] != null) {
-      dataJson.addAll(localResponseBody['results']);
       dataResponse = await callApiEndPoint(
         HttpAction.GET,
         localResponseBody['next'],
@@ -78,9 +80,9 @@ Future<List> getAllDataFromApiPoint(
         httpClient,
       );
       localResponseBody = jsonDecode(dataResponse.body);
+      dataJson.addAll(localResponseBody['results']);
     }
-  } else {
-    dataJson = localResponseBody['results'];
   }
+
   return dataJson;
 }

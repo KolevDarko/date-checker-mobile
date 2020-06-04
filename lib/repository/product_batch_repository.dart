@@ -60,7 +60,7 @@ class ProductBatchRepository {
       productBatch = null;
     }
     if (productBatch == null) {
-      this.saveProductBatchesLocally(productBatches);
+      await this.saveProductBatchesLocally(productBatches);
       return "Успешно ги синхронизиравте вашите податоци.";
     }
     return "Вашите податоци се веќе синхронизирани.";
@@ -86,6 +86,7 @@ class ProductBatchRepository {
 
   Future<String> uploadNewProductBatches(List<ProductBatch> newBatches) async {
     try {
+      // TODO ne gi snima kako so treba
       List<ProductBatch> serverResponseBatches =
           await this.productBatchApiClient.uploadLocalBatches(newBatches);
       await this.updateProductBatchesLocally(serverResponseBatches);

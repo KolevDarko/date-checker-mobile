@@ -38,17 +38,15 @@ class BatchWarningApiClient {
 
   Future<dynamic> updateWarnings(List<BatchWarning> warnings) async {
     try {
-      http.Response updateResponse = await this.httpClient.put(
-            batchWarningsUrl,
-            headers: uploadBatchHeaders,
-            body: json.encode(BatchWarning.toJsonMap(warnings)),
-          );
+      http.Response updateResponse = await callApiEndPoint(
+        HttpAction.PUT,
+        batchWarningsUrl,
+        "Failed to update server data",
+        httpClient,
+        body: json.encode(BatchWarning.toJsonMap(warnings)),
+      );
 
-      if (updateResponse.statusCode != 204) {
-        throw Exception(
-            "Failed to update server data, status code: ${updateResponse.statusCode}");
-      }
-      return updateResponse.body;
+      return json.decode(updateResponse.body);
     } catch (e) {
       throw Exception("Something went wrong when doing update on the server");
     }
