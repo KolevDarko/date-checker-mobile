@@ -5,14 +5,12 @@ import 'package:date_checker_app/api/product_batch_client.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 import 'package:http/http.dart' as http;
 
 import 'mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
   group('Product Batch Api Client tests', () {
     ProductBatchApiClient productBatchApiClient;

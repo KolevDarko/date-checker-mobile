@@ -8,16 +8,16 @@ import 'package:http/http.dart' as http;
 class BatchWarningApiClient {
   final http.Client httpClient;
 
-  BatchWarningApiClient({this.httpClient});
+  BatchWarningApiClient({this.httpClient}) : assert(httpClient != null);
 
   Future<List<BatchWarning>> getAllBatchWarnings() async {
-    final batchWarningResponse = await this.httpClient.get(
-          batchWarningsUrl,
-          headers: authHeaders,
-        );
-    if (batchWarningResponse.statusCode != 200) {
-      throw Exception('Error getting batch warning data');
-    }
+    final batchWarningResponse = await callApiEndPoint(
+      HttpAction.GET,
+      batchWarningsUrl,
+      'Error getting batch warning data',
+      httpClient,
+    );
+
     final batchWarnings = jsonDecode(batchWarningResponse.body);
 
     return this.createBatchWarningsFromJson(batchWarnings);

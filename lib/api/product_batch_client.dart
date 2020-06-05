@@ -43,7 +43,7 @@ class ProductBatchApiClient {
       );
       var uploadResponseBody = json.decode(uploadResponse.body);
       List<ProductBatch> editedBatches = List<ProductBatch>.of(localBatches);
-      // TODO check if this script works
+
       for (ProductBatch productBatch in editedBatches) {
         var item = uploadResponseBody
             .firstWhere((val) => val['id_code'] == productBatch.barCode);
