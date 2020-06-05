@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 class ProductBatchApiClient {
   final http.Client httpClient;
 
-  ProductBatchApiClient({this.httpClient});
+  ProductBatchApiClient({this.httpClient}) : assert(httpClient != null);
 
   Future<List<ProductBatch>> getAllProductBatches() async {
     try {
@@ -25,22 +25,8 @@ class ProductBatchApiClient {
       );
       return this.createProductBatchesFromJson(productBatchesJson);
     } catch (e) {
-      throw Exception("Couldn't get products data");
-    }
-  }
-
-  Future<String> updateProductBatch(ProductBatch productBatch) async {
-    try {
-      await callApiEndPoint(
-        HttpAction.PUT,
-        syncBatchesUrl,
-        "Bad request, failed to update api.",
-        this.httpClient,
-        body: json.encode(ProductBatch.toJson(productBatch)),
-      );
-      return 'Successfully updated product batch';
-    } catch (e) {
-      throw Exception("Failed to update product batch on the server.");
+      print(e);
+      throw Exception("Couldn't get product bathes data");
     }
   }
 

@@ -4,18 +4,14 @@ import 'package:date_checker_app/database/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 import 'dart:convert';
 
-class MockHttpClient extends Mock implements http.Client {}
-
-class MockResponse extends Mock implements http.Response {}
+import 'mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
-  group('ProductRepository', () {
+  group('ProductsApiClient tests', () {
     ProductsApiClient productsApiClient;
     http.Client mockHttpClient;
 
