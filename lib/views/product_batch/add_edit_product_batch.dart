@@ -47,14 +47,17 @@ class _AddOrEditProductBatchViewState extends State<AddOrEditProductBatchView> {
     _quantity = TextEditingController(
         text: productBatch != null ? productBatch.quantity.toString() : '');
     _expirationDate = TextEditingController(
-      text: DateTimeFormatter.formatDateDMY(
-        productBatch?.expirationDate ?? '',
-        shortYear: false,
-      ),
+      text: productBatch != null
+          ? DateTimeFormatter.formatDateDMY(
+              productBatch.expirationDate,
+              shortYear: false,
+            )
+          : '',
     );
     _selectedProduct = widget.product ?? null;
-    expirationDate =
-        DateTimeFormatter.dateTimeParser(productBatch?.expirationDate ?? null);
+    expirationDate = productBatch != null
+        ? DateTimeFormatter.dateTimeParser(productBatch.expirationDate)
+        : null;
     super.initState();
   }
 

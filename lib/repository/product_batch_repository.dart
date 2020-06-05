@@ -86,10 +86,10 @@ class ProductBatchRepository {
 
   Future<String> uploadNewProductBatches(List<ProductBatch> newBatches) async {
     try {
-      // TODO ne gi snima kako so treba
-      List<ProductBatch> serverResponseBatches =
+      List<ProductBatch> editedBatches =
           await this.productBatchApiClient.uploadLocalBatches(newBatches);
-      await this.updateProductBatchesLocally(serverResponseBatches);
+
+      await this.updateProductBatchesLocally(editedBatches);
       return "Успешна синхронизација на податоците.";
     } catch (e) {
       throw Exception(

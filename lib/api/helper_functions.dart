@@ -17,9 +17,6 @@ Future<http.Response> callApiEndPoint(
     case HttpAction.GET:
       {
         response = await httpClient.get(url, headers: authHeaders);
-        if (response.statusCode != 200) {
-          throw Exception(errorMessage);
-        }
       }
       break;
     case HttpAction.POST:
@@ -29,9 +26,6 @@ Future<http.Response> callApiEndPoint(
           headers: uploadBatchHeaders,
           body: body,
         );
-        if (response.statusCode != 200) {
-          throw Exception(errorMessage);
-        }
       }
       break;
     case HttpAction.PUT:
@@ -41,20 +35,17 @@ Future<http.Response> callApiEndPoint(
           headers: uploadBatchHeaders,
           body: body,
         );
-
-        if (response.statusCode != 200) {
-          throw Exception(errorMessage);
-        }
       }
       break;
     case HttpAction.DELETE:
       {
         response = await httpClient.delete(url, headers: uploadBatchHeaders);
-        if (response.statusCode != 204) {
-          throw Exception(errorMessage);
-        }
       }
       break;
+  }
+
+  if (response.statusCode != 200) {
+    throw Exception(errorMessage);
   }
   return response;
 }
@@ -64,7 +55,6 @@ Future<List> getAllDataFromApiPoint(
   dynamic responseBody,
   http.Client httpClient,
 ) async {
-  print("here");
   List<dynamic> dataJson = [];
   http.Response dataResponse;
   var localResponseBody = responseBody;

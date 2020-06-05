@@ -55,8 +55,16 @@ class ProductBatchApiClient {
         this.httpClient,
         body: json.encode(ProductBatch.toJsonList(localBatches)),
       );
-      return this
-          .createProductBatchesFromJson(json.decode(uploadResponse.body));
+      var uploadResponseBody = json.decode(uploadResponse.body);
+      List<ProductBatch> editedBatches = List<ProductBatch>.of(localBatches);
+      // TODO check if this script works
+      for (ProductBatch productBatch in editedBatches) {
+        var item = uploadResponseBody
+            .firstWhere((val) => val['id_code'] == productBatch.barCode);
+        productBatch.serverId = item['id'];
+        productBatch.synced = true;
+      }
+      return editedBatches;
     } catch (e) {
       throw Exception("Error saving data on the server");
     }
@@ -70,6 +78,7 @@ class ProductBatchApiClient {
       httpClient,
       body: json.encode(ProductBatch.toJsonList(editedBatches)),
     );
+
     return json.decode(uploadResponse.body);
   }
 

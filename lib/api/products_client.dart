@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 class ProductsApiClient {
   final http.Client httpClient;
 
-  ProductsApiClient({this.httpClient});
+  ProductsApiClient({this.httpClient}) : assert(httpClient != null);
 
   Future<List<Product>> getAllProducts() async {
     List<dynamic> productsJson = [];
@@ -38,6 +38,7 @@ class ProductsApiClient {
       this.httpClient,
     );
     var productsJson = jsonDecode(productsSyncResponse.body);
+
     return Product.productsListFromJson(productsJson);
   }
 }
