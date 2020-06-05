@@ -6,7 +6,9 @@ class ProductRepository {
   final ProductsApiClient productsApiClient;
   final AppDatabase db;
 
-  ProductRepository({this.productsApiClient, this.db});
+  ProductRepository({this.productsApiClient, this.db})
+      : assert(productsApiClient != null),
+        assert(db != null);
 
   Future<List<Product>> getAllProducts() async {
     return this.db.productDao.all();
