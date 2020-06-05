@@ -7,7 +7,9 @@ class ProductBatchRepository {
   final ProductBatchApiClient productBatchApiClient;
   final AppDatabase db;
 
-  ProductBatchRepository({this.productBatchApiClient, this.db});
+  ProductBatchRepository({this.productBatchApiClient, this.db})
+      : assert(productBatchApiClient != null),
+        assert(db != null);
 
   Future<int> addProductBatch(ProductBatch productBatch) async {
     try {
