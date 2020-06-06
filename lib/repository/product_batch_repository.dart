@@ -50,11 +50,6 @@ class ProductBatchRepository {
 
   Future<String> syncProductBatchesData() async {
     List<ProductBatch> productBatches = [];
-    try {
-      productBatches = await this.productBatchApiClient.getAllProductBatches();
-    } catch (e) {
-      throw Exception("Failed to get product batches");
-    }
     ProductBatch productBatch;
     try {
       productBatch = await this.db.productBatchDao.getLast();
@@ -62,6 +57,7 @@ class ProductBatchRepository {
       productBatch = null;
     }
     if (productBatch == null) {
+      productBatches = await this.productBatchApiClient.getAllProductBatches();
       await this.saveProductBatchesLocally(productBatches);
       return "Успешно ги синхронизиравте вашите податоци.";
     }
@@ -82,6 +78,7 @@ class ProductBatchRepository {
       await this.db.productBatchDao.updateProductBatch(productBatch);
       return "Успешно ја елиминиравте пратката од базата на податоци. Ве молиме синхронизирајте со серверот!";
     } catch (e) {
+      print(e);
       throw Exception("Error while deleting batch locally.");
     }
   }
@@ -101,7 +98,7 @@ class ProductBatchRepository {
 
   Future<void> uploadEditedProductBatches(
       List<ProductBatch> editedBatches) async {
-    List<ProductBatch> synced = editedBatches;
+    List<ProductBatch> synced = List.of(editedBatches);
     var responseBody =
         await this.productBatchApiClient.callEditBatch(editedBatches);
     if (responseBody['success']) {
@@ -118,7 +115,7 @@ class ProductBatchRepository {
     try {
       await this.db.productBatchDao.saveProductBatches(productBatches);
     } catch (e) {
-      throw Exception("here error when saving product batches to the databse.");
+      throw Exception("Error when saving product batches to the database.");
     }
   }
 
@@ -134,6 +131,11 @@ class ProductBatchRepository {
   }
 
   Future<void> updateProductBatch(ProductBatch productBatch) async {
-    await this.db.productBatchDao.updateProductBatch(productBatch);
+    try {
+      await this.db.productBatchDao.updateProductBatch(productBatch);
+    } catch (e) {
+      throw Exception(
+          "Error when updating single product batch in the database.");
+    }
   }
 }

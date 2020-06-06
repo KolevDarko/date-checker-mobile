@@ -40,14 +40,12 @@ class Product {
 class ProductBatch {
   @PrimaryKey(autoGenerate: true)
   int id;
-
   int serverId;
   String barCode;
   int productId;
   int quantity;
   String expirationDate;
   String productName;
-
   bool synced;
   String created;
   String updated;
@@ -100,6 +98,32 @@ class ProductBatch {
   static List<Map<String, dynamic>> toJsonList(
       List<ProductBatch> productBatches) {
     return productBatches.map((elem) => toJson(elem)).toList();
+  }
+
+  ProductBatch copyWith({
+    int id,
+    int serverId,
+    String barCode,
+    int productId,
+    int quantity,
+    String expirationDate,
+    String productName,
+    bool synced,
+    String created,
+    String updated,
+  }) {
+    return ProductBatch(
+      id ?? this.id,
+      serverId ?? this.serverId,
+      barCode ?? this.barCode,
+      productId ?? this.productId,
+      quantity ?? this.quantity,
+      expirationDate ?? this.expirationDate,
+      synced ?? this.synced,
+      created ?? this.created,
+      updated ?? this.updated,
+      productName ?? this.productName,
+    );
   }
 }
 
