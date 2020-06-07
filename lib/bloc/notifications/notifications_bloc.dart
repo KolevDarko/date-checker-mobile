@@ -47,8 +47,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationState> {
         message: (productSyncBloc.state as SyncProductDataSuccess).message,
       );
     } else if (productSyncBloc.state is SyncProductDataError) {
-      yield DisplayNotification(
-        message: (productSyncBloc.state as SyncProductDataError).error,
+      yield DisplayErrorNotification(
+        error: (productSyncBloc.state as SyncProductDataError).error,
       );
     } else if (syncBatchWarningBloc.state is SyncBatchWarningDataSuccess) {
       yield DisplayNotification(
@@ -56,9 +56,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationState> {
             (syncBatchWarningBloc.state as SyncBatchWarningDataSuccess).message,
       );
     } else if (syncBatchWarningBloc.state is SyncBatchWarningDataError) {
-      yield DisplayNotification(
-        message:
-            (syncBatchWarningBloc.state as SyncBatchWarningDataError).error,
+      yield DisplayErrorNotification(
+        error: (syncBatchWarningBloc.state as SyncBatchWarningDataError).error,
       );
     }
   }

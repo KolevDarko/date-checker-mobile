@@ -18,12 +18,6 @@ class BatchWarningAllLoaded extends BatchWarningState {
   BatchWarningAllLoaded({this.allBatchWarning});
 }
 
-class SyncBatchWarningsSuccess extends BatchWarningState {
-  final String message;
-
-  SyncBatchWarningsSuccess({this.message});
-}
-
 class BatchWarningError extends BatchWarningState {
   final String error;
 

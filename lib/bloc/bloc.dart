@@ -14,9 +14,9 @@ export 'unsynced_product_batches/upb_bloc.dart';
 export 'unsynced_product_batches/upb_state.dart';
 export 'unsynced_product_batches/upb_event.dart';
 
-export 'unsync_warnings_bloc/uw_bloc.dart';
-export 'unsync_warnings_bloc/uw_state.dart';
-export 'unsync_warnings_bloc/uw_event.dart';
+export 'unsynced_warnings_bloc/uw_bloc.dart';
+export 'unsynced_warnings_bloc/uw_state.dart';
+export 'unsynced_warnings_bloc/uw_event.dart';
 
 export 'notifications/notifications_bloc.dart';
 export 'notifications/notifications_state.dart';

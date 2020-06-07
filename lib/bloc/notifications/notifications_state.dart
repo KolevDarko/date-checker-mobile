@@ -11,3 +11,9 @@ class DisplayNotification extends NotificationState {
 
   DisplayNotification({this.message});
 }
+
+class DisplayErrorNotification extends NotificationState {
+  final String error;
+
+  DisplayErrorNotification({this.error});
+}

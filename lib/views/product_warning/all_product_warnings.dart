@@ -40,14 +40,6 @@ class _BatchWarningTableState extends State<BatchWarningTable>
               content: Text(state.message),
             ),
           );
-        } else if (state is SyncBatchWarningsSuccess) {
-          Scaffold.of(context).removeCurrentSnackBar();
-          final snackBar = SnackBar(
-            duration: Duration(seconds: 4),
-            backgroundColor: Colors.green,
-            content: Text(state.message),
-          );
-          Scaffold.of(context).showSnackBar(snackBar);
         } else if (state is BatchWarningError) {
           Scaffold.of(context).removeCurrentSnackBar();
           Scaffold.of(context).showSnackBar(

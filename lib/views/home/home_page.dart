@@ -53,8 +53,17 @@ class _HomePageState extends State<HomePage> {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
                     duration: Duration(seconds: 4),
-                    backgroundColor: Colors.greenAccent,
+                    backgroundColor: Colors.green,
                     content: Text(state.message),
+                  ),
+                );
+              } else if (state is DisplayErrorNotification) {
+                Scaffold.of(context).removeCurrentSnackBar();
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 4),
+                    backgroundColor: Colors.red,
+                    content: Text(state.error),
                   ),
                 );
               }
