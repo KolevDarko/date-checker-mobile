@@ -252,4 +252,7 @@ void main() {
       }
     });
   });
+  tearDown(() async {
+    await db.close();
+  });
 }

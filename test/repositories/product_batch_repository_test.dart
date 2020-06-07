@@ -389,4 +389,7 @@ void main() {
       expect(productBatch.quantity, isNot(equals(1)));
     });
   });
+  tearDown(() async {
+    await db.close();
+  });
 }
