@@ -64,8 +64,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationState> {
 
   @override
   Future<void> close() {
-    productSyncBlocSubscription.cancel();
-    syncBatchWarningBlocSubscription.cancel();
+    productSyncBlocSubscription?.cancel();
+    syncBatchWarningBlocSubscription?.cancel();
     return super.close();
   }
 }
