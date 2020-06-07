@@ -60,6 +60,7 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
       try {
         await this.batchWarningRepository.uploadEditedWarnings(event.warnings);
         yield Success(message: 'Успешно ги снимавте истекувањата на серверот');
+        productBatchBloc.add(AllProductBatch());
       } catch (e) {
         yield BatchWarningError(
             error: 'Грешка при снимањето на истекувањата на серверот');
