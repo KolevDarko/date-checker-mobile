@@ -208,4 +208,32 @@ class BatchWarning {
   String toString() {
     return "$productName - $oldQuantity - $expirationDate";
   }
+
+  BatchWarning copyWith({
+    int id,
+    String productName,
+    int daysLeft,
+    String expirationDate,
+    int productBatchId,
+    String status,
+    String priority,
+    int oldQuantity,
+    int newQuantity,
+    String created,
+    String updated,
+  }) {
+    return BatchWarning(
+      id ?? this.id,
+      productName ?? this.productName,
+      daysLeft ?? this.daysLeft,
+      expirationDate ?? this.expirationDate,
+      productBatchId ?? this.productBatchId,
+      status ?? this.status,
+      priority ?? this.priority,
+      oldQuantity ?? this.oldQuantity,
+      newQuantity ?? this.newQuantity,
+      created ?? this.created,
+      updated ?? this.updated,
+    );
+  }
 }

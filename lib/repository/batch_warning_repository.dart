@@ -7,7 +7,9 @@ class BatchWarningRepository {
   final BatchWarningApiClient batchWarningApi;
   final AppDatabase db;
 
-  BatchWarningRepository({this.db, this.batchWarningApi});
+  BatchWarningRepository({this.db, this.batchWarningApi})
+      : assert(batchWarningApi != null),
+        assert(db != null);
 
   Future<List<BatchWarning>> warnings() async {
     List<BatchWarning> warnings = await this.db.batchWarningDao.all();
@@ -41,14 +43,17 @@ class BatchWarningRepository {
       var responseBody = await batchWarningApi.updateWarnings(warnings);
       if (responseBody['success']) {
         for (BatchWarning warning in warnings) {
-          ProductBatch batch =
-              await this.db.productBatchDao.get(warning.productBatchId);
+          ProductBatch batch = await this
+              .db
+              .productBatchDao
+              .getByServerId(warning.productBatchId);
           batch.synced = true;
           await this.db.productBatchDao.updateProductBatch(batch);
           await this.db.batchWarningDao.delete(warning.id);
         }
       }
     } catch (e) {
+      print(e);
       throw Exception("Failed to update quantity online");
     }
   }
@@ -57,7 +62,7 @@ class BatchWarningRepository {
     try {
       await this.db.batchWarningDao.delete(batchWarning.id);
     } catch (e) {
-      throw Exception("Error while deleting batch warning, error: $e");
+      throw Exception("Error while deleting batch warning in the database.");
     }
   }
 
@@ -74,7 +79,6 @@ class BatchWarningRepository {
     } else {
       warnings = await this.batchWarningApi.getAllBatchWarnings();
     }
-
     if (warnings.length > 0) {
       await this.db.batchWarningDao.saveWarnings(warnings);
       return 'Успешно ги синхронизиравте податоците.';
