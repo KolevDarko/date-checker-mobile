@@ -74,6 +74,22 @@ void main() {
             e.toString(), "Exception: Error saving product batch to database.");
       }
     });
+
+    tearDown(() async {
+      var warnings = await db.batchWarningDao.all() ?? [];
+      var productbatches = await db.productBatchDao.all() ?? [];
+
+      if (warnings.length > 0) {
+        for (var warning in warnings) {
+          await db.batchWarningDao.delete(warning.id);
+        }
+      }
+      if (productbatches.length > 0) {
+        for (var productBatch in productbatches) {
+          await db.productBatchDao.delete(productBatch.id);
+        }
+      }
+    });
   });
 
   group('allProductBatchList tests', () {
@@ -84,11 +100,25 @@ void main() {
 
       List<ProductBatch> batches =
           await productBatchRepository.allProductBatchList();
-
       expect(batches.length, 2);
 
       // productBatch2 has newer update
       expect(batches[0].productName, productBatch2.productName);
+    });
+    tearDown(() async {
+      var warnings = await db.batchWarningDao.all() ?? [];
+      var productbatches = await db.productBatchDao.all() ?? [];
+
+      if (warnings.length > 0) {
+        for (var warning in warnings) {
+          await db.batchWarningDao.delete(warning.id);
+        }
+      }
+      if (productbatches.length > 0) {
+        for (var productBatch in productbatches) {
+          await db.productBatchDao.delete(productBatch.id);
+        }
+      }
     });
   });
 
@@ -103,6 +133,21 @@ void main() {
           await productBatchRepository.getFilteredProductBatches(inputString);
       expect(batches.length, 1);
       expect(batches[0].productName, 'Schweppes');
+    });
+    tearDown(() async {
+      var warnings = await db.batchWarningDao.all() ?? [];
+      var productbatches = await db.productBatchDao.all() ?? [];
+
+      if (warnings.length > 0) {
+        for (var warning in warnings) {
+          await db.batchWarningDao.delete(warning.id);
+        }
+      }
+      if (productbatches.length > 0) {
+        for (var productBatch in productbatches) {
+          await db.productBatchDao.delete(productBatch.id);
+        }
+      }
     });
   });
 
@@ -119,6 +164,21 @@ void main() {
       expect(batches.length, 2);
       expect(batches[0].productName, 'Coca Cola');
     });
+    tearDown(() async {
+      var warnings = await db.batchWarningDao.all() ?? [];
+      var productbatches = await db.productBatchDao.all() ?? [];
+
+      if (warnings.length > 0) {
+        for (var warning in warnings) {
+          await db.batchWarningDao.delete(warning.id);
+        }
+      }
+      if (productbatches.length > 0) {
+        for (var productBatch in productbatches) {
+          await db.productBatchDao.delete(productBatch.id);
+        }
+      }
+    });
   });
 
   group('syncProductBatchesData tests', () {
@@ -132,6 +192,21 @@ void main() {
       await db.productBatchDao.add(productBatch);
       String message = await productBatchRepository.syncProductBatchesData();
       expect(message, 'Вашите податоци се веќе синхронизирани.');
+    });
+    tearDown(() async {
+      var warnings = await db.batchWarningDao.all() ?? [];
+      var productbatches = await db.productBatchDao.all() ?? [];
+
+      if (warnings.length > 0) {
+        for (var warning in warnings) {
+          await db.batchWarningDao.delete(warning.id);
+        }
+      }
+      if (productbatches.length > 0) {
+        for (var productBatch in productbatches) {
+          await db.productBatchDao.delete(productBatch.id);
+        }
+      }
     });
   });
 
@@ -219,6 +294,21 @@ void main() {
             .uploadEditedProductBatches([savedProductBatch]);
       } catch (e) {
         expect(e.toString(), 'Error uploading edited batches.');
+      }
+    });
+    tearDown(() async {
+      var warnings = await db.batchWarningDao.all() ?? [];
+      var productbatches = await db.productBatchDao.all() ?? [];
+
+      if (warnings.length > 0) {
+        for (var warning in warnings) {
+          await db.batchWarningDao.delete(warning.id);
+        }
+      }
+      if (productbatches.length > 0) {
+        for (var productBatch in productbatches) {
+          await db.productBatchDao.delete(productBatch.id);
+        }
       }
     });
   });
