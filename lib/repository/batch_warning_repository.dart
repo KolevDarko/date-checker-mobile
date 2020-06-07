@@ -66,7 +66,7 @@ class BatchWarningRepository {
     }
   }
 
-  Future<String> syncWarnings() async {
+  Future<int> syncWarnings() async {
     BatchWarning batchWarning;
     List<BatchWarning> warnings = [];
     try {
@@ -79,10 +79,10 @@ class BatchWarningRepository {
     } else {
       warnings = await this.batchWarningApi.getAllBatchWarnings();
     }
-    if (warnings.length > 0) {
+    int warningsLength = warnings.length;
+    if (warningsLength > 0) {
       await this.db.batchWarningDao.saveWarnings(warnings);
-      return 'Успешно ги синхронизиравте податоците.';
     }
-    return 'Нема нови податоци.';
+    return warningsLength;
   }
 }

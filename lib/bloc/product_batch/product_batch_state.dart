@@ -51,10 +51,10 @@ class ProductBatchError extends ProductBatchState {
   List<Object> get props => [error];
 }
 
-class SyncProductDataSuccess extends ProductBatchState {
+class SyncProductBatchDataSuccess extends ProductBatchState {
   final String message;
 
-  SyncProductDataSuccess({this.message});
+  SyncProductBatchDataSuccess({this.message});
   @override
   List<Object> get props => [message];
 }

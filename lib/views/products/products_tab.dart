@@ -24,37 +24,23 @@ class _ProductsTableState extends State<ProductsTable>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<ProductBloc, ProductState>(
-        listener: (context, state) {
-          if (state is ProductSyncDone) {
-            Scaffold.of(context).removeCurrentSnackBar();
-            Scaffold.of(context).showSnackBar(
-              SnackBar(
-                duration: Duration(seconds: 3),
-                backgroundColor: Colors.green,
-                content: Text(state.message),
-              ),
-            );
-          }
-        },
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: BlocBuilder<ProductBloc, ProductState>(
-              builder: (context, state) {
-                if (state is ProductEmpty) {
-                  return Container();
-                } else if (state is ProductLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (state is AllProductsLoaded) {
-                  return _buildProductBatchItems(state.products);
-                } else {
-                  return Container();
-                }
-              },
-            ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: BlocBuilder<ProductBloc, ProductState>(
+            builder: (context, state) {
+              if (state is ProductEmpty) {
+                return Container();
+              } else if (state is ProductLoading) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is AllProductsLoaded) {
+                return _buildProductBatchItems(state.products);
+              } else {
+                return Container();
+              }
+            },
           ),
         ),
       ),

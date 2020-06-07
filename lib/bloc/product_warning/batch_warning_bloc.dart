@@ -45,14 +45,6 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
       } catch (e) {
         yield BatchWarningError(error: 'Грешка при зачувување на промени.');
       }
-    } else if (event is SyncBatchWarnings) {
-      yield BatchWarningLoading();
-      try {
-        String message = await this.batchWarningRepository.syncWarnings();
-        yield SyncBatchWarningsSuccess(message: message);
-      } catch (e) {
-        yield BatchWarningError(error: 'Грешка при ажурирање на податоците');
-      }
     } else if (event is BWProductBatchClosed) {
       yield Success(message: event.message);
     } else if (event is UploadEditedWarnings) {

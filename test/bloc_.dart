@@ -101,7 +101,6 @@ void main() async {
       expect: [
         ProductEmpty(),
         ProductLoading(),
-        ProductSyncDone(),
       ],
     );
 

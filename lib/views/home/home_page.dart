@@ -46,16 +46,30 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               title: Text('Date Checker Tabs')),
-          body: Builder(
-            builder: (BuildContext context) {
-              return TabBarView(
-                children: [
-                  ProductBatchTable(),
-                  BatchWarningTable(),
-                  ProductsTable(),
-                ],
-              );
+          body: BlocListener<NotificationsBloc, NotificationState>(
+            listener: (context, state) {
+              if (state is DisplayNotification) {
+                Scaffold.of(context).removeCurrentSnackBar();
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 4),
+                    backgroundColor: Colors.greenAccent,
+                    content: Text(state.message),
+                  ),
+                );
+              }
             },
+            child: Builder(
+              builder: (BuildContext context) {
+                return TabBarView(
+                  children: [
+                    ProductBatchTable(),
+                    BatchWarningTable(),
+                    ProductsTable(),
+                  ],
+                );
+              },
+            ),
           ),
           floatingActionButton: customFloatingButton(_currentTabIndex),
         ),
@@ -83,9 +97,8 @@ class _HomePageState extends State<HomePage> {
         {
           return FloatingActionButton(
             onPressed: () async {
-              BlocProvider.of<BatchWarningBloc>(context)
-                ..add(SyncBatchWarnings())
-                ..add(AllBatchWarnings());
+              BlocProvider.of<SyncBatchWarningBloc>(context)
+                  .add(SyncBatchWarnings());
             },
             child: Icon(Icons.refresh),
           );
@@ -95,7 +108,7 @@ class _HomePageState extends State<HomePage> {
         {
           return FloatingActionButton(
             onPressed: () {
-              BlocProvider.of<ProductBloc>(context).add(SyncProductData());
+              BlocProvider.of<ProductSyncBloc>(context).add(SyncProductData());
             },
             child: Icon(Icons.refresh),
           );

@@ -53,7 +53,7 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
       try {
         String message =
             await this.productBatchRepository.syncProductBatchesData();
-        yield SyncProductDataSuccess(message: message);
+        yield SyncProductBatchDataSuccess(message: message);
       } catch (e) {
         yield ProductBatchError(
             error: "Грешка при синхронизација на податоци!");

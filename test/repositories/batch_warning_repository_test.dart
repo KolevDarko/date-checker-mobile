@@ -208,10 +208,10 @@ void main() {
     test('sync warnings on empty db', () async {
       when(batchWarningApiClient.getAllBatchWarnings())
           .thenAnswer((_) => Future.value([bw1]));
-      final message = await batchWarningRepository.syncWarnings();
+      int numberReturned = await batchWarningRepository.syncWarnings();
       final warnings = await db.batchWarningDao.all();
       expect(warnings.length, 1);
-      expect(message, 'Успешно ги синхронизиравте податоците.');
+      expect(numberReturned, 1);
     });
 
     test('sync warning with some data in db already', () async {
@@ -219,12 +219,12 @@ void main() {
       when(batchWarningApiClient.refreshWarnings(bwId))
           .thenAnswer((_) => Future.value([bw2]));
 
-      final message = await batchWarningRepository.syncWarnings();
+      int numReturned = await batchWarningRepository.syncWarnings();
 
       final warnings = await db.batchWarningDao.all();
       expect(warnings.length, 2);
       expect(warnings[0].productName, bw1.productName);
-      expect(message, 'Успешно ги синхронизиравте податоците.');
+      expect(numReturned, 1);
     });
     test('no more data on the server', () async {
       int bwId1 = await db.batchWarningDao.add(bw1);
@@ -232,9 +232,9 @@ void main() {
 
       when(batchWarningApiClient.refreshWarnings(bwId2))
           .thenAnswer((_) => Future.value([]));
-      final message = await batchWarningRepository.syncWarnings();
+      int numReturned = await batchWarningRepository.syncWarnings();
 
-      expect(message, 'Нема нови податоци.');
+      expect(numReturned, 0);
     });
     tearDown(() async {
       var warnings = await db.batchWarningDao.all() ?? [];

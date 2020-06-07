@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-          BlocProvider<ProductBloc>(
+        BlocProvider<ProductBloc>(
           create: (BuildContext context) =>
               ProductBloc(productRepository: productRepository),
         ),
@@ -100,6 +100,25 @@ class MyApp extends StatelessWidget {
           create: (BuildContext context) => BatchWarningBloc(
             productBatchBloc: BlocProvider.of<ProductBatchBloc>(context),
             batchWarningRepository: batchWarningRepository,
+          ),
+        ),
+        BlocProvider<ProductSyncBloc>(
+          create: (BuildContext context) => ProductSyncBloc(
+            productRepository: productRepository,
+            productBloc: BlocProvider.of<ProductBloc>(context),
+          ),
+        ),
+        BlocProvider<SyncBatchWarningBloc>(
+          create: (BuildContext context) => SyncBatchWarningBloc(
+            batchWarningRepository: batchWarningRepository,
+            batchWarningBloc: BlocProvider.of<BatchWarningBloc>(context),
+          ),
+        ),
+        BlocProvider<NotificationsBloc>(
+          create: (BuildContext context) => NotificationsBloc(
+            productSyncBloc: BlocProvider.of<ProductSyncBloc>(context),
+            syncBatchWarningBloc:
+                BlocProvider.of<SyncBatchWarningBloc>(context),
           ),
         ),
       ],

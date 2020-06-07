@@ -24,20 +24,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       } catch (e) {
         yield ProductError(error: "Грешка при превземање продукти.");
       }
-    } else if (event is SyncProductData) {
-      yield ProductLoading();
-      try {
-        int productsLength = await this.productRepository.syncProducts();
-        if (productsLength == 0) {
-          yield ProductSyncDone(message: 'Нема нови продукти.');
-        } else {
-          yield ProductSyncDone(
-              message: 'Успешно ги синхронизиравте продуктите.');
-        }
-        this.add(FetchAllProducts());
-      } catch (e) {
-        yield ProductError(error: "Грешка при синхронизација на податоци");
-      }
     }
   }
 }

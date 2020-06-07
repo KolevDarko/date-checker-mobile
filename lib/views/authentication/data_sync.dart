@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/dependencies/dependency_assembler.dart';
-import 'package:date_checker_app/repository/repository.dart';
+
 import 'package:date_checker_app/views/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,9 +34,8 @@ class _DataSyncState extends State<DataSync> {
   }
 
   _saveBatchWarnings() {
-    BlocProvider.of<ProductBloc>(context)
-      ..add(SyncProductData())
-      ..add(FetchAllProducts());
+    BlocProvider.of<ProductSyncBloc>(context).add(SyncProductData());
+    BlocProvider.of<ProductBloc>(context).add(FetchAllProducts());
     BlocProvider.of<ProductBatchBloc>(context)
       ..add(SyncProductBatchData())
       ..add(AllProductBatch());

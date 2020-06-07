@@ -8,8 +8,3 @@ class FetchAllProducts extends ProductEvent {
   @override
   List<Object> get props => null;
 }
-
-class SyncProductData extends ProductEvent {
-  @override
-  List<Object> get props => null;
-}
