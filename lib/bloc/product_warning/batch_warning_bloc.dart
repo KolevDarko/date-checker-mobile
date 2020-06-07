@@ -70,7 +70,7 @@ class BatchWarningBloc extends Bloc<BatchWarningEvent, BatchWarningState> {
 
   @override
   Future<void> close() {
-    productBatchSubscription.cancel();
+    productBatchSubscription?.cancel();
     return super.close();
   }
 }

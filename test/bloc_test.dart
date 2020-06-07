@@ -13,6 +13,8 @@ class ProductBatchRepositoryMock extends Mock
 
 class ProductRepositoryMock extends Mock implements ProductRepository {}
 
+class ProductBatchBlocMock extends Mock implements ProductBatchBloc {}
+
 class BatchWarningRepositoryMock extends Mock
     implements BatchWarningRepository {}
 
@@ -75,6 +77,10 @@ void main() async {
         ProductBatchAdded(),
       ],
     );
+
+    tearDown(() {
+      productBatchBloc?.close();
+    });
   });
   group('ProductBloc', () {
     ProductBloc productBloc;
@@ -109,16 +115,23 @@ void main() async {
         AllProductsLoaded(),
       ],
     );
+    tearDown(() {
+      productBloc?.close();
+    });
   });
 
   group('BatchWarningBloc', () {
     BatchWarningBloc batchWarningBloc;
     BatchWarningRepository batchWarningRepository;
+    ProductBatchBloc productBatchBloc;
     BatchWarning batchWarning;
     setUp(() {
       batchWarningRepository = BatchWarningRepositoryMock();
-      batchWarningBloc =
-          BatchWarningBloc(batchWarningRepository: batchWarningRepository);
+      productBatchBloc = ProductBatchBlocMock();
+      batchWarningBloc = BatchWarningBloc(
+        batchWarningRepository: batchWarningRepository,
+        productBatchBloc: productBatchBloc,
+      );
       batchWarning = BatchWarning(
         1,
         'Product 1',
@@ -168,5 +181,10 @@ void main() async {
         SyncBatchWarningsSuccess(),
       ],
     );
+
+    tearDown(() {
+      productBatchBloc?.close();
+      batchWarningBloc?.close();
+    });
   });
 }
