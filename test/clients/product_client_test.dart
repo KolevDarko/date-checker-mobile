@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'dart:convert';
 
-import 'mocks.dart';
+import '../mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

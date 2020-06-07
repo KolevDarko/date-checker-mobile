@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
 
-import 'mocks.dart';
+import '../mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -186,7 +186,70 @@ void main() {
     });
 
     group('uploadLocalBatches tests', () {
-      //TODO: still waiting on backend changes.
+      var jsonResponse;
+      ProductBatch newBatch;
+      setUp(() {
+        newBatch = ProductBatch(1, null, '121', 6, 50, "2020-03-13", false,
+            DateTime.now().toString(), DateTime.now().toString(), "Mirinda");
+        jsonResponse = """
+        [
+          {
+            "id": 4,
+            "original_quantity": 400,
+            "quantity": 50,
+            "expiration_date": "2020-03-13",
+            "id_code": "121",
+            "created_on": "2020-03-06T19:06:39.718855Z",
+            "updated_on": "2020-05-21T16:55:50.422308Z",
+            "store": {
+                "id": 1,
+                "name": "Reptil Aerodrom",
+                "address": "Posle kruzniot",
+                "company": 1
+            },
+            "product": {
+                "id": 6,
+                "name": "Mirinda",
+                "price": 49.0,
+                "id_code": "005",
+                "company": 1
+            }
+          }  
+        ]
+        """;
+      });
+      test('success on upload', () async {
+        var response = MockResponse();
+        when(response.statusCode).thenReturn(200);
+        when(response.body).thenReturn(jsonResponse);
+        when(mockHttpClient.post(
+          syncBatchesUrl,
+          headers: uploadBatchHeaders,
+          body: json.encode(ProductBatch.toJsonList([newBatch])),
+        )).thenAnswer((_) => Future.value(response));
+
+        List<ProductBatch> editedBatches =
+            await productBatchApiClient.uploadLocalBatches([newBatch]);
+        expect(editedBatches.length, 1);
+        expect(editedBatches[0].serverId, 4);
+        expect(editedBatches[0].synced, true);
+      });
+      test('server returns 500', () async {
+        var response = MockResponse();
+        when(response.statusCode).thenReturn(500);
+        when(mockHttpClient.post(
+          syncBatchesUrl,
+          headers: uploadBatchHeaders,
+          body: json.encode(ProductBatch.toJsonList([newBatch])),
+        )).thenAnswer((_) => Future.value(response));
+
+        try {
+          List<ProductBatch> editedBatches =
+              await productBatchApiClient.uploadLocalBatches([newBatch]);
+        } catch (e) {
+          expect(e.toString(), 'Exception: Bad request, post call.');
+        }
+      });
     });
   });
 }

@@ -33,27 +33,23 @@ class ProductBatchApiClient {
   Future<List<ProductBatch>> uploadLocalBatches(
     List<ProductBatch> localBatches,
   ) async {
-    try {
-      http.Response uploadResponse = await callApiEndPoint(
-        HttpAction.POST,
-        syncBatchesUrl,
-        "Bad request, post call.",
-        this.httpClient,
-        body: json.encode(ProductBatch.toJsonList(localBatches)),
-      );
-      var uploadResponseBody = json.decode(uploadResponse.body);
-      List<ProductBatch> editedBatches = List<ProductBatch>.of(localBatches);
+    http.Response uploadResponse = await callApiEndPoint(
+      HttpAction.POST,
+      syncBatchesUrl,
+      "Bad request, post call.",
+      this.httpClient,
+      body: json.encode(ProductBatch.toJsonList(localBatches)),
+    );
+    var uploadResponseBody = json.decode(uploadResponse.body);
+    List<ProductBatch> editedBatches = List<ProductBatch>.of(localBatches);
 
-      for (ProductBatch productBatch in editedBatches) {
-        var item = uploadResponseBody
-            .firstWhere((val) => val['id_code'] == productBatch.barCode);
-        productBatch.serverId = item['id'];
-        productBatch.synced = true;
-      }
-      return editedBatches;
-    } catch (e) {
-      throw Exception("Error saving data on the server");
+    for (ProductBatch productBatch in editedBatches) {
+      var item = uploadResponseBody
+          .firstWhere((val) => val['id_code'] == productBatch.barCode);
+      productBatch.serverId = item['id'];
+      productBatch.synced = true;
     }
+    return editedBatches;
   }
 
   Future<dynamic> callEditBatch(List<ProductBatch> editedBatches) async {
