@@ -36,10 +36,12 @@ class _ButtonWithIndicatorState extends State<ButtonWithIndicator> {
                   textColor: Colors.redAccent,
                   borderSide: BorderSide(color: Colors.redAccent),
                   onPressed: () {
-                    BlocProvider.of<ProductBatchBloc>(context)
-                      ..add(UploadEditedProductBatches(
-                          editedProductBatches: state.unsyncProductBatches))
-                      ..add(AllProductBatch());
+                    if (state.unsyncProductBatches.length > 0) {
+                      BlocProvider.of<ProductBatchBloc>(context)
+                        ..add(UploadEditedProductBatches(
+                            editedProductBatches: state.unsyncProductBatches))
+                        ..add(AllProductBatch());
+                    }
                   },
                   text: 'Променети',
                   icon: GFBadge(
@@ -66,10 +68,12 @@ class _ButtonWithIndicatorState extends State<ButtonWithIndicator> {
                   textColor: Colors.green,
                   borderSide: BorderSide(color: Colors.green),
                   onPressed: () {
-                    BlocProvider.of<ProductBatchBloc>(context)
-                      ..add(UploadProductBatchData(
-                          newBatches: state.unsavedProductBatches))
-                      ..add(AllProductBatch());
+                    if (state.unsavedProductBatches.length > 0) {
+                      BlocProvider.of<ProductBatchBloc>(context)
+                        ..add(UploadProductBatchData(
+                            newBatches: state.unsavedProductBatches))
+                        ..add(AllProductBatch());
+                    }
                   },
                   text: 'Нови',
                   icon: GFBadge(
@@ -95,10 +99,12 @@ class _ButtonWithIndicatorState extends State<ButtonWithIndicator> {
                   textColor: Colors.orange,
                   borderSide: BorderSide(color: Colors.orange),
                   onPressed: () {
-                    BlocProvider.of<BatchWarningBloc>(context)
-                      ..add(
-                          UploadEditedWarnings(warnings: state.unsyncWarnings))
-                      ..add(AllBatchWarnings());
+                    if (state.unsyncWarnings.length > 0) {
+                      BlocProvider.of<BatchWarningBloc>(context)
+                        ..add(UploadEditedWarnings(
+                            warnings: state.unsyncWarnings))
+                        ..add(AllBatchWarnings());
+                    }
                   },
                   text: 'Проверени',
                   icon: GFBadge(

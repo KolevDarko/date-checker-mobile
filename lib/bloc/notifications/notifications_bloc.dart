@@ -19,14 +19,14 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationState> {
       if (state is SyncProductDataSuccess) {
         this.add(AddNewNotification(message: state.message));
       } else if (state is SyncProductDataError) {
-        this.add(AddNewNotification(message: state.error));
+        this.add(AddNewErrorNotification(error: state.error));
       }
     });
     syncBatchWarningBlocSubscription = syncBatchWarningBloc.listen((state) {
       if (state is SyncBatchWarningDataSuccess) {
         this.add(AddNewNotification(message: state.message));
       } else if (state is SyncBatchWarningDataError) {
-        this.add(AddNewNotification(message: state.error));
+        this.add(AddNewErrorNotification(error: state.error));
       }
     });
   }
@@ -37,28 +37,9 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationState> {
   @override
   Stream<NotificationState> mapEventToState(NotificationsEvent event) async* {
     if (event is AddNewNotification) {
-      yield* _mapEventsToState(event);
-    }
-  }
-
-  Stream<NotificationState> _mapEventsToState(NotificationsEvent event) async* {
-    if (productSyncBloc.state is SyncProductDataSuccess) {
-      yield DisplayNotification(
-        message: (productSyncBloc.state as SyncProductDataSuccess).message,
-      );
-    } else if (productSyncBloc.state is SyncProductDataError) {
-      yield DisplayErrorNotification(
-        error: (productSyncBloc.state as SyncProductDataError).error,
-      );
-    } else if (syncBatchWarningBloc.state is SyncBatchWarningDataSuccess) {
-      yield DisplayNotification(
-        message:
-            (syncBatchWarningBloc.state as SyncBatchWarningDataSuccess).message,
-      );
-    } else if (syncBatchWarningBloc.state is SyncBatchWarningDataError) {
-      yield DisplayErrorNotification(
-        error: (syncBatchWarningBloc.state as SyncBatchWarningDataError).error,
-      );
+      yield DisplayNotification(message: event.message);
+    } else if (event is AddNewErrorNotification) {
+      yield DisplayErrorNotification(error: event.error);
     }
   }
 

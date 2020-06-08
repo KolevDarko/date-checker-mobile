@@ -87,8 +87,8 @@ class ProductBatchRepository {
     try {
       List<ProductBatch> editedBatches =
           await this.productBatchApiClient.uploadLocalBatches(newBatches);
-
       await this.updateProductBatchesLocally(editedBatches);
+
       return "Успешна синхронизација на податоците.";
     } catch (e) {
       throw Exception(
@@ -132,7 +132,21 @@ class ProductBatchRepository {
 
   Future<void> updateProductBatch(ProductBatch productBatch) async {
     try {
-      await this.db.productBatchDao.updateProductBatch(productBatch);
+      ProductBatch pb = await this.db.productBatchDao.get(productBatch.id);
+      if (pb != null) {
+        await this.db.productBatchDao.updateProductBatch(productBatch);
+
+        BatchWarning batchWarning = await this
+            .db
+            .batchWarningDao
+            .getByProductBatchId(productBatch.serverId);
+        if (batchWarning != null) {
+          batchWarning.newQuantity = productBatch.quantity;
+          batchWarning.status = BatchWarning.batchWarningStatus()[1];
+          batchWarning.updated = DateTime.now().toString();
+          await db.batchWarningDao.updateBatchWarning(batchWarning);
+        }
+      }
     } catch (e) {
       throw Exception(
           "Error when updating single product batch in the database.");

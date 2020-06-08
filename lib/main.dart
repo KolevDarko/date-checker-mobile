@@ -8,7 +8,6 @@ import 'package:date_checker_app/views/authentication/login.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 
 import 'repository/repository.dart';
 

@@ -38,8 +38,8 @@ void main() {
         2,
         'NEW',
         'WARNING',
-        50,
-        50,
+        40,
+        40,
         DateTime.now().toString(),
         DateTime.now().toString());
   });
@@ -367,8 +367,10 @@ void main() {
   group('updateProductBatch tests', () {
     int pbId;
     ProductBatch savedProductBatch;
+    int bwId;
     setUp(() async {
-      pbId = await db.productBatchDao.add(productBatch);
+      pbId = await db.productBatchDao.add(productBatch2);
+      bwId = await db.batchWarningDao.add(batchWarning);
       savedProductBatch = await db.productBatchDao.get(pbId);
     });
 
@@ -376,6 +378,9 @@ void main() {
       ProductBatch editedProduct = savedProductBatch.copyWith(quantity: 10);
       await productBatchRepository.updateProductBatch(editedProduct);
       ProductBatch afterUpdate = await db.productBatchDao.get(pbId);
+      BatchWarning bwAfterUpdate = await db.batchWarningDao.get(bwId);
+      expect(bwAfterUpdate.newQuantity, 10);
+      expect(bwAfterUpdate.status, 'CHECKED');
       expect(afterUpdate.quantity, 10);
     });
 
@@ -383,10 +388,12 @@ void main() {
       ProductBatch editedProduct =
           savedProductBatch.copyWith(id: 111230, quantity: 1);
       await productBatchRepository.updateProductBatch(editedProduct);
+      BatchWarning bwAfterUpdate = await db.batchWarningDao.get(bwId);
 
       productBatch = await db.productBatchDao.get(pbId);
       expect(productBatch.id, isNot(equals(111230)));
       expect(productBatch.quantity, isNot(equals(1)));
+      expect(bwAfterUpdate.newQuantity, 40);
     });
   });
   tearDown(() async {

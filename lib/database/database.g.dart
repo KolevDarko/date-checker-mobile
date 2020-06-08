@@ -473,6 +473,14 @@ class _$BatchWarningDao extends BatchWarningDao {
   }
 
   @override
+  Future<BatchWarning> getByProductBatchId(int id) async {
+    return _queryAdapter.query(
+        'SELECT * FROM BatchWarning WHERE productBatchId = ?',
+        arguments: <dynamic>[id],
+        mapper: _batchWarningMapper);
+  }
+
+  @override
   Future<void> delete(int id) async {
     await _queryAdapter.queryNoReturn('DELETE FROM BatchWarning WHERE id = ?',
         arguments: <dynamic>[id]);

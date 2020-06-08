@@ -109,6 +109,9 @@ abstract class BatchWarningDao {
   @Query('SELECT * FROM BatchWarning WHERE id = :id')
   Future<BatchWarning> get(int id);
 
+  @Query('SELECT * FROM BatchWarning WHERE productBatchId = :id')
+  Future<BatchWarning> getByProductBatchId(int id);
+
   @Query('DELETE FROM BatchWarning WHERE id = :id')
   Future<void> delete(int id);
 

@@ -167,9 +167,11 @@ class _ProductBatchTableState extends State<ProductBatchTable>
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  orderByDate
-                      ? Icon(Icons.arrow_drop_down)
-                      : Icon(Icons.arrow_drop_up),
+                  Expanded(
+                    child: orderByDate
+                        ? Icon(Icons.arrow_drop_down)
+                        : Icon(Icons.arrow_drop_up),
+                  ),
                 ],
               ),
             ),

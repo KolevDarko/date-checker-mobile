@@ -12,3 +12,12 @@ class AddNewNotification extends NotificationsEvent {
   @override
   List<Object> get props => [message];
 }
+
+class AddNewErrorNotification extends NotificationsEvent {
+  final String error;
+
+  AddNewErrorNotification({this.error});
+
+  @override
+  List<Object> get props => [error];
+}
