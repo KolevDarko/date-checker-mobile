@@ -23,6 +23,14 @@ class AllProductBatchLoaded extends ProductBatchState {
   final List<ProductBatch> productBatchList;
 
   AllProductBatchLoaded({this.productBatchList});
+  List<Object> get props => [productBatchList];
+}
+
+class OrderedByExpiryDate extends ProductBatchState {
+  final List<ProductBatch> productBatchList;
+
+  OrderedByExpiryDate({this.productBatchList});
+  List<Object> get props => [productBatchList];
 }
 
 class ProductBatchLoaded extends ProductBatchState {
@@ -39,4 +47,40 @@ class ProductBatchError extends ProductBatchState {
   final String error;
 
   ProductBatchError({this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class SyncProductBatchDataSuccess extends ProductBatchState {
+  final String message;
+
+  SyncProductBatchDataSuccess({this.message});
+  @override
+  List<Object> get props => [message];
+}
+
+class UploadProductBatchesSuccess extends ProductBatchState {
+  final String message;
+
+  UploadProductBatchesSuccess({this.message});
+  @override
+  List<Object> get props => [message];
+}
+
+class ProductBatchClosedState extends ProductBatchState {
+  final String message;
+
+  ProductBatchClosedState({this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+class ProductBatchEditSuccess extends ProductBatchState {
+  final String message;
+
+  ProductBatchEditSuccess({this.message});
+
+  @override
+  List<Object> get props => [message];
 }

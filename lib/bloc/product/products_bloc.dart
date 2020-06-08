@@ -16,25 +16,13 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   @override
   Stream<ProductState> mapEventToState(ProductEvent event) async* {
-    print("EVENT $event");
-    if (event is FetchProduct) {
-      print("fetch product event ${event.id}");
+    if (event is FetchAllProducts) {
       yield ProductLoading();
       try {
-        final Product product = await productRepository.getProduct(event.id);
-        yield ProductLoaded(product: product);
-      } catch (_) {
-        yield ProductError(error: "Something went wrong");
-      }
-    } else if (event is AddProductEvent) {
-      yield ProductLoading();
-      try {
-        // int productId = await productRepository.addProduct(event.storeId,
-        //     event.productName, event.price, event.quantity, event.expiryDate);
-        // yield ProductAdded(productId: productId);
+        final List<Product> products = await productRepository.getAllProducts();
+        yield AllProductsLoaded(products: products);
       } catch (e) {
-        yield ProductError(
-            error: "Something went wrong when saving the product.");
+        yield ProductError(error: "Грешка при превземање продукти.");
       }
     }
   }

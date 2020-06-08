@@ -42,9 +42,12 @@ class _$AppDatabaseBuilder {
 
   /// Creates the database and initializes it.
   Future<AppDatabase> build() async {
+    final path = name != null
+        ? join(await sqflite.getDatabasesPath(), name)
+        : ':memory:';
     final database = _$AppDatabase();
     database.database = await database.open(
-      name ?? ':memory:',
+      path,
       _migrations,
       _callback,
     );
@@ -63,10 +66,8 @@ class _$AppDatabase extends AppDatabase {
 
   BatchWarningDao _batchWarningDaoInstance;
 
-  Future<sqflite.Database> open(String name, List<Migration> migrations,
+  Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback callback]) async {
-    final path = join(await sqflite.getDatabasesPath(), name);
-
     return sqflite.openDatabase(
       path,
       version: 1,
@@ -77,18 +78,18 @@ class _$AppDatabase extends AppDatabase {
         await callback?.onOpen?.call(database);
       },
       onUpgrade: (database, startVersion, endVersion) async {
-        MigrationAdapter.runMigrations(
+        await MigrationAdapter.runMigrations(
             database, startVersion, endVersion, migrations);
 
         await callback?.onUpgrade?.call(database, startVersion, endVersion);
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Product` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT, `price` REAL, `barCode` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `Product` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `name` TEXT, `price` REAL, `barCode` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productId`) REFERENCES `Product` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
+            'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `productName` TEXT, `synced` INTEGER, `created` TEXT, `updated` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT, FOREIGN KEY (`productBatchId`) REFERENCES `ProductBatch` (`barCode`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
+            'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productName` TEXT, `daysLeft` INTEGER, `expirationDate` TEXT, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -121,6 +122,7 @@ class _$ProductDao extends ProductDao {
             'Product',
             (Product item) => <String, dynamic>{
                   'id': item.id,
+                  'serverId': item.serverId,
                   'name': item.name,
                   'price': item.price,
                   'barCode': item.barCode
@@ -134,6 +136,7 @@ class _$ProductDao extends ProductDao {
 
   static final _productMapper = (Map<String, dynamic> row) => Product(
       row['id'] as int,
+      row['serverId'] as int,
       row['name'] as String,
       row['price'] as double,
       row['barCode'] as String);
@@ -144,6 +147,18 @@ class _$ProductDao extends ProductDao {
   Future<List<Product>> all() async {
     return _queryAdapter.queryList('SELECT * FROM Product',
         mapper: _productMapper);
+  }
+
+  @override
+  Future<Product> getLast() async {
+    return _queryAdapter.query('SELECT * from Product order by id desc limit 1',
+        mapper: _productMapper);
+  }
+
+  @override
+  Future<Product> getByServerId(int serverId) async {
+    return _queryAdapter.query('SELECT * FROM Product WHERE serverId = ?',
+        arguments: <dynamic>[serverId], mapper: _productMapper);
   }
 
   @override
@@ -159,6 +174,21 @@ class _$ProductDao extends ProductDao {
   }
 
   @override
+  Future<Product> getProductWithLastServerId() async {
+    return _queryAdapter.query(
+        'SELECT * FROM Product ORDER BY serverId DESC LIMIT 1',
+        mapper: _productMapper);
+  }
+
+  @override
+  Future<List<Product>> getProductsBySearchTerm(String inputString) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM Product WHERE instr(name, ?) > 0',
+        arguments: <dynamic>[inputString],
+        mapper: _productMapper);
+  }
+
+  @override
   Future<void> delete(int id) async {
     await _queryAdapter.queryNoReturn('DELETE FROM Product WHERE id = ?',
         arguments: <dynamic>[id]);
@@ -168,6 +198,26 @@ class _$ProductDao extends ProductDao {
   Future<int> add(Product product) {
     return _productInsertionAdapter.insertAndReturnId(
         product, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> insertAllProducts(List<Product> products) async {
+    await _productInsertionAdapter.insertList(
+        products, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> saveProducts(List<Product> products) async {
+    if (database is sqflite.Transaction) {
+      await super.saveProducts(products);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$AppDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.productDao.saveProducts(products);
+      });
+    }
   }
 }
 
@@ -179,10 +229,29 @@ class _$ProductBatchDao extends ProductBatchDao {
             'ProductBatch',
             (ProductBatch item) => <String, dynamic>{
                   'id': item.id,
+                  'serverId': item.serverId,
                   'barCode': item.barCode,
                   'productId': item.productId,
                   'quantity': item.quantity,
                   'expirationDate': item.expirationDate,
+                  'productName': item.productName,
+                  'synced': item.synced ? 1 : 0,
+                  'created': item.created,
+                  'updated': item.updated
+                }),
+        _productBatchUpdateAdapter = UpdateAdapter(
+            database,
+            'ProductBatch',
+            ['id'],
+            (ProductBatch item) => <String, dynamic>{
+                  'id': item.id,
+                  'serverId': item.serverId,
+                  'barCode': item.barCode,
+                  'productId': item.productId,
+                  'quantity': item.quantity,
+                  'expirationDate': item.expirationDate,
+                  'productName': item.productName,
+                  'synced': item.synced ? 1 : 0,
                   'created': item.created,
                   'updated': item.updated
                 });
@@ -195,18 +264,44 @@ class _$ProductBatchDao extends ProductBatchDao {
 
   static final _productBatchMapper = (Map<String, dynamic> row) => ProductBatch(
       row['id'] as int,
+      row['serverId'] as int,
       row['barCode'] as String,
       row['productId'] as int,
       row['quantity'] as int,
       row['expirationDate'] as String,
+      (row['synced'] as int) != 0,
       row['created'] as String,
-      row['updated'] as String);
+      row['updated'] as String,
+      row['productName'] as String);
 
   final InsertionAdapter<ProductBatch> _productBatchInsertionAdapter;
+
+  final UpdateAdapter<ProductBatch> _productBatchUpdateAdapter;
 
   @override
   Future<List<ProductBatch>> all() async {
     return _queryAdapter.queryList('SELECT * FROM ProductBatch',
+        mapper: _productBatchMapper);
+  }
+
+  @override
+  Future<ProductBatch> getLast() async {
+    return _queryAdapter.query(
+        'SELECT * from ProductBatch order by id desc limit 1',
+        mapper: _productBatchMapper);
+  }
+
+  @override
+  Future<List<ProductBatch>> getNewProductBatches() async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM ProductBatch WHERE serverId IS NULL',
+        mapper: _productBatchMapper);
+  }
+
+  @override
+  Future<List<ProductBatch>> getUnsyncedProductBatches() async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM ProductBatch WHERE NOT sync AND serverId NOT NULL',
         mapper: _productBatchMapper);
   }
 
@@ -217,8 +312,30 @@ class _$ProductBatchDao extends ProductBatchDao {
   }
 
   @override
+  Future<List<ProductBatch>> getByBarCode(String barCode) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM ProductBatch WHERE barCode = ?',
+        arguments: <dynamic>[barCode],
+        mapper: _productBatchMapper);
+  }
+
+  @override
+  Future<List<ProductBatch>> searchQuery(String inputString) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM ProductBatch WHERE INSTR(productName, ?) > 0',
+        arguments: <dynamic>[inputString],
+        mapper: _productBatchMapper);
+  }
+
+  @override
   Future<ProductBatch> get(int id) async {
     return _queryAdapter.query('SELECT * FROM ProductBatch WHERE id = ?',
+        arguments: <dynamic>[id], mapper: _productBatchMapper);
+  }
+
+  @override
+  Future<ProductBatch> getByServerId(int id) async {
+    return _queryAdapter.query('SELECT * FROM ProductBatch WHERE serverId = ?',
         arguments: <dynamic>[id], mapper: _productBatchMapper);
   }
 
@@ -233,6 +350,40 @@ class _$ProductBatchDao extends ProductBatchDao {
     return _productBatchInsertionAdapter.insertAndReturnId(
         productBatch, sqflite.ConflictAlgorithm.abort);
   }
+
+  @override
+  Future<void> insertAllProductBatches(
+      List<ProductBatch> productBatches) async {
+    await _productBatchInsertionAdapter.insertList(
+        productBatches, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> updateProductBatch(ProductBatch productBatch) async {
+    await _productBatchUpdateAdapter.update(
+        productBatch, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<int> updateBatches(List<ProductBatch> productBatches) {
+    return _productBatchUpdateAdapter.updateListAndReturnChangedRows(
+        productBatches, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> saveProductBatches(List<ProductBatch> productBatches) async {
+    if (database is sqflite.Transaction) {
+      await super.saveProductBatches(productBatches);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$AppDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.productBatchDao
+            .saveProductBatches(productBatches);
+      });
+    }
+  }
 }
 
 class _$BatchWarningDao extends BatchWarningDao {
@@ -243,6 +394,26 @@ class _$BatchWarningDao extends BatchWarningDao {
             'BatchWarning',
             (BatchWarning item) => <String, dynamic>{
                   'id': item.id,
+                  'productName': item.productName,
+                  'daysLeft': item.daysLeft,
+                  'expirationDate': item.expirationDate,
+                  'productBatchId': item.productBatchId,
+                  'status': item.status,
+                  'priority': item.priority,
+                  'oldQuantity': item.oldQuantity,
+                  'newQuantity': item.newQuantity,
+                  'created': item.created,
+                  'updated': item.updated
+                }),
+        _batchWarningUpdateAdapter = UpdateAdapter(
+            database,
+            'BatchWarning',
+            ['id'],
+            (BatchWarning item) => <String, dynamic>{
+                  'id': item.id,
+                  'productName': item.productName,
+                  'daysLeft': item.daysLeft,
+                  'expirationDate': item.expirationDate,
                   'productBatchId': item.productBatchId,
                   'status': item.status,
                   'priority': item.priority,
@@ -260,6 +431,9 @@ class _$BatchWarningDao extends BatchWarningDao {
 
   static final _batchWarningMapper = (Map<String, dynamic> row) => BatchWarning(
       row['id'] as int,
+      row['productName'] as String,
+      row['daysLeft'] as int,
+      row['expirationDate'] as String,
       row['productBatchId'] as int,
       row['status'] as String,
       row['priority'] as String,
@@ -270,9 +444,19 @@ class _$BatchWarningDao extends BatchWarningDao {
 
   final InsertionAdapter<BatchWarning> _batchWarningInsertionAdapter;
 
+  final UpdateAdapter<BatchWarning> _batchWarningUpdateAdapter;
+
   @override
   Future<List<BatchWarning>> all() async {
     return _queryAdapter.queryList('SELECT * FROM BatchWarning',
+        mapper: _batchWarningMapper);
+  }
+
+  @override
+  Future<List<BatchWarning>> allStatusChecked(String status) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM BatchWarning WHERE status = ?',
+        arguments: <dynamic>[status],
         mapper: _batchWarningMapper);
   }
 
@@ -289,14 +473,55 @@ class _$BatchWarningDao extends BatchWarningDao {
   }
 
   @override
+  Future<BatchWarning> getByProductBatchId(int id) async {
+    return _queryAdapter.query(
+        'SELECT * FROM BatchWarning WHERE productBatchId = ?',
+        arguments: <dynamic>[id],
+        mapper: _batchWarningMapper);
+  }
+
+  @override
   Future<void> delete(int id) async {
     await _queryAdapter.queryNoReturn('DELETE FROM BatchWarning WHERE id = ?',
         arguments: <dynamic>[id]);
   }
 
   @override
+  Future<BatchWarning> getLast() async {
+    return _queryAdapter.query(
+        'SELECT * from BatchWarning order by id desc limit 1',
+        mapper: _batchWarningMapper);
+  }
+
+  @override
   Future<int> add(BatchWarning batchWarning) {
     return _batchWarningInsertionAdapter.insertAndReturnId(
         batchWarning, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> insertAllWarnings(List<BatchWarning> warnings) async {
+    await _batchWarningInsertionAdapter.insertList(
+        warnings, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> updateBatchWarning(BatchWarning batchWarning) async {
+    await _batchWarningUpdateAdapter.update(
+        batchWarning, sqflite.ConflictAlgorithm.abort);
+  }
+
+  @override
+  Future<void> saveWarnings(List<BatchWarning> warnings) async {
+    if (database is sqflite.Transaction) {
+      await super.saveWarnings(warnings);
+    } else {
+      await (database as sqflite.Database)
+          .transaction<void>((transaction) async {
+        final transactionDatabase = _$AppDatabase(changeListener)
+          ..database = transaction;
+        await transactionDatabase.batchWarningDao.saveWarnings(warnings);
+      });
+    }
   }
 }

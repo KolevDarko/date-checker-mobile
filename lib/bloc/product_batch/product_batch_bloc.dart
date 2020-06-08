@@ -1,5 +1,3 @@
-import 'package:date_checker_app/bloc/product/products_event.dart';
-import 'package:date_checker_app/bloc/product/products_state.dart';
 import 'package:date_checker_app/bloc/product_batch/product_batch_event.dart';
 import 'package:date_checker_app/bloc/product_batch/product_batch_state.dart';
 import 'package:date_checker_app/database/models.dart';
@@ -19,16 +17,7 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
 
   @override
   Stream<ProductBatchState> mapEventToState(ProductBatchEvent event) async* {
-    if (event is GetProductBatch) {
-      yield ProductBatchLoading();
-      try {
-        final ProductBatch productBatch =
-            await productBatchRepository.getProductBatch(event.id);
-        yield ProductBatchLoaded(productBatch: productBatch);
-      } catch (_) {
-        yield ProductBatchError(error: "Something went wrong");
-      }
-    } else if (event is AddProductBatch) {
+    if (event is AddProductBatch) {
       yield ProductBatchLoading();
       try {
         int productBatchId =
@@ -36,7 +25,7 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
         yield ProductBatchAdded(productBatchId: productBatchId);
       } catch (e) {
         yield ProductBatchError(
-            error: "Something went wrong when saving the product.");
+            error: "Грешка при зачувување нова пратка. Пробајте повторно.");
       }
     } else if (event is AllProductBatch) {
       yield ProductBatchLoading();
@@ -48,6 +37,78 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
       } catch (e) {
         yield ProductBatchError(
             error: 'Something went wrong. Please try again.');
+      }
+    } else if (event is OrderByExpiryDateEvent) {
+      yield ProductBatchLoading();
+      try {
+        List<ProductBatch> productBatchList =
+            await productBatchRepository.orderedByExpiryDateList();
+        yield OrderedByExpiryDate(productBatchList: productBatchList);
+      } catch (e) {
+        yield ProductBatchError(
+            error: 'Something went wrong. Please try again.');
+      }
+    } else if (event is SyncProductBatchData) {
+      yield ProductBatchLoading();
+      try {
+        String message =
+            await this.productBatchRepository.syncProductBatchesData();
+        yield SyncProductBatchDataSuccess(message: message);
+      } catch (e) {
+        yield ProductBatchError(
+            error: "Грешка при синхронизација на податоци!");
+      }
+    } else if (event is UploadProductBatchData) {
+      yield ProductBatchLoading();
+      try {
+        String message = await this
+            .productBatchRepository
+            .uploadNewProductBatches(event.newBatches);
+        yield UploadProductBatchesSuccess(message: message);
+      } catch (e) {
+        yield ProductBatchError(
+            error: "Грешка при снимање податоци на серверот!");
+      }
+    } else if (event is RemoveProductBatch) {
+      try {
+        String message =
+            await this.productBatchRepository.closeProductBatch(event.warning);
+        yield ProductBatchClosedState(message: message);
+      } catch (e) {
+        yield ProductBatchError(
+            error: "Грешка при отстранувањето на пратката.");
+      }
+    } else if (event is FilterProductBatch) {
+      try {
+        List<ProductBatch> productBatches = await this
+            .productBatchRepository
+            .getFilteredProductBatches(event.inputValue);
+        yield AllProductBatchLoaded(productBatchList: productBatches);
+      } catch (e) {
+        yield ProductBatchError(error: "Грешка при филтрирање на податоци.");
+      }
+    } else if (event is EditProductBatch) {
+      try {
+        await this
+            .productBatchRepository
+            .updateProductBatch(event.productBatch);
+        yield ProductBatchEditSuccess(
+            message: 'Успешно ја променивте пратката.');
+      } catch (e) {
+        yield ProductBatchError(error: "Грешка при снимањето на пратката.");
+      }
+    } else if (event is UploadEditedProductBatches) {
+      yield ProductBatchLoading();
+      try {
+        await this
+            .productBatchRepository
+            .uploadEditedProductBatches(event.editedProductBatches);
+        yield UploadProductBatchesSuccess(
+            message: "Успешно ги снимавте променетите пратки на серверот.");
+      } catch (e) {
+        yield ProductBatchError(
+            error:
+                "Грешка при синхронизација со серверот. Ве молиме пробајте повторно.");
       }
     }
   }

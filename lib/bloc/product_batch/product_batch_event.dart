@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 import 'package:date_checker_app/database/models.dart';
 
@@ -15,16 +14,60 @@ class AddProductBatch extends ProductBatchEvent {
   List<Object> get props => [productBatch];
 }
 
-class GetProductBatch extends ProductBatchEvent {
-  final int id;
+class EditProductBatch extends ProductBatchEvent {
+  final ProductBatch productBatch;
 
-  GetProductBatch(this.id);
+  EditProductBatch({this.productBatch});
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [productBatch];
+}
+
+class OrderByExpiryDateEvent extends ProductBatchEvent {
+  @override
+  List<Object> get props => null;
 }
 
 class AllProductBatch extends ProductBatchEvent {
   @override
   List<Object> get props => null;
+}
+
+class SyncProductBatchData extends ProductBatchEvent {
+  @override
+  List<Object> get props => null;
+}
+
+class UploadProductBatchData extends ProductBatchEvent {
+  final List<ProductBatch> newBatches;
+
+  UploadProductBatchData({this.newBatches});
+  @override
+  List<Object> get props => [newBatches];
+}
+
+class UploadEditedProductBatches extends ProductBatchEvent {
+  final List<ProductBatch> editedProductBatches;
+
+  UploadEditedProductBatches({this.editedProductBatches});
+  @override
+  List<Object> get props => [editedProductBatches];
+}
+
+class FilterProductBatch extends ProductBatchEvent {
+  final ProductBatch productBatch;
+  final String inputValue;
+
+  FilterProductBatch({this.productBatch, this.inputValue});
+  @override
+  List<Object> get props => [productBatch, inputValue];
+}
+
+class RemoveProductBatch extends ProductBatchEvent {
+  final BatchWarning warning;
+
+  RemoveProductBatch({this.warning});
+
+  @override
+  List<Object> get props => [warning];
 }

@@ -1,45 +1,44 @@
+import 'package:date_checker_app/api/products_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/main.dart';
 
 class ProductRepository {
+  final ProductsApiClient productsApiClient;
+  final AppDatabase db;
+
+  ProductRepository({this.productsApiClient, this.db})
+      : assert(productsApiClient != null),
+        assert(db != null);
+
   Future<List<Product>> getAllProducts() async {
-    print("called here");
-    AppDatabase db = await DbProvider.instance.database;
-    return db.productDao.all();
+    return this.db.productDao.all();
   }
 
-  Future<List<Product>> getSuggestions(String pattern) async {
-    List<Product> products = await getAllProducts();
-    List<Product> suggested = [];
-    for (Product product in products) {
-      if (product.barCode.toLowerCase().contains(pattern.toLowerCase())) {
-        suggested.add(product);
-      }
+  Future<int> syncProducts() async {
+    int lastProductId;
+    List<Product> newProducts = [];
+    try {
+      lastProductId = await this.db.productDao.getLastServerId();
+    } catch (e) {
+      lastProductId = null;
     }
-    return suggested;
+    if (lastProductId != null) {
+      newProducts = await this.productsApiClient.syncProducts(lastProductId);
+    } else {
+      newProducts = await this.productsApiClient.getAllProducts();
+    }
+    int newProductsLength = newProducts.length;
+    if (newProductsLength > 0) {
+      await this.saveProductsLocally(newProducts);
+    }
+    return newProductsLength;
   }
 
-  // Future<List<Product>> getProductsInLocation(int storeId) async {
-  //   AppDatabase db = await DbProvider.instance.database;
-  //   Future<List<Product>> products = db.storeDao.getProducts(storeId);
-  //   return products;
-  // }
-
-  // Future<int> addProduct(int storeId, String productName, double price,
-  //     int quantity, String expiryDate) async {
-  //   AppDatabase db = await DbProvider.instance.database;
-  //   Product product = Product(null, productName, price);
-  //   int productId = await db.productDao.add(product);
-  //   ProductInStore productInStore =
-  //       ProductInStore(null, storeId, productId, quantity, expiryDate);
-  //   int productInStoreId = await db.productInStoreDao.add(productInStore);
-  //   return productInStoreId;
-  // }
-
-  Future<Product> getProduct(int productId) async {
-    AppDatabase db = await DbProvider.instance.database;
-    Product product = await db.productDao.get(productId);
-    return product;
+  Future<void> saveProductsLocally(List<Product> newProducts) async {
+    try {
+      await this.db.productDao.saveProducts(newProducts);
+    } catch (e) {
+      throw Exception("Error when saving products to the database");
+    }
   }
 }
