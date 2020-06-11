@@ -23,7 +23,8 @@ class ProductRepository {
       lastProductId = null;
     }
     if (lastProductId != null) {
-      newProducts = await this.productsApiClient.syncProducts(lastProductId);
+      newProducts =
+          await this.productsApiClient.getLatestProducts(lastProductId);
     } else {
       newProducts = await this.productsApiClient.getAllProductsFromServer();
     }

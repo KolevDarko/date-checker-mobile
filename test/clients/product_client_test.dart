@@ -109,7 +109,7 @@ void main() {
         when(mockHttpClient.get(finalUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
         try {
-          await productsApiClient.syncProducts(product.id);
+          await productsApiClient.getLatestProducts(product.id);
           fail('should throw');
         } catch (e) {
           expect(e.toString(), 'Exception: Error getting products data sync');
@@ -158,7 +158,7 @@ void main() {
             .thenAnswer((_) => Future.value(response));
 
         List<Product> products =
-            await productsApiClient.syncProducts(product.id);
+            await productsApiClient.getLatestProducts(product.id);
         expect(products.length, 5);
       });
     });

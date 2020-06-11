@@ -57,7 +57,8 @@ class ProductBatchRepository {
       productBatch = null;
     }
     if (productBatch == null) {
-      productBatches = await this.productBatchApiClient.getAllProductBatches();
+      productBatches =
+          await this.productBatchApiClient.getAllProductBatchesFromServer();
       await this.saveProductBatchesLocally(productBatches);
       return "Успешно ги синхронизиравте вашите податоци.";
     }
@@ -85,9 +86,10 @@ class ProductBatchRepository {
 
   Future<String> uploadNewProductBatches(List<ProductBatch> newBatches) async {
     try {
-      List<ProductBatch> editedBatches =
-          await this.productBatchApiClient.uploadLocalBatches(newBatches);
-      await this.updateProductBatchesLocally(editedBatches);
+      List<ProductBatch> updatedBatches = await this
+          .productBatchApiClient
+          .updatedBatchesAfterPostCall(newBatches);
+      await this.updateProductBatchesLocally(updatedBatches);
 
       return "Успешна синхронизација на податоците.";
     } catch (e) {
@@ -97,10 +99,12 @@ class ProductBatchRepository {
   }
 
   Future<void> uploadEditedProductBatches(
-      List<ProductBatch> editedBatches) async {
+    List<ProductBatch> editedBatches,
+  ) async {
     List<ProductBatch> synced = List.of(editedBatches);
-    var responseBody =
-        await this.productBatchApiClient.callEditBatch(editedBatches);
+    dynamic responseBody = await this
+        .productBatchApiClient
+        .putCallResponseBodyOfBatch(editedBatches);
     if (responseBody['success']) {
       for (ProductBatch batch in synced) {
         batch.synced = true;

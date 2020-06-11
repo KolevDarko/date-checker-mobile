@@ -40,7 +40,8 @@ class BatchWarningRepository {
 
   Future<void> uploadEditedWarnings(List<BatchWarning> warnings) async {
     try {
-      var responseBody = await batchWarningApi.updateWarnings(warnings);
+      dynamic responseBody =
+          await batchWarningApi.warningsPutCallResponseBody(warnings);
       if (responseBody['success']) {
         for (BatchWarning warning in warnings) {
           ProductBatch batch = await this
@@ -75,9 +76,10 @@ class BatchWarningRepository {
       batchWarning = null;
     }
     if (batchWarning != null) {
-      warnings = await this.batchWarningApi.refreshWarnings(batchWarning.id);
+      warnings =
+          await this.batchWarningApi.getLatestBatchWarnings(batchWarning.id);
     } else {
-      warnings = await this.batchWarningApi.getAllBatchWarnings();
+      warnings = await this.batchWarningApi.getAllBatchWarningsFromServer();
     }
     int warningsLength = warnings.length;
     if (warningsLength > 0) {

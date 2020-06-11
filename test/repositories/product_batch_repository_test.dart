@@ -183,7 +183,7 @@ void main() {
 
   group('syncProductBatchesData tests', () {
     test('initial db is empty', () async {
-      when(productBatchApiClient.getAllProductBatches())
+      when(productBatchApiClient.getAllProductBatchesFromServer())
           .thenAnswer((_) => Future.value([productBatch, productBatch2]));
       String message = await productBatchRepository.syncProductBatchesData();
       expect(message, 'Успешно ги синхронизиравте вашите податоци.');
@@ -244,7 +244,8 @@ void main() {
       editedProductBatch = savedProductBatch.copyWith(synced: true);
     });
     test('successfully upload new product batches', () async {
-      when(productBatchApiClient.uploadLocalBatches([savedProductBatch]))
+      when(productBatchApiClient
+              .updatedBatchesAfterPostCall([savedProductBatch]))
           .thenAnswer((_) => Future.value([editedProductBatch]));
 
       String message = await productBatchRepository
@@ -255,8 +256,8 @@ void main() {
       expect(message, 'Успешна синхронизација на податоците.');
     });
     test('product batch api gave error', () async {
-      when(productBatchApiClient.uploadLocalBatches([savedProductBatch]))
-          .thenThrow('oops');
+      when(productBatchApiClient
+          .updatedBatchesAfterPostCall([savedProductBatch])).thenThrow('oops');
       try {
         String message = await productBatchRepository
             .uploadNewProductBatches([savedProductBatch]);
@@ -279,7 +280,8 @@ void main() {
     });
 
     test('successfully upload edited', () async {
-      when(productBatchApiClient.callEditBatch([savedProductBatch]))
+      when(productBatchApiClient
+              .putCallResponseBodyOfBatch([savedProductBatch]))
           .thenAnswer((_) => Future.value(json.decode(jsonResponse)));
       await productBatchRepository
           .uploadEditedProductBatches([savedProductBatch]);
@@ -287,7 +289,8 @@ void main() {
       expect(afterUpload.synced, true);
     });
     test('product batch client throws error', () async {
-      when(productBatchApiClient.callEditBatch([savedProductBatch]))
+      when(productBatchApiClient
+              .putCallResponseBodyOfBatch([savedProductBatch]))
           .thenThrow('Error uploading edited batches.');
       try {
         await productBatchRepository

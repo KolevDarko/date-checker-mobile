@@ -27,12 +27,10 @@ class Product {
     );
   }
 
-  static List<Product> productsListFromJson(var productsJson) {
-    List<Product> products = [];
-    for (var productJson in productsJson) {
-      products.add(Product.fromJson(productJson));
-    }
-    return products;
+  static List<Product> productsListFromJson(dynamic productsJson) {
+    return productsJson
+        .map<Product>((productJson) => Product.fromJson((productJson)))
+        .toList();
   }
 }
 
@@ -98,6 +96,13 @@ class ProductBatch {
   static List<Map<String, dynamic>> toJsonList(
       List<ProductBatch> productBatches) {
     return productBatches.map((elem) => toJson(elem)).toList();
+  }
+
+  static List<ProductBatch> batchesListFromJson(dynamic productBatchesJson) {
+    return productBatchesJson
+        .map<ProductBatch>(
+            (productBatchJson) => ProductBatch.fromJson(productBatchJson))
+        .toList();
   }
 
   ProductBatch copyWith({
@@ -202,6 +207,12 @@ class BatchWarning {
     List<dynamic> jsonWarnings =
         warnings.map((warning) => toJson(warning)).toList();
     return {'batchWarnings': jsonWarnings};
+  }
+
+  static List<BatchWarning> warningsListFromJson(dynamic batchWarningsJson) {
+    return batchWarningsJson
+        .map<BatchWarning>((warning) => BatchWarning.fromJson(warning))
+        .toList();
   }
 
   @override

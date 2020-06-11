@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:date_checker_app/api/constants.dart';
-import 'package:date_checker_app/api/helper_functions.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:http/http.dart' as http;
+
+import 'base_http_client.dart';
 
 class ProductsApiClient extends BaseHttpClient {
   final http.Client httpClient;
@@ -31,7 +32,7 @@ class ProductsApiClient extends BaseHttpClient {
     return Product.productsListFromJson(productsJson);
   }
 
-  Future<List<Product>> syncProducts(int lastProductId) async {
+  Future<List<Product>> getLatestProducts(int lastProductId) async {
     String url = productsSyncUrl + '$lastProductId';
     http.Response response = await getApiCallResponse(
       url: url,

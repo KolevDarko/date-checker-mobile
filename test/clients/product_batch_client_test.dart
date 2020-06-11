@@ -99,14 +99,14 @@ void main() {
           () async {
         var response = MockResponse();
         when(response.statusCode).thenReturn(404);
-        when(mockHttpClient.get(productBatchesUrl, headers: authHeaders))
+        when(mockHttpClient.get(productBatchesUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
 
         try {
-          await productBatchApiClient.getAllProductBatches();
+          await productBatchApiClient.getAllProductBatchesFromServer();
           fail('Should fail');
         } catch (e) {
-          expect(e.toString(), 'Exception: Couldn\'t get product bathes data');
+          expect(e.toString(), 'Exception: Error calling products end point');
         }
       });
       test(
@@ -116,16 +116,16 @@ void main() {
         var responseNext = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponseNext);
-        when(mockHttpClient.get(productBatchesUrl, headers: authHeaders))
+        when(mockHttpClient.get(productBatchesUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
 
         when(responseNext.statusCode).thenReturn(200);
         when(responseNext.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(nextUrl, headers: authHeaders))
+        when(mockHttpClient.get(nextUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(responseNext));
 
         List<ProductBatch> batches =
-            await productBatchApiClient.getAllProductBatches();
+            await productBatchApiClient.getAllProductBatchesFromServer();
         expect(batches.length, 2);
       });
 
@@ -135,11 +135,11 @@ void main() {
         var response = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(productBatchesUrl, headers: authHeaders))
+        when(mockHttpClient.get(productBatchesUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
 
         List<ProductBatch> batches =
-            await productBatchApiClient.getAllProductBatches();
+            await productBatchApiClient.getAllProductBatchesFromServer();
         expect(batches.length, 1);
       });
     });
@@ -165,7 +165,7 @@ void main() {
           body: jsonProductBatches,
         )).thenAnswer((_) => Future.value(response));
         try {
-          await productBatchApiClient.callEditBatch(batches);
+          await productBatchApiClient.putCallResponseBodyOfBatch(batches);
           fail('Should fail');
         } catch (e) {
           expect(e.toString(), 'Exception: Error uploading edited batches.');
@@ -180,7 +180,8 @@ void main() {
           headers: uploadBatchHeaders,
           body: jsonProductBatches,
         )).thenAnswer((_) => Future.value(response));
-        var responseBody = await productBatchApiClient.callEditBatch(batches);
+        var responseBody =
+            await productBatchApiClient.putCallResponseBodyOfBatch(batches);
         expect(responseBody['success'], true);
       });
     });
@@ -229,7 +230,7 @@ void main() {
         )).thenAnswer((_) => Future.value(response));
 
         List<ProductBatch> editedBatches =
-            await productBatchApiClient.uploadLocalBatches([newBatch]);
+            await productBatchApiClient.updatedBatchesAfterPostCall([newBatch]);
         expect(editedBatches.length, 1);
         expect(editedBatches[0].serverId, 4);
         expect(editedBatches[0].synced, true);
@@ -244,8 +245,8 @@ void main() {
         )).thenAnswer((_) => Future.value(response));
 
         try {
-          List<ProductBatch> editedBatches =
-              await productBatchApiClient.uploadLocalBatches([newBatch]);
+          List<ProductBatch> editedBatches = await productBatchApiClient
+              .updatedBatchesAfterPostCall([newBatch]);
         } catch (e) {
           expect(e.toString(), 'Exception: Bad request, post call.');
         }
