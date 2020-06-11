@@ -30,43 +30,48 @@ void main() {
       var nextUrl;
       setUp(() {
         nextUrl = "http://datecheck.lifehqapp.com/api/product-batches/?page=2";
-        jsonResponse = json.encode({
+        jsonResponse = """
+        {
           "count": 1,
           "next": null,
           "previous": null,
           "results": [
-            {"name": "Mirinda", "price": 49.0, "id_code": "005", "id": 6},
+            {"name": "Mirinda", "price": 49.0, "id_code": "005", "id": 6}
           ]
-        });
-        jsonResponseNext = json.encode({
+        }
+        """;
+        jsonResponseNext = """
+        {
           "count": 2,
-          "next": nextUrl,
+          "next": "$nextUrl",
           "previous": null,
           "results": [
-            {"name": "Scheweppes", "price": 59.0, "id_code": "009", "id": 5},
+            {"name": "Scheweppes", "price": 59.0, "id_code": "009", "id": 5}
           ]
-        });
+        }
+        """;
       });
       test('throws Exception when httpClient return non-200 response',
           () async {
         final response = MockResponse();
         when(response.statusCode).thenReturn(404);
-        when(mockHttpClient.get(productsUrl, headers: authHeaders))
+        when(mockHttpClient.get(productsUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
         try {
-          await productsApiClient.getAllProducts();
+          await productsApiClient.getAllProductsFromServer();
           fail('should throw');
         } catch (e) {
-          expect(e.toString(), 'Exception: Couldn\'t get products data');
+          expect(e.toString(), 'Exception: Error calling products end point');
         }
       });
       test('return list of products on 200', () async {
         var response = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(productsUrl, headers: authHeaders))
+        when(mockHttpClient.get(productsUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
-        List<Product> products = await productsApiClient.getAllProducts();
+        List<Product> products =
+            await productsApiClient.getAllProductsFromServer();
         expect(products.length, 1);
         expect(products[0].barCode,
             json.decode(jsonResponse)['results'][0]['id_code']);
@@ -77,15 +82,16 @@ void main() {
         var responseNext = MockResponse();
         when(responseNext.statusCode).thenReturn(200);
         when(responseNext.body).thenReturn(jsonResponseNext);
-        when(mockHttpClient.get(productsUrl, headers: authHeaders))
+        when(mockHttpClient.get(productsUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(responseNext));
 
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(nextUrl, headers: authHeaders))
+        when(mockHttpClient.get(nextUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
 
-        List<Product> products = await productsApiClient.getAllProducts();
+        List<Product> products =
+            await productsApiClient.getAllProductsFromServer();
         expect(products.length, 2);
       });
     });
@@ -100,7 +106,7 @@ void main() {
       test('throws exception on non-200 status code', () async {
         final response = MockResponse();
         when(response.statusCode).thenReturn(404);
-        when(mockHttpClient.get(finalUrl, headers: authHeaders))
+        when(mockHttpClient.get(finalUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
         try {
           await productsApiClient.syncProducts(product.id);
@@ -148,7 +154,7 @@ void main() {
         """;
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(finalUrl, headers: authHeaders))
+        when(mockHttpClient.get(finalUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
 
         List<Product> products =

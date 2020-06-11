@@ -5,40 +5,38 @@ import 'package:date_checker_app/api/helper_functions.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:http/http.dart' as http;
 
-class ProductsApiClient {
+class ProductsApiClient extends BaseHttpClient {
   final http.Client httpClient;
 
-  ProductsApiClient({this.httpClient}) : assert(httpClient != null);
+  ProductsApiClient({this.httpClient})
+      : assert(httpClient != null),
+        super(httpClient: httpClient);
 
-  Future<List<Product>> getAllProducts() async {
+  Future<List<Product>> getAllProductsFromServer() async {
     List<dynamic> productsJson = [];
     dynamic responseBody;
-    http.Response productResponse;
-    try {
-      productResponse = await callApiEndPoint(
-        HttpAction.GET,
-        productsUrl,
-        "Error calling products end point",
-        httpClient,
-      );
-    } catch (e) {
-      throw Exception("Couldn't get products data");
+    http.Response response;
+
+    response = await getApiCallResponse(
+      url: productsUrl,
+      errorMessage: "Error calling products end point",
+    );
+    responseBody = jsonDecode(response.body);
+    if (responseBody['next'] != null) {
+      productsJson = await getPaginatedApiCallResults(responseBody);
+    } else {
+      productsJson = List.of(responseBody['results']);
     }
-    responseBody = jsonDecode(productResponse.body);
-    productsJson = await getAllDataFromApiPoint(responseBody, httpClient);
+
     return Product.productsListFromJson(productsJson);
   }
 
   Future<List<Product>> syncProducts(int lastProductId) async {
     String url = productsSyncUrl + '$lastProductId';
-    http.Response productsSyncResponse = await callApiEndPoint(
-      HttpAction.GET,
-      url,
-      'Error getting products data sync',
-      this.httpClient,
+    http.Response response = await getApiCallResponse(
+      url: url,
+      errorMessage: 'Error getting products data sync',
     );
-    var productsJson = jsonDecode(productsSyncResponse.body);
-
-    return Product.productsListFromJson(productsJson);
+    return Product.productsListFromJson(jsonDecode(response.body));
   }
 }
