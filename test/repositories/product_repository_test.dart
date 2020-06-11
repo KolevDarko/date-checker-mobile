@@ -60,7 +60,7 @@ void main() {
       await db.productDao.add(product1);
       var lastProductId = await db.productDao.getLastServerId();
 
-      when(productsApiClient.syncProducts(lastProductId))
+      when(productsApiClient.getLatestProducts(lastProductId))
           .thenAnswer((_) => Future.value([]));
       int newProductsLength = await productRepository.syncProducts();
       expect(newProductsLength, 0);
@@ -69,14 +69,14 @@ void main() {
     test('sync products when they are not synced', () async {
       await db.productDao.add(product1);
       var lastProductId = await db.productDao.getLastServerId();
-      when(productsApiClient.syncProducts(lastProductId))
+      when(productsApiClient.getLatestProducts(lastProductId))
           .thenAnswer((_) => Future.value(products));
       int newProductsLength = await productRepository.syncProducts();
       expect(newProductsLength, 2);
     });
 
     test('sync products when db is empty', () async {
-      when(productsApiClient.getAllProducts())
+      when(productsApiClient.getAllProductsFromServer())
           .thenAnswer((_) => Future.value(products));
       int newProductsLength = await productRepository.syncProducts();
       expect(newProductsLength, 2);

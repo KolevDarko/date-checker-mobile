@@ -129,7 +129,7 @@ void main() {
     });
 
     test('success uploading edited warnings', () async {
-      when(batchWarningApiClient.updateWarnings([savedWarning]))
+      when(batchWarningApiClient.warningsPutCallResponseBody([savedWarning]))
           .thenAnswer((_) => Future.value(json.decode('{"success": true}')));
       await batchWarningRepository.uploadEditedWarnings([savedWarning]);
       newProductBatch = await db.productBatchDao.get(pbId);
@@ -142,7 +142,7 @@ void main() {
     test('error on batch warning api client call', () async {
       BatchWarning savedWarning = await db.batchWarningDao.get(bwId);
 
-      when(batchWarningApiClient.updateWarnings([savedWarning]))
+      when(batchWarningApiClient.warningsPutCallResponseBody([savedWarning]))
           .thenThrow('oops');
       try {
         await batchWarningRepository.uploadEditedWarnings([savedWarning]);
@@ -206,7 +206,7 @@ void main() {
 
   group('syncWarnings tests', () {
     test('sync warnings on empty db', () async {
-      when(batchWarningApiClient.getAllBatchWarnings())
+      when(batchWarningApiClient.getAllBatchWarningsFromServer())
           .thenAnswer((_) => Future.value([bw1]));
       int numberReturned = await batchWarningRepository.syncWarnings();
       final warnings = await db.batchWarningDao.all();
@@ -216,7 +216,7 @@ void main() {
 
     test('sync warning with some data in db already', () async {
       int bwId = await db.batchWarningDao.add(bw1);
-      when(batchWarningApiClient.refreshWarnings(bwId))
+      when(batchWarningApiClient.getLatestBatchWarnings(bwId))
           .thenAnswer((_) => Future.value([bw2]));
 
       int numReturned = await batchWarningRepository.syncWarnings();
@@ -230,7 +230,7 @@ void main() {
       int bwId1 = await db.batchWarningDao.add(bw1);
       int bwId2 = await db.batchWarningDao.add(bw2);
 
-      when(batchWarningApiClient.refreshWarnings(bwId2))
+      when(batchWarningApiClient.getLatestBatchWarnings(bwId2))
           .thenAnswer((_) => Future.value([]));
       int numReturned = await batchWarningRepository.syncWarnings();
 

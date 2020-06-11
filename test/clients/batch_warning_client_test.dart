@@ -49,10 +49,10 @@ void main() {
           () async {
         var response = MockResponse();
         when(response.statusCode).thenReturn(500);
-        when(mockHttpClient.get(batchWarningsUrl, headers: authHeaders))
+        when(mockHttpClient.get(batchWarningsUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
         try {
-          await batchWarningApiClient.getAllBatchWarnings();
+          await batchWarningApiClient.getAllBatchWarningsFromServer();
           fail('Should throw');
         } catch (e) {
           expect(e.toString(), 'Exception: Error getting batch warning data');
@@ -62,11 +62,12 @@ void main() {
         var response = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(batchWarningsUrl, headers: authHeaders))
+        when(mockHttpClient.get(batchWarningsUrl, headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
 
         List<BatchWarning> warnings =
-            await batchWarningApiClient.getAllBatchWarnings();
+            await batchWarningApiClient.getAllBatchWarningsFromServer();
+
         expect(warnings.length, 1);
         expect(warnings[0].productName, "Fanta");
       });
@@ -98,11 +99,12 @@ void main() {
         var response = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(syncBatchWarningsUrl, headers: authHeaders))
+        when(mockHttpClient.get(syncBatchWarningsUrl,
+                headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
 
         List<BatchWarning> warnings =
-            await batchWarningApiClient.refreshWarnings(1);
+            await batchWarningApiClient.getLatestBatchWarnings(1);
         expect(warnings.length, 1);
         expect(warnings[0].productName, "Fanta");
       });
@@ -111,10 +113,11 @@ void main() {
           () async {
         var response = MockResponse();
         when(response.statusCode).thenReturn(500);
-        when(mockHttpClient.get(syncBatchWarningsUrl, headers: authHeaders))
+        when(mockHttpClient.get(syncBatchWarningsUrl,
+                headers: uploadBatchHeaders))
             .thenAnswer((_) => Future.value(response));
         try {
-          await batchWarningApiClient.refreshWarnings(1);
+          await batchWarningApiClient.getLatestBatchWarnings(1);
           fail('Should throw');
         } catch (e) {
           expect(e.toString(), 'Exception: Error getting new batches');
@@ -133,25 +136,29 @@ void main() {
           () async {
         var response = MockResponse();
         when(response.statusCode).thenReturn(500);
-        when(mockHttpClient.put(batchWarningsUrl, headers: uploadBatchHeaders))
-            .thenAnswer((_) => Future.value(response));
+        when(mockHttpClient.put(
+          batchWarningsUrl,
+          headers: uploadBatchHeaders,
+          body: json.encode(BatchWarning.toJsonMap(warnings)),
+        )).thenAnswer((_) => Future.value(response));
         try {
-          await batchWarningApiClient.updateWarnings(warnings);
+          await batchWarningApiClient.warningsPutCallResponseBody(warnings);
           fail('Should throw');
         } catch (e) {
-          expect(e.toString(),
-              'Exception: Something went wrong when doing update on the server');
+          expect(e.toString(), 'Exception: Failed to update server data');
         }
       });
       test('return success: true on  200 response', () async {
         var response = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(json.encode({"success": true}));
-        when(mockHttpClient.put(batchWarningsUrl,
-                headers: uploadBatchHeaders,
-                body: json.encode(BatchWarning.toJsonMap(warnings))))
-            .thenAnswer((_) => Future.value(response));
-        var bodyResponse = await batchWarningApiClient.updateWarnings(warnings);
+        when(mockHttpClient.put(
+          batchWarningsUrl,
+          headers: uploadBatchHeaders,
+          body: json.encode(BatchWarning.toJsonMap(warnings)),
+        )).thenAnswer((_) => Future.value(response));
+        var bodyResponse =
+            await batchWarningApiClient.warningsPutCallResponseBody(warnings);
         expect(bodyResponse['success'], true);
       });
     });
