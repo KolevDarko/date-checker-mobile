@@ -24,12 +24,16 @@ class BatchWarningRepository {
           .db
           .productBatchDao
           .getByServerId(batchWarning.productBatchId);
+//      update data in model
+//      productBatch.updateQuantity(quantity);
       productBatch.quantity = quantity;
       productBatch.updated = DateTime.now().toString();
       productBatch.synced = false;
+//      batchWarning.updateQuantity(quantity)
       batchWarning.status = 'CHECKED';
       batchWarning.updated = DateTime.now().toString();
       batchWarning.newQuantity = quantity;
+
       await this.db.batchWarningDao.updateBatchWarning(batchWarning);
       await this.db.productBatchDao.updateProductBatch(productBatch);
       return 'Успешно ја променивте количина на пратката.';
@@ -43,6 +47,9 @@ class BatchWarningRepository {
       dynamic responseBody =
           await batchWarningApi.warningsPutCallResponseBody(warnings);
       if (responseBody['success']) {
+//        1. with sql update all product batches in one query
+//      2. with sql delete all warnings
+//      two separate methods
         for (BatchWarning warning in warnings) {
           ProductBatch batch = await this
               .db
@@ -70,6 +77,7 @@ class BatchWarningRepository {
   Future<int> syncWarnings() async {
     BatchWarning batchWarning;
     List<BatchWarning> warnings = [];
+//    try/catch probably not needed, query should return null if row doesn't exist
     try {
       batchWarning = await this.db.batchWarningDao.getLast();
     } catch (e) {

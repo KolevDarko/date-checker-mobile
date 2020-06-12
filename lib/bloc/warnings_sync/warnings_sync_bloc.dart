@@ -9,6 +9,10 @@ class SyncBatchWarningBloc
   final BatchWarningBloc batchWarningBloc;
   final BatchWarningRepository batchWarningRepository;
 
+  static const NO_NEW_WARNINGS = 'Нема нови податоци.';
+  static const NEW_WARNINGS_SYNCED = 'Успешно ги синхронизиравте податоците.';
+  static const ERROR_SYNC_WARNINGS = 'Грешка при ажурирање на податоците';
+  
   SyncBatchWarningBloc({
     this.batchWarningBloc,
     this.batchWarningRepository,
@@ -24,15 +28,15 @@ class SyncBatchWarningBloc
       try {
         int returnedNumber = await this.batchWarningRepository.syncWarnings();
         if (returnedNumber == 0) {
-          yield SyncBatchWarningDataSuccess(message: 'Нема нови податоци.');
+          yield SyncBatchWarningDataSuccess(message: NO_NEW_WARNINGS);
         } else {
           yield SyncBatchWarningDataSuccess(
-              message: 'Успешно ги синхронизиравте податоците.');
+              message: NEW_WARNINGS_SYNCED);
           batchWarningBloc.add(AllBatchWarnings());
         }
       } catch (e) {
         yield SyncBatchWarningDataError(
-            error: 'Грешка при ажурирање на податоците');
+            error: ERROR_SYNC_WARNINGS);
       }
     }
   }
