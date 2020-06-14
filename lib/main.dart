@@ -3,6 +3,7 @@ import 'package:date_checker_app/bloc_delegate.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
+import 'package:date_checker_app/dependencies/local_storage_service.dart';
 import 'package:date_checker_app/views/authentication/login.dart';
 
 import 'package:flutter/material.dart';
@@ -29,7 +30,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppDatabase db = await DbProvider.instance.database;
   BlocSupervisor.delegate = SimpleBlocDelegate();
-  setupDependencyAssembler(db: db, dependencyAssembler: dependencyAssembler);
+  LocalStorageService ls = await LocalStorageService.getInstance();
+
+  setupDependencyAssembler(
+    db: db,
+    dependencyAssembler: dependencyAssembler,
+    localStorage: ls,
+  );
 
   runApp(
     InheritedDataProviderHelper(
@@ -119,6 +126,13 @@ class MyApp extends StatelessWidget {
             syncBatchWarningBloc:
                 BlocProvider.of<SyncBatchWarningBloc>(context),
           ),
+        ),
+        BlocProvider<AuthenticationBloc>(
+          create: (BuildContext context) => AuthenticationBloc(
+            authRepository: dependencyAssembler.get<AuthRepository>(),
+          )..add(
+              AuthenticationStarted(),
+            ),
         ),
       ],
       child: MaterialApp(

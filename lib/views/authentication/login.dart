@@ -1,4 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
+import 'package:date_checker_app/custom_widgets/splash_screen.dart';
 import 'package:date_checker_app/views/authentication/data_sync.dart';
 import 'package:date_checker_app/views/home/home_page.dart';
 import 'package:flutter/material.dart';
@@ -20,47 +21,57 @@ class _LoginViewState extends State<LoginView> {
       ),
       body: Builder(
         builder: (BuildContext context) {
-          return Form(
-            key: _formKey,
-            child: Column(
-              children: <Widget>[
-                TextFormField(
-                  // The validator receives the text that the user has entered.
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Please enter some text';
-                    }
-                    return null;
-                  },
+          return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+            builder: (context, state) {
+              if (state is AuthenticationInitial) {
+                return SplashScreen();
+              } else if (state is AuthenticationSuccess) {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (ctx) => DataSync()));
+              }
+              return Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      // The validator receives the text that the user has entered.
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please enter some text';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    TextFormField(
+                      // The validator receives the text that the user has entered.
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please enter some text';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    RaisedButton(
+                      child: Text('Логирај се.'),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (ctx) => DataSync(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                TextFormField(
-                  // The validator receives the text that the user has entered.
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Please enter some text';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                RaisedButton(
-                  child: Text('Логирај се.'),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (ctx) => DataSync(),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),

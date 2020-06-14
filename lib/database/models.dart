@@ -248,3 +248,26 @@ class BatchWarning {
     );
   }
 }
+
+@entity
+class User {
+  @PrimaryKey(autoGenerate: true)
+  int id;
+  String email;
+  String password;
+  String firstName;
+  String lastName;
+
+  User(
+    this.id,
+    this.email,
+    this.password, [
+    this.firstName,
+    this.lastName,
+  ]);
+
+  @override
+  String toString() {
+    return "User email: $email";
+  }
+}

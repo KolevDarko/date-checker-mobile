@@ -66,6 +66,8 @@ class _$AppDatabase extends AppDatabase {
 
   BatchWarningDao _batchWarningDaoInstance;
 
+  UserDao _userDaoInstance;
+
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback callback]) async {
     return sqflite.openDatabase(
@@ -90,6 +92,8 @@ class _$AppDatabase extends AppDatabase {
             'CREATE TABLE IF NOT EXISTS `ProductBatch` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `serverId` INTEGER, `barCode` TEXT, `productId` INTEGER, `quantity` INTEGER, `expirationDate` TEXT, `productName` TEXT, `synced` INTEGER, `created` TEXT, `updated` TEXT)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `BatchWarning` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `productName` TEXT, `daysLeft` INTEGER, `expirationDate` TEXT, `productBatchId` INTEGER, `status` TEXT, `priority` TEXT, `oldQuantity` INTEGER, `newQuantity` INTEGER, `created` TEXT, `updated` TEXT)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `User` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `email` TEXT, `password` TEXT, `firstName` TEXT, `lastName` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -111,6 +115,11 @@ class _$AppDatabase extends AppDatabase {
   BatchWarningDao get batchWarningDao {
     return _batchWarningDaoInstance ??=
         _$BatchWarningDao(database, changeListener);
+  }
+
+  @override
+  UserDao get userDao {
+    return _userDaoInstance ??= _$UserDao(database, changeListener);
   }
 }
 
@@ -523,5 +532,53 @@ class _$BatchWarningDao extends BatchWarningDao {
         await transactionDatabase.batchWarningDao.saveWarnings(warnings);
       });
     }
+  }
+}
+
+class _$UserDao extends UserDao {
+  _$UserDao(this.database, this.changeListener)
+      : _queryAdapter = QueryAdapter(database),
+        _userInsertionAdapter = InsertionAdapter(
+            database,
+            'User',
+            (User item) => <String, dynamic>{
+                  'id': item.id,
+                  'email': item.email,
+                  'password': item.password,
+                  'firstName': item.firstName,
+                  'lastName': item.lastName
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  static final _userMapper = (Map<String, dynamic> row) => User(
+      row['id'] as int,
+      row['email'] as String,
+      row['password'] as String,
+      row['firstName'] as String,
+      row['lastName'] as String);
+
+  final InsertionAdapter<User> _userInsertionAdapter;
+
+  @override
+  Future<User> getUserById(int id) async {
+    return _queryAdapter.query('SELECT * FROM User WHERE id = ?',
+        arguments: <dynamic>[id], mapper: _userMapper);
+  }
+
+  @override
+  Future<User> getUserByEmail(String email) async {
+    return _queryAdapter.query('SELECT * FROM User WHERE email = ?',
+        arguments: <dynamic>[email], mapper: _userMapper);
+  }
+
+  @override
+  Future<int> add(User user) {
+    return _userInsertionAdapter.insertAndReturnId(
+        user, sqflite.ConflictAlgorithm.abort);
   }
 }

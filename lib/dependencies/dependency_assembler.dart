@@ -2,6 +2,7 @@ import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/api/product_batch_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/dependencies/debouncer.dart';
+import 'package:date_checker_app/dependencies/local_storage_service.dart';
 import 'package:date_checker_app/repository/repository.dart';
 import 'package:date_checker_app/api/products_client.dart';
 import 'package:get_it/get_it.dart';
@@ -12,10 +13,20 @@ GetIt dependencyAssembler = GetIt.instance;
 void setupDependencyAssembler({
   AppDatabase db,
   GetIt dependencyAssembler,
+  LocalStorageService localStorage,
 }) {
   Client httpClient = Client();
 
   dependencyAssembler.registerFactory(() => Debouncer(milliseconds: 500));
+
+  dependencyAssembler.registerSingleton<LocalStorageService>(localStorage);
+
+  dependencyAssembler.registerLazySingleton(
+    () => AuthRepository(
+      db: db,
+      localStorage: localStorage,
+    ),
+  );
 
   dependencyAssembler.registerLazySingleton(
     () => ProductRepository(

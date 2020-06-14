@@ -132,3 +132,15 @@ abstract class BatchWarningDao {
     await insertAllWarnings(warnings);
   }
 }
+
+@dao
+abstract class UserDao {
+  @insert
+  Future<int> add(User user);
+
+  @Query('SELECT * FROM User WHERE id = :id')
+  Future<User> getUserById(int id);
+
+  @Query('SELECT * FROM User WHERE email = :email')
+  Future<User> getUserByEmail(String email);
+}
