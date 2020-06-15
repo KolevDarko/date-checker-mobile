@@ -1,5 +1,6 @@
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/views/authentication/login.dart';
+import 'package:date_checker_app/custom_widgets/route_animation.dart';
+import 'package:date_checker_app/views/authentication/starter_screen.dart';
 import 'package:date_checker_app/views/product_batch/add_edit_product_batch.dart';
 import 'package:date_checker_app/views/product_batch/all_product_batch.dart';
 import 'package:date_checker_app/views/product_warning/all_product_warnings.dart';
@@ -56,14 +57,11 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.redAccent,
                 ),
                 onPressed: () {
-                  BlocProvider.of<AuthenticationBloc>(context).add(
-                    AuthenticationLoggedOut(),
+                  BlocProvider.of<LoggedOutBloc>(context).add(
+                    LogOutPressed(),
                   );
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (ctx) => LoginView()),
-                    (_) => false,
-                  );
+
+                  Navigator.pop(context);
                 },
               )
             ],
@@ -115,9 +113,7 @@ class _HomePageState extends State<HomePage> {
           return FloatingActionButton(
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => AddOrEditProductBatchView(),
-                ),
+                createRoute(AddOrEditProductBatchView()),
               );
             },
             child: Icon(Icons.add),

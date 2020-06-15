@@ -4,8 +4,6 @@ import 'package:date_checker_app/custom_widgets/custom_product_picker.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/date_time_formatter.dart';
 
-import 'package:date_checker_app/repository/product_repository.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';

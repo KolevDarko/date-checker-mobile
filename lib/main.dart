@@ -5,7 +5,7 @@ import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/dependencies/local_storage_service.dart';
-import 'package:date_checker_app/views/authentication/login.dart';
+import 'package:date_checker_app/views/authentication/starter_screen.dart';
 
 import 'package:flutter/material.dart';
 
@@ -145,6 +145,11 @@ class MyApp extends StatelessWidget {
               AuthenticationStarted(),
             ),
         ),
+        BlocProvider<LoggedOutBloc>(
+          create: (context) => LoggedOutBloc(
+            authBloc: BlocProvider.of<AuthenticationBloc>(context),
+          ),
+        )
       ],
       child: MaterialApp(
           title: "Date Checker App",

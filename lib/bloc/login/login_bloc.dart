@@ -55,6 +55,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Stream<LoginState> _mapLoginWithCredentialsPressedToState(
       {String email, String password}) async* {
     yield LoginState.loading();
+    await Future.delayed(Duration(seconds: 2));
     try {
       await this.authRepository.signIn(email: email, password: password);
       yield LoginState.success();

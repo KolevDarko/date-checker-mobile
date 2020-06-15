@@ -1,6 +1,6 @@
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
-import 'package:date_checker_app/repository/auth_repository.dart';
+import 'package:date_checker_app/repository/repository.dart';
 import 'package:date_checker_app/views/authentication/login_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -1,6 +1,7 @@
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/custom_widgets/button_with_indicator.dart';
 import 'package:date_checker_app/custom_widgets/custom_table.dart';
+import 'package:date_checker_app/custom_widgets/route_animation.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/date_time_formatter.dart';
@@ -200,10 +201,9 @@ class _ProductBatchTableState extends State<ProductBatchTable>
                   Product product =
                       await this.db.productDao.getByServerId(_batch.productId);
                   if (val) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (ctx) => AddOrEditProductBatchView(
+                    Navigator.of(context).push(
+                      createRoute(
+                        AddOrEditProductBatchView(
                           productBatch: _batch,
                           product: product,
                         ),
