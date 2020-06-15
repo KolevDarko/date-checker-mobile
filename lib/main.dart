@@ -1,6 +1,7 @@
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/bloc_delegate.dart';
 import 'package:date_checker_app/database/database.dart';
+import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/dependencies/local_storage_service.dart';
@@ -37,6 +38,16 @@ Future<void> main() async {
     dependencyAssembler: dependencyAssembler,
     localStorage: ls,
   );
+  // AuthRepository auth = dependencyAssembler.get<AuthRepository>();
+  // String hashedPass = await auth.hashPassword("Zoran123456!");
+  // try {
+  //   User user =
+  //       User(1, "zoranstoilov@yahoo.com", hashedPass, "Zoran", "Stoilov");
+  //   await db.userDao.add(user);
+  // } catch (e) {
+  //   print(e);
+  //   print("user exists");
+  // }
 
   runApp(
     InheritedDataProviderHelper(

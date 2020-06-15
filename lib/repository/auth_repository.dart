@@ -1,6 +1,9 @@
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/local_storage_service.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:flutter_string_encryption/flutter_string_encryption.dart';
 
 class AuthRepository {
   final AppDatabase db;
@@ -11,7 +14,7 @@ class AuthRepository {
 
   Future<User> signIn({String email, String password}) async {
     User user = await this.db.userDao.getUserByEmail(email);
-    if (user != null) {
+    if (user != null && _passwordHashMatches(user.password, password)) {
       localStorage.saveToDiskAsString(userValueKey, user.email);
     }
     return user;
@@ -36,5 +39,24 @@ class AuthRepository {
       return user;
     }
     return null;
+  }
+
+  Future<String> hashPassword(String password) async {
+    final cryptor = new PlatformStringCryptor();
+    final salt = await cryptor.generateSalt();
+    final saltedPassword = salt + password;
+    final bytes = utf8.encode(saltedPassword);
+    final hash = sha256.convert(bytes);
+    return '$salt.$hash';
+  }
+
+  bool _passwordHashMatches(String saltHash, String password) {
+    final parts = saltHash.split('.');
+    final salt = parts[0];
+    final savedHash = parts[1];
+    final saltedPassword = salt + password;
+    final bytes = utf8.encode(saltedPassword);
+    final newHash = sha256.convert(bytes).toString();
+    return newHash == savedHash;
   }
 }
