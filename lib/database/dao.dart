@@ -80,6 +80,9 @@ abstract class ProductBatchDao {
   @update
   Future<void> updateProductBatch(ProductBatch productBatch);
 
+  @Query('UPDATE ProductBatch SET synced = 1 WHERE id IN (:batches)')
+  Future<void> updateAsSynced(List<int> productBatchIds);
+
   @update
   Future<int> updateBatches(List<ProductBatch> productBatches);
 
@@ -114,6 +117,9 @@ abstract class BatchWarningDao {
 
   @Query('DELETE FROM BatchWarning WHERE id = :id')
   Future<void> delete(int id);
+
+  @Query('DELETE FROM BatchWarning WHERE id IN (:warningIds)')
+  Future<void> deleteWarnings(List<int> warningIds);
 
   @Query('SELECT * from BatchWarning order by id desc limit 1')
   Future<BatchWarning> getLast();

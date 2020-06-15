@@ -355,6 +355,13 @@ class _$ProductBatchDao extends ProductBatchDao {
   }
 
   @override
+  Future<void> updateAsSynced(List<int> productBatchIds) async {
+    final valueList1 = productBatchIds.map((value) => "'$value'").join(', ');
+    await _queryAdapter.queryNoReturn(
+        'UPDATE ProductBatch SET synced = 1 WHERE id IN ($valueList1)');
+  }
+
+  @override
   Future<int> add(ProductBatch productBatch) {
     return _productBatchInsertionAdapter.insertAndReturnId(
         productBatch, sqflite.ConflictAlgorithm.abort);
@@ -493,6 +500,13 @@ class _$BatchWarningDao extends BatchWarningDao {
   Future<void> delete(int id) async {
     await _queryAdapter.queryNoReturn('DELETE FROM BatchWarning WHERE id = ?',
         arguments: <dynamic>[id]);
+  }
+
+  @override
+  Future<void> deleteWarnings(List<int> warningIds) async {
+    final valueList1 = warningIds.map((value) => "'$value'").join(', ');
+    await _queryAdapter
+        .queryNoReturn('DELETE FROM BatchWarning WHERE id IN ($valueList1)');
   }
 
   @override

@@ -105,6 +105,12 @@ class ProductBatch {
         .toList();
   }
 
+  void updateQuantity({@required int quantity, @required String dtString}) {
+    this.quantity = quantity ?? this.quantity;
+    this.updated = dtString ?? this.updated;
+    this.synced = false;
+  }
+
   ProductBatch copyWith({
     int id,
     int serverId,
@@ -218,6 +224,12 @@ class BatchWarning {
   @override
   String toString() {
     return "$productName - $oldQuantity - $expirationDate";
+  }
+
+  void updateQuantity({@required int quantity, @required String dtString}) {
+    this.newQuantity = quantity ?? this.newQuantity;
+    this.updated = dtString ?? this.updated;
+    this.status = 'CHECKED';
   }
 
   BatchWarning copyWith({
