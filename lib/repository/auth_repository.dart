@@ -16,8 +16,9 @@ class AuthRepository {
     User user = await this.db.userDao.getUserByEmail(email);
     if (user != null && _passwordHashMatches(user.password, password)) {
       localStorage.saveToDiskAsString(userValueKey, user.email);
+      return user;
     }
-    return user;
+    throw Exception("No such user.");
   }
 
   Future<void> signOut() async {

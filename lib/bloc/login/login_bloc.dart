@@ -49,7 +49,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   Stream<LoginState> _mapLoginPasswordChangedToState(String password) async* {
-    yield state.update(isEmailValid: Validators.isValidPassword(password));
+    yield state.update(isPasswordValid: Validators.isValidPassword(password));
   }
 
   Stream<LoginState> _mapLoginWithCredentialsPressedToState(
@@ -58,6 +58,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     try {
       await this.authRepository.signIn(email: email, password: password);
       yield LoginState.success();
-    } catch (_) {}
+    } catch (_) {
+      yield LoginState.failure();
+    }
   }
 }
