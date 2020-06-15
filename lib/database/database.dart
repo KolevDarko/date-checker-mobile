@@ -8,9 +8,10 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'database.g.dart'; // the generated code will be there
 
-@Database(version: 1, entities: [Product, ProductBatch, BatchWarning])
+@Database(version: 1, entities: [Product, ProductBatch, BatchWarning, User])
 abstract class AppDatabase extends FloorDatabase {
   ProductDao get productDao;
   ProductBatchDao get productBatchDao;
   BatchWarningDao get batchWarningDao;
+  UserDao get userDao;
 }

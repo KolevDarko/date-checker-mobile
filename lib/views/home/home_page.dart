@@ -1,4 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
+import 'package:date_checker_app/views/authentication/login.dart';
 import 'package:date_checker_app/views/product_batch/add_edit_product_batch.dart';
 import 'package:date_checker_app/views/product_batch/all_product_batch.dart';
 import 'package:date_checker_app/views/product_warning/all_product_warnings.dart';
@@ -33,19 +34,35 @@ class _HomePageState extends State<HomePage> {
         length: 3,
         child: Scaffold(
           appBar: AppBar(
-              bottom: TabBar(
-                onTap: (int currentTabIndex) {
-                  setState(() {
-                    _currentTabIndex = currentTabIndex;
-                  });
+            bottom: TabBar(
+              onTap: (int currentTabIndex) {
+                setState(() {
+                  _currentTabIndex = currentTabIndex;
+                });
+              },
+              tabs: [
+                Tab(icon: Text('Пратки')),
+                Tab(icon: Text('Истекување')),
+                Tab(icon: Text("Производи")),
+              ],
+            ),
+            title: Text('Date Checker Tabs'),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.exit_to_app),
+                onPressed: () {
+                  BlocProvider.of<AuthenticationBloc>(context).add(
+                    AuthenticationLoggedOut(),
+                  );
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (ctx) => LoginView()),
+                    (_) => false,
+                  );
                 },
-                tabs: [
-                  Tab(icon: Text('Пратки')),
-                  Tab(icon: Text('Истекување')),
-                  Tab(icon: Text("Производи")),
-                ],
-              ),
-              title: Text('Date Checker Tabs')),
+              )
+            ],
+          ),
           body: BlocListener<NotificationsBloc, NotificationState>(
             listener: (context, state) {
               if (state is DisplayNotification) {

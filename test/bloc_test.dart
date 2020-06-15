@@ -75,7 +75,7 @@ void main() async {
 
     blocTest(
       'add product batch',
-      build: () => productBatchBloc,
+      build: () async => productBatchBloc,
       act: (bloc) => bloc.add(AddProductBatch()),
       expect: [
         ProductBatchEmpty(),

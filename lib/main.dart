@@ -1,8 +1,10 @@
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/bloc_delegate.dart';
 import 'package:date_checker_app/database/database.dart';
+import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
+import 'package:date_checker_app/dependencies/local_storage_service.dart';
 import 'package:date_checker_app/views/authentication/login.dart';
 
 import 'package:flutter/material.dart';
@@ -29,7 +31,23 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppDatabase db = await DbProvider.instance.database;
   BlocSupervisor.delegate = SimpleBlocDelegate();
-  setupDependencyAssembler(db: db, dependencyAssembler: dependencyAssembler);
+  LocalStorageService ls = await LocalStorageService.getInstance();
+
+  setupDependencyAssembler(
+    db: db,
+    dependencyAssembler: dependencyAssembler,
+    localStorage: ls,
+  );
+  // AuthRepository auth = dependencyAssembler.get<AuthRepository>();
+  // String hashedPass = await auth.hashPassword("Zoran123456!");
+  // try {
+  //   User user =
+  //       User(1, "zoranstoilov@yahoo.com", hashedPass, "Zoran", "Stoilov");
+  //   await db.userDao.add(user);
+  // } catch (e) {
+  //   print(e);
+  //   print("user exists");
+  // }
 
   runApp(
     InheritedDataProviderHelper(
@@ -119,6 +137,13 @@ class MyApp extends StatelessWidget {
             syncBatchWarningBloc:
                 BlocProvider.of<SyncBatchWarningBloc>(context),
           ),
+        ),
+        BlocProvider<AuthenticationBloc>(
+          create: (BuildContext context) => AuthenticationBloc(
+            authRepository: dependencyAssembler.get<AuthRepository>(),
+          )..add(
+              AuthenticationStarted(),
+            ),
         ),
       ],
       child: MaterialApp(
