@@ -10,7 +10,9 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: Text('Најава'),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).appBarTheme.color,
       ),
       body: BlocProvider<LoginBloc>(
         create: (context) => LoginBloc(

@@ -13,7 +13,6 @@ class LoginView extends StatelessWidget {
         builder: (BuildContext context) {
           return BlocBuilder<AuthenticationBloc, AuthenticationState>(
             builder: (context, state) {
-              print(state);
               if (state is AuthenticationInitial) {
                 return SplashScreen();
               } else if (state is AuthenticationFailure) {

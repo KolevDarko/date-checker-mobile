@@ -34,6 +34,8 @@ class _HomePageState extends State<HomePage> {
         length: 3,
         child: Scaffold(
           appBar: AppBar(
+            automaticallyImplyLeading: false,
+            centerTitle: true,
             bottom: TabBar(
               onTap: (int currentTabIndex) {
                 setState(() {
@@ -49,7 +51,10 @@ class _HomePageState extends State<HomePage> {
             title: Text('Date Checker Tabs'),
             actions: <Widget>[
               IconButton(
-                icon: Icon(Icons.exit_to_app),
+                icon: Icon(
+                  Icons.exit_to_app,
+                  color: Colors.redAccent,
+                ),
                 onPressed: () {
                   BlocProvider.of<AuthenticationBloc>(context).add(
                     AuthenticationLoggedOut(),

@@ -68,7 +68,7 @@ class _LoginFormState extends State<LoginForm> {
               SnackBar(
                 content: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text('Login Failure'), Icon(Icons.error)],
+                  children: [Text('Погрешни податоци'), Icon(Icons.error)],
                 ),
                 backgroundColor: Colors.red,
               ),
@@ -82,7 +82,7 @@ class _LoginFormState extends State<LoginForm> {
                 content: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Logging In...'),
+                    Text('Најавување...'),
                     CircularProgressIndicator(),
                   ],
                 ),
@@ -108,26 +108,28 @@ class _LoginFormState extends State<LoginForm> {
                     controller: _emailController,
                     decoration: InputDecoration(
                       icon: Icon(Icons.email),
-                      labelText: 'Email',
+                      labelText: 'Емаил',
                     ),
                     keyboardType: TextInputType.emailAddress,
                     autovalidate: true,
                     autocorrect: false,
                     validator: (_) {
-                      return !state.isEmailValid ? 'Invalid email' : null;
+                      return !state.isEmailValid ? 'Невалиден емаил' : null;
                     },
                   ),
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
                       icon: Icon(Icons.lock),
-                      labelText: 'Password',
+                      labelText: 'Лозинка',
                     ),
                     autovalidate: true,
                     obscureText: true,
                     autocorrect: false,
                     validator: (_) {
-                      return !state.isPasswordValid ? 'Invalid password' : null;
+                      return !state.isPasswordValid
+                          ? 'Лозинката мора да биде над 5 карактери'
+                          : null;
                     },
                   ),
                   Padding(
