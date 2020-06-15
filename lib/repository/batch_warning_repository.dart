@@ -69,11 +69,7 @@ class BatchWarningRepository {
   Future<int> syncWarnings() async {
     BatchWarning batchWarning;
     List<BatchWarning> warnings = [];
-    try {
-      batchWarning = await this.db.batchWarningDao.getLast();
-    } catch (e) {
-      batchWarning = null;
-    }
+    batchWarning = await this.db.batchWarningDao.getLast();
     if (batchWarning != null) {
       warnings =
           await this.batchWarningApi.getLatestBatchWarnings(batchWarning.id);
