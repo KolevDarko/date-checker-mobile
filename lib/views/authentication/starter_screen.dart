@@ -30,6 +30,7 @@ class LoginView extends StatelessWidget {
                 } else if (state is AuthenticationFailure) {
                   return LoginScreen();
                 } else if (state is AuthenticationSuccess) {
+                  _saveBatchWarnings(context);
                   return DataSync();
                 }
               },
@@ -38,5 +39,13 @@ class LoginView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  _saveBatchWarnings(BuildContext context) {
+    BlocProvider.of<ProductSyncBloc>(context).add(SyncProductData());
+    BlocProvider.of<ProductBloc>(context).add(FetchAllProducts());
+    BlocProvider.of<ProductBatchBloc>(context)
+      ..add(SyncProductBatchData())
+      ..add(AllProductBatch());
   }
 }

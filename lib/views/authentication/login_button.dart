@@ -1,6 +1,4 @@
-import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginButton extends StatelessWidget {
   final VoidCallback _onPressed;
@@ -8,14 +6,6 @@ class LoginButton extends StatelessWidget {
   const LoginButton({Key key, VoidCallback onPressed})
       : _onPressed = onPressed,
         super(key: key);
-
-  _saveBatchWarnings(BuildContext context) {
-    BlocProvider.of<ProductSyncBloc>(context).add(SyncProductData());
-    BlocProvider.of<ProductBloc>(context).add(FetchAllProducts());
-    BlocProvider.of<ProductBatchBloc>(context)
-      ..add(SyncProductBatchData())
-      ..add(AllProductBatch());
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +15,12 @@ class LoginButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(30.0),
       ),
       onPressed: () {
-        _onPressed();
-        _saveBatchWarnings(context);
+        if (_onPressed != null) {
+          _onPressed();
+        }
       },
       child: Text(
-        'Login',
+        'Најавете се!',
         style: TextStyle(color: Colors.white),
       ),
     );

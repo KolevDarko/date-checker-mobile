@@ -4,6 +4,7 @@ import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
+import 'package:date_checker_app/dependencies/encryption_service.dart';
 import 'package:date_checker_app/dependencies/local_storage_service.dart';
 import 'package:date_checker_app/views/authentication/starter_screen.dart';
 
@@ -32,14 +33,16 @@ Future<void> main() async {
   AppDatabase db = await DbProvider.instance.database;
   BlocSupervisor.delegate = SimpleBlocDelegate();
   LocalStorageService ls = await LocalStorageService.getInstance();
+  EncryptionService eS = await EncryptionService.getInstance();
 
   setupDependencyAssembler(
     db: db,
     dependencyAssembler: dependencyAssembler,
     localStorage: ls,
+    encService: eS,
   );
   // AuthRepository auth = dependencyAssembler.get<AuthRepository>();
-  // String hashedPass = await auth.hashPassword("Zoran123456!");
+  // String hashedPass = await auth.hashPassword("123456");
   // try {
   //   User user =
   //       User(1, "zoranstoilov@yahoo.com", hashedPass, "Zoran", "Stoilov");
