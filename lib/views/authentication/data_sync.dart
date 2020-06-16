@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:date_checker_app/bloc/bloc.dart';
+import 'package:date_checker_app/custom_widgets/route_animation.dart';
 
 import 'package:date_checker_app/views/home/home_page.dart';
 import 'package:flutter/material.dart';
@@ -18,27 +19,20 @@ class _DataSyncState extends State<DataSync> {
   @override
   void initState() {
     super.initState();
-    _saveBatchWarnings();
-    productBatchSubscription =
-        BlocProvider.of<ProductBatchBloc>(context).listen((state) {
-      if (state is AllProductBatchLoaded) {
-        productBatchSubscription.cancel();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomePage(),
-          ),
-        );
-      }
-    });
-  }
 
-  _saveBatchWarnings() {
-    BlocProvider.of<ProductSyncBloc>(context).add(SyncProductData());
-    BlocProvider.of<ProductBloc>(context).add(FetchAllProducts());
-    BlocProvider.of<ProductBatchBloc>(context)
-      ..add(SyncProductBatchData())
-      ..add(AllProductBatch());
+    productBatchSubscription =
+        BlocProvider.of<ProductBatchBloc>(context).listen(
+      (state) {
+        if (state is AllProductBatchLoaded) {
+          productBatchSubscription.cancel();
+          Navigator.of(context).push(
+            createRoute(
+              HomePage(),
+            ),
+          );
+        }
+      },
+    );
   }
 
   @override
