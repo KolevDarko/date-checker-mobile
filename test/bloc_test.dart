@@ -42,7 +42,7 @@ void main() async {
 
     blocTest(
       'loads all the product batches',
-      build: () => productBatchBloc,
+      build: () async => productBatchBloc,
       act: (bloc) => bloc.add(AllProductBatch()),
       expect: [
         ProductBatchEmpty(),
@@ -53,7 +53,7 @@ void main() async {
 
     blocTest(
       'synchronize product batch data',
-      build: () => productBatchBloc,
+      build: () async => productBatchBloc,
       act: (bloc) => bloc.add(SyncProductBatchData()),
       expect: [
         ProductBatchEmpty(),
@@ -64,7 +64,7 @@ void main() async {
 
     blocTest(
       'order by expiry date',
-      build: () => productBatchBloc,
+      build: () async => productBatchBloc,
       act: (bloc) => bloc.add(OrderByExpiryDateEvent()),
       expect: [
         ProductBatchEmpty(),
@@ -103,7 +103,7 @@ void main() async {
 
     blocTest(
       'get all products',
-      build: () => productBloc,
+      build: () async => productBloc,
       act: (bloc) => bloc.add(FetchAllProducts()),
       expect: [
         ProductEmpty(),
@@ -115,45 +115,6 @@ void main() async {
       productBloc?.close();
     });
   });
-
-  // Due to the fact that I have the state not extending Equatable
-  // then the instances of the states cannot be compared
-  // this is required because I want to display notifications every time
-  // when the user clicks the button even if it's the same state
-
-  // group('ProductSyncBloc', () {
-  //   ProductBloc productBloc;
-  //   ProductRepository productRepository;
-  //   ProductSyncBloc productSyncBloc;
-
-  //   setUp(() {
-  //     productBloc = ProductBlocMock();
-  //     productRepository = ProductRepositoryMock();
-  //     productSyncBloc = ProductSyncBloc(
-  //       productBloc: productBloc,
-  //       productRepository: productRepository,
-  //     );
-  //   });
-
-  //   test('initial state is ProductEmpty', () {
-  //     expect(productSyncBloc.initialState, EmptySyncProductState());
-  //   });
-
-  //   blocTest(
-  //     'sync product data',
-  //     build: () => productSyncBloc,
-  //     act: (bloc) => bloc.add(SyncProductData()),
-  //     expect: [
-  //       EmptySyncProductState(),
-  //       SyncProductDataSuccess(),
-  //     ],
-  //   );
-
-  //   tearDown(() {
-  //     productBloc?.close();
-  //     productSyncBloc?.close();
-  //   });
-  // });
 
   group('BatchWarningBloc', () {
     BatchWarningBloc batchWarningBloc;
@@ -187,7 +148,7 @@ void main() async {
 
     blocTest(
       'get all batch warnings',
-      build: () => batchWarningBloc,
+      build: () async => batchWarningBloc,
       act: (bloc) => bloc.add(AllBatchWarnings()),
       expect: [
         BatchWarningEmpty(),
@@ -197,7 +158,7 @@ void main() async {
     );
     blocTest(
       'edit quantity',
-      build: () => batchWarningBloc,
+      build: () async => batchWarningBloc,
       act: (bloc) =>
           bloc.add(EditQuantityEvent(quantity: 20, batchWarning: batchWarning)),
       expect: [
@@ -211,29 +172,4 @@ void main() async {
       batchWarningBloc?.close();
     });
   });
-
-  // Same goes for notifications bloc as ProductSyncBloc
-  // group('NotificationsBloc', () {
-  //   SyncBatchWarningBloc syncBatchWarningBloc;
-  //   ProductSyncBloc productSyncBloc;
-  //   NotificationsBloc notificationsBloc;
-  //   setUp(() {
-  //     syncBatchWarningBloc = SyncBatchWarningBlocMock();
-  //     productSyncBloc = ProductSyncBlocMock();
-  //     notificationsBloc = NotificationsBloc(
-  //       productSyncBloc: productSyncBloc,
-  //       syncBatchWarningBloc: syncBatchWarningBloc,
-  //     );
-  //   });
-
-  //   test('initial state is ProductEmpty', () {
-  //     expect(notificationsBloc.initialState, EmptyNotification());
-  //   });
-
-  //   tearDown(() {
-  //     syncBatchWarningBloc?.close();
-  //     productSyncBloc?.close();
-  //     notificationsBloc?.close();
-  //   });
-  // });
 }
