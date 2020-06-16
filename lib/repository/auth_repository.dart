@@ -10,10 +10,14 @@ class AuthRepository {
   final LocalStorageService localStorage;
   static String userValueKey = 'user';
 
-  AuthRepository({this.localStorage, this.db});
+  AuthRepository({this.localStorage, this.db})
+      : assert(localStorage != null),
+        assert(db != null);
 
   Future<User> signIn({String email, String password}) async {
+    print("here 1");
     User user = await this.db.userDao.getUserByEmail(email);
+    print("user $user");
     if (user != null && _passwordHashMatches(user.password, password)) {
       localStorage.saveToDiskAsString(userValueKey, user.email);
       return user;
