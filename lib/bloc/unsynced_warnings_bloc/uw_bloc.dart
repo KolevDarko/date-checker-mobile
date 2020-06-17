@@ -56,7 +56,8 @@ class UnsyncWarningBloc extends Bloc<UnsyncWarningEvent, UnsyncedWarningState> {
 
   @override
   Future<void> close() {
-    batchWarningBlocSubscription.cancel();
+    batchWarningBlocSubscription?.cancel();
+    batchWarningBloc?.close();
     return super.close();
   }
 }

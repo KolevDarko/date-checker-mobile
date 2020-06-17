@@ -347,4 +347,149 @@ void main() async {
       syncBatchWarningBloc?.close();
     });
   });
+
+  group('ProductSyncBloc', () {
+    ProductSyncBloc productSyncBloc;
+    ProductRepository productRepository;
+    ProductBloc productBloc;
+    setUp(() {
+      productRepository = ProductRepositoryMock();
+      productBloc = ProductBlocMock();
+      productSyncBloc = ProductSyncBloc(
+        productRepository: productRepository,
+        productBloc: productBloc,
+      );
+    });
+
+    test('SyncProductData event with no new data', () {
+      when(productRepository.syncProducts()).thenAnswer((_) => Future.value(0));
+      expectLater(
+          productSyncBloc,
+          emitsInOrder(
+            [
+              isA<EmptySyncProductState>(),
+              isA<SyncProductDataSuccess>().having(
+                (state) => state.message,
+                'message',
+                ProductSyncBloc.NO_NEW_PRODUCTS,
+              ),
+            ],
+          ));
+      productSyncBloc.add(SyncProductData());
+    });
+
+    test('SyncProductData event with new data', () {
+      when(productRepository.syncProducts()).thenAnswer((_) => Future.value(5));
+
+      expectLater(
+        productSyncBloc,
+        emitsInOrder([
+          isA<EmptySyncProductState>(),
+          isA<SyncProductDataSuccess>().having(
+            (state) => state.message,
+            'message',
+            ProductSyncBloc.SYNC_SUCCESS,
+          ),
+        ]),
+      );
+
+      productSyncBloc.add(SyncProductData());
+    });
+
+    test('SyncProductData error when calling repository', () {
+      when(productRepository.syncProducts()).thenThrow('Exception');
+
+      expectLater(
+        productSyncBloc,
+        emitsInOrder([
+          isA<EmptySyncProductState>(),
+          isA<SyncProductDataError>().having(
+            (state) => state.error,
+            'message',
+            ProductSyncBloc.SYNC_ERROR,
+          ),
+        ]),
+      );
+
+      productSyncBloc.add(SyncProductData());
+    });
+
+    tearDown(() {
+      productSyncBloc?.close();
+      productBloc?.close();
+    });
+  });
+
+  group('UnsyncedProductBatchBloc', () {
+    UnsyncedProductBatchBloc unsyncedProductBatchBloc;
+    ProductBatchBloc productBatchBloc;
+    setUp(() {
+      productBatchBloc = ProductBatchBlocMock();
+      unsyncedProductBatchBloc =
+          UnsyncedProductBatchBloc(productBatchBloc: productBatchBloc);
+    });
+
+    test('test UnsyncUpdated', () {
+      List<ProductBatch> productBatchList = [
+        ProductBatch(1, 1, "1001", 1, 20, "2020-03-11", false),
+        ProductBatch(2, null, "1002", 2, 40, "2020-03-11", false),
+      ];
+      when(productBatchBloc.state).thenReturn(
+          AllProductBatchLoaded(productBatchList: productBatchList));
+      expectLater(
+        unsyncedProductBatchBloc,
+        emitsInOrder([
+          UnsyncedProductsLoading(),
+          UnsyncedProductsLoaded(
+            unsavedProductBatches: [productBatchList[1]],
+            unsyncProductBatches: [productBatchList[0]],
+          ),
+        ]),
+      );
+      unsyncedProductBatchBloc.add(UnsyncUpdated());
+    });
+
+    tearDown(() {
+      unsyncedProductBatchBloc?.close();
+      productBatchBloc?.close();
+    });
+  });
+
+  group('UnsyncWarningBloc', () {
+    UnsyncWarningBloc unsyncWarningBloc;
+    BatchWarningBloc batchWarningBloc;
+    setUp(() {
+      batchWarningBloc = BatchWarningMock();
+      unsyncWarningBloc = UnsyncWarningBloc(
+        batchWarningBloc: batchWarningBloc,
+      );
+    });
+
+    test('UnsyncWarningsUpdated', () {
+      List<BatchWarning> warnings = [
+        BatchWarning(1, 'Coca Cola', 30, '2020-05-11', 1, 'NEW', 'WARNING', 30,
+            30, DateTime.now().toString(), DateTime.now().toString()),
+        BatchWarning(2, 'Schweppes', 10, '2020-02-21', 2, 'CHECKED', 'WARNING',
+            50, 50, DateTime.now().toString(), DateTime.now().toString())
+      ];
+
+      when(batchWarningBloc.state)
+          .thenReturn(BatchWarningAllLoaded(allBatchWarning: warnings));
+
+      expectLater(
+        unsyncWarningBloc,
+        emitsInOrder([
+          UnsyncedWarningsLoading(),
+          UnsyncedWarningsLoaded(unsyncWarnings: [warnings[1]]),
+        ]),
+      );
+
+      unsyncWarningBloc.add(UnsyncWarningsUpdated());
+    });
+
+    tearDown(() {
+      unsyncWarningBloc?.close();
+      batchWarningBloc?.close();
+    });
+  });
 }

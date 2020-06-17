@@ -1,4 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
+import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/repository/repository.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
@@ -35,3 +36,5 @@ class ProductSyncBlocMock extends Mock implements ProductSyncBloc {}
 class MockAuthRespository extends Mock implements AuthRepository {}
 
 class MockAuthBloc extends Mock implements AuthenticationBloc {}
+
+class BatchWarningMock extends Mock implements BatchWarningBloc {}
