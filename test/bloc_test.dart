@@ -50,10 +50,10 @@ void main() async {
     blocTest(
       'order by expiry date',
       build: () async => productBatchBloc,
-      act: (bloc) => bloc.add(OrderByExpiryDateEvent()),
+      act: (bloc) => bloc.add(FilterEvent()),
       expect: [
         ProductBatchLoading(),
-        OrderedByExpiryDate(),
+        FilteredBatches(),
       ],
     );
 

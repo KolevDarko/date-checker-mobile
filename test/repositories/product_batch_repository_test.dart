@@ -151,19 +151,54 @@ void main() {
     });
   });
 
-  group('orderedByExpiryDateList tests', () {
+  group('applyFilter tests', () {
+    List<ProductBatch> batchesFromDb;
     setUp(() async {
       productBatch.expirationDate = '2020-03-11';
       productBatch2.expirationDate = '2020-02-11';
       await db.productBatchDao
           .saveProductBatches([productBatch, productBatch2]);
+      batchesFromDb = await db.productBatchDao.all();
     });
     test('get batches ordered by expiry date', () async {
-      List<ProductBatch> batches =
-          await productBatchRepository.orderedByExpiryDateList();
+      List<ProductBatch> batches = await productBatchRepository.applyFilter(
+        batchesFromDb,
+        ProductBatchFilter.expiryDate,
+      );
       expect(batches.length, 2);
       expect(batches[0].productName, 'Coca Cola');
     });
+
+    test('get batches ordered by productName', () async {
+      List<ProductBatch> batches = await productBatchRepository.applyFilter(
+        batchesFromDb,
+        ProductBatchFilter.productName,
+      );
+      expect(batches.length, 2);
+      expect(batches[0].productName, 'Coca Cola');
+    });
+
+    test('get batches ordered by quantity', () async {
+      List<ProductBatch> batches = await productBatchRepository.applyFilter(
+        batchesFromDb,
+        ProductBatchFilter.quantity,
+      );
+
+      expect(batches.length, 2);
+      // Schweppes quantity is 30, Coca Cola is 40
+      expect(batches[0].productName, 'Schweppes');
+    });
+
+    test('get batches ordered by barCode', () async {
+      List<ProductBatch> batches = await productBatchRepository.applyFilter(
+        batchesFromDb,
+        ProductBatchFilter.barCode,
+      );
+
+      expect(batches.length, 2);
+      expect(batches[0].productName, 'Schweppes');
+    });
+
     tearDown(() async {
       var warnings = await db.batchWarningDao.all() ?? [];
       var productbatches = await db.productBatchDao.all() ?? [];
