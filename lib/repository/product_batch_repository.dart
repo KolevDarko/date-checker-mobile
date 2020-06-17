@@ -3,6 +3,8 @@ import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/date_time_formatter.dart';
 
+enum ProductBatchFilter { barCode, productName, quantity, updated, expiryDate }
+
 class ProductBatchRepository {
   final ProductBatchApiClient productBatchApiClient;
   final AppDatabase db;
@@ -39,13 +41,23 @@ class ProductBatchRepository {
     }
   }
 
-  Future<List<ProductBatch>> orderedByExpiryDateList() async {
-    List<ProductBatch> productBatchList = await allProductBatchList();
-    productBatchList.sort((a, b) =>
-        DateTimeFormatter.dateTimeParser(a.expirationDate)
-            .compareTo(DateTimeFormatter.dateTimeParser(b.expirationDate)));
+  Future<List<ProductBatch>> applyFilter(
+      List<ProductBatch> batches, ProductBatchFilter filter) async {
+    if (filter == ProductBatchFilter.barCode) {
+      batches.sort((a, b) => a.barCode.compareTo(b.barCode));
+    } else if (filter == ProductBatchFilter.quantity) {
+      batches.sort((a, b) => a.quantity.compareTo(b.quantity));
+    } else if (filter == ProductBatchFilter.productName) {
+      batches.sort((a, b) => a.productName.compareTo(b.productName));
+    } else if (filter == ProductBatchFilter.expiryDate) {
+      batches.sort((a, b) => DateTimeFormatter.dateTimeParser(a.expirationDate)
+          .compareTo(DateTimeFormatter.dateTimeParser(b.expirationDate)));
+    } else if (filter == ProductBatchFilter.updated) {
+      batches.sort((a, b) => DateTimeFormatter.dateTimeParser(b.updated)
+          .compareTo(DateTimeFormatter.dateTimeParser(a.updated)));
+    }
 
-    return productBatchList;
+    return batches;
   }
 
   Future<String> syncProductBatchesData() async {

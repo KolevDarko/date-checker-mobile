@@ -1,4 +1,6 @@
 import 'package:date_checker_app/bloc/bloc.dart';
+import 'package:date_checker_app/custom_widgets/route_animation.dart';
+import 'package:date_checker_app/views/authentication/starter_screen.dart';
 import 'package:date_checker_app/views/product_batch/add_edit_product_batch.dart';
 import 'package:date_checker_app/views/product_batch/all_product_batch.dart';
 import 'package:date_checker_app/views/product_warning/all_product_warnings.dart';
@@ -33,19 +35,35 @@ class _HomePageState extends State<HomePage> {
         length: 3,
         child: Scaffold(
           appBar: AppBar(
-              bottom: TabBar(
-                onTap: (int currentTabIndex) {
-                  setState(() {
-                    _currentTabIndex = currentTabIndex;
-                  });
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            bottom: TabBar(
+              onTap: (int currentTabIndex) {
+                setState(() {
+                  _currentTabIndex = currentTabIndex;
+                });
+              },
+              tabs: [
+                Tab(icon: Text('Пратки')),
+                Tab(icon: Text('Истекување')),
+                Tab(icon: Text("Производи")),
+              ],
+            ),
+            title: Text('Табови'),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(
+                  Icons.exit_to_app,
+                  color: Colors.redAccent,
+                ),
+                onPressed: () {
+                  BlocProvider.of<LoggedOutBloc>(context).add(
+                    LogOutPressed(),
+                  );
                 },
-                tabs: [
-                  Tab(icon: Text('Пратки')),
-                  Tab(icon: Text('Истекување')),
-                  Tab(icon: Text("Производи")),
-                ],
-              ),
-              title: Text('Date Checker Tabs')),
+              )
+            ],
+          ),
           body: BlocListener<NotificationsBloc, NotificationState>(
             listener: (context, state) {
               if (state is DisplayNotification) {
@@ -92,10 +110,12 @@ class _HomePageState extends State<HomePage> {
         {
           return FloatingActionButton(
             onPressed: () {
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus) {
+                currentFocus.unfocus();
+              }
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => AddOrEditProductBatchView(),
-                ),
+                createRoute(AddOrEditProductBatchView()),
               );
             },
             child: Icon(Icons.add),

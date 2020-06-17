@@ -24,12 +24,16 @@ class BatchWarningRepository {
           .db
           .productBatchDao
           .getByServerId(batchWarning.productBatchId);
-      productBatch.quantity = quantity;
-      productBatch.updated = DateTime.now().toString();
-      productBatch.synced = false;
-      batchWarning.status = 'CHECKED';
-      batchWarning.updated = DateTime.now().toString();
-      batchWarning.newQuantity = quantity;
+
+      String dtString = DateTime.now().toString();
+      productBatch.updateQuantity(
+        quantity: quantity,
+        dtString: dtString,
+      );
+      batchWarning.updateQuantity(
+        quantity: quantity,
+        dtString: dtString,
+      );
       await this.db.batchWarningDao.updateBatchWarning(batchWarning);
       await this.db.productBatchDao.updateProductBatch(productBatch);
       return 'Успешно ја променивте количина на пратката.';
@@ -43,15 +47,10 @@ class BatchWarningRepository {
       dynamic responseBody =
           await batchWarningApi.warningsPutCallResponseBody(warnings);
       if (responseBody['success']) {
-        for (BatchWarning warning in warnings) {
-          ProductBatch batch = await this
-              .db
-              .productBatchDao
-              .getByServerId(warning.productBatchId);
-          batch.synced = true;
-          await this.db.productBatchDao.updateProductBatch(batch);
-          await this.db.batchWarningDao.delete(warning.id);
-        }
+        await this.db.productBatchDao.updateAsSynced(
+            warnings.map<int>((warning) => warning.productBatchId).toList());
+        await this.db.batchWarningDao.deleteWarnings(
+            warnings.map<int>((warning) => warning.id).toList());
       }
     } catch (e) {
       print(e);
@@ -70,11 +69,7 @@ class BatchWarningRepository {
   Future<int> syncWarnings() async {
     BatchWarning batchWarning;
     List<BatchWarning> warnings = [];
-    try {
-      batchWarning = await this.db.batchWarningDao.getLast();
-    } catch (e) {
-      batchWarning = null;
-    }
+    batchWarning = await this.db.batchWarningDao.getLast();
     if (batchWarning != null) {
       warnings =
           await this.batchWarningApi.getLatestBatchWarnings(batchWarning.id);

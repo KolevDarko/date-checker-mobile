@@ -105,6 +105,12 @@ class ProductBatch {
         .toList();
   }
 
+  void updateQuantity({@required int quantity, @required String dtString}) {
+    this.quantity = quantity ?? this.quantity;
+    this.updated = dtString ?? this.updated;
+    this.synced = false;
+  }
+
   ProductBatch copyWith({
     int id,
     int serverId,
@@ -220,6 +226,12 @@ class BatchWarning {
     return "$productName - $oldQuantity - $expirationDate";
   }
 
+  void updateQuantity({@required int quantity, @required String dtString}) {
+    this.newQuantity = quantity ?? this.newQuantity;
+    this.updated = dtString ?? this.updated;
+    this.status = 'CHECKED';
+  }
+
   BatchWarning copyWith({
     int id,
     String productName,
@@ -246,5 +258,28 @@ class BatchWarning {
       created ?? this.created,
       updated ?? this.updated,
     );
+  }
+}
+
+@entity
+class User {
+  @PrimaryKey(autoGenerate: true)
+  int id;
+  String email;
+  String password;
+  String firstName;
+  String lastName;
+
+  User(
+    this.id,
+    this.email,
+    this.password, [
+    this.firstName,
+    this.lastName,
+  ]);
+
+  @override
+  String toString() {
+    return "User email: $email";
   }
 }

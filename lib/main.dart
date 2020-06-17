@@ -1,9 +1,12 @@
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/bloc_delegate.dart';
 import 'package:date_checker_app/database/database.dart';
+import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
-import 'package:date_checker_app/views/authentication/login.dart';
+import 'package:date_checker_app/dependencies/encryption_service.dart';
+import 'package:date_checker_app/dependencies/local_storage_service.dart';
+import 'package:date_checker_app/views/authentication/starter_screen.dart';
 
 import 'package:flutter/material.dart';
 
@@ -29,7 +32,24 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppDatabase db = await DbProvider.instance.database;
   BlocSupervisor.delegate = SimpleBlocDelegate();
-  setupDependencyAssembler(db: db, dependencyAssembler: dependencyAssembler);
+  LocalStorageService ls = await LocalStorageService.getInstance();
+  EncryptionService eS = await EncryptionService.getInstance();
+
+  setupDependencyAssembler(
+    db: db,
+    dependencyAssembler: dependencyAssembler,
+    localStorage: ls,
+    encService: eS,
+  );
+  AuthRepository auth = dependencyAssembler.get<AuthRepository>();
+  String hashedPass = await auth.hashPassword("123456");
+  try {
+    User user = User(2, "admin@admin.com", hashedPass, "Admin", "User");
+    await db.userDao.add(user);
+  } catch (e) {
+    print(e);
+    print("user exists");
+  }
 
   runApp(
     InheritedDataProviderHelper(
@@ -120,11 +140,40 @@ class MyApp extends StatelessWidget {
                 BlocProvider.of<SyncBatchWarningBloc>(context),
           ),
         ),
+        BlocProvider<AuthenticationBloc>(
+          create: (BuildContext context) => AuthenticationBloc(
+            authRepository: dependencyAssembler.get<AuthRepository>(),
+          )..add(
+              AuthenticationStarted(),
+            ),
+        ),
+        BlocProvider<LoggedOutBloc>(
+          create: (context) => LoggedOutBloc(
+            authBloc: BlocProvider.of<AuthenticationBloc>(context),
+          ),
+        )
       ],
       child: MaterialApp(
-        title: "Date Checker App",
-        home: LoginView(),
-      ),
+          debugShowCheckedModeBanner: false,
+          title: "Date Checker App",
+          home: LoginView(),
+          theme: ThemeData(
+            // Define the default brightness and colors.
+            appBarTheme: AppBarTheme(color: Colors.black38),
+            primaryColor: Colors.lightBlue[800],
+            accentColor: Colors.red[600],
+
+            // Define the default font family.
+            fontFamily: 'Georgia',
+
+            // Define the default TextTheme. Use this to specify the default
+            // text styling for headlines, titles, bodies of text, and more.
+            textTheme: TextTheme(
+              headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+              headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+              bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+            ),
+          )),
     );
   }
 }

@@ -14,7 +14,7 @@ class UnsyncedProductsLoaded extends UnsyncedProductBachState {
   final List<ProductBatch> unsyncProductBatches;
   final List<ProductBatch> unsavedProductBatches;
 
-  UnsyncedProductsLoaded(
+  const UnsyncedProductsLoaded(
       {this.unsyncProductBatches, this.unsavedProductBatches});
 
   @override

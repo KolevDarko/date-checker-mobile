@@ -72,7 +72,7 @@ class UnsyncedProductBatchBloc
 
   @override
   Future<void> close() {
-    productBatchSubscription.cancel();
+    productBatchSubscription?.cancel();
     return super.close();
   }
 }
