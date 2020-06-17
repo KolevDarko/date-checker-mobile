@@ -1,11 +1,13 @@
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/custom_widgets/button_with_indicator.dart';
+import 'package:date_checker_app/custom_widgets/custom_data_column.dart';
 import 'package:date_checker_app/custom_widgets/custom_table.dart';
 import 'package:date_checker_app/custom_widgets/route_animation.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/date_time_formatter.dart';
 import 'package:date_checker_app/main.dart';
+import 'package:date_checker_app/repository/repository.dart';
 import 'package:date_checker_app/views/product_batch/_search_component.dart';
 import 'package:date_checker_app/views/product_batch/add_edit_product_batch.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +23,7 @@ class ProductBatchTable extends StatefulWidget {
 
 class _ProductBatchTableState extends State<ProductBatchTable>
     with AutomaticKeepAliveClientMixin {
-  bool orderByDate = false;
+  ProductBatchFilter filter;
   AppDatabase db;
 
   @override
@@ -131,11 +133,12 @@ class _ProductBatchTableState extends State<ProductBatchTable>
                       return Container();
                     } else if (state is ProductBatchLoading) {
                       return Center(
-                        child: CircularProgressIndicator(),
+                        child: Container(),
                       );
                     } else if (state is AllProductBatchLoaded) {
                       return _buildProductBatchItems(state.productBatchList);
-                    } else if (state is OrderedByExpiryDate) {
+                    } else if (state is FilteredBatches) {
+                      filter = state.filter;
                       return _buildProductBatchItems(state.productBatchList);
                     } else {
                       return Container();
@@ -150,6 +153,20 @@ class _ProductBatchTableState extends State<ProductBatchTable>
     );
   }
 
+  _updatedFilterCallback(List<ProductBatch> items) {
+    BlocProvider.of<ProductBatchBloc>(context).add(FilterEvent(
+      productBatchList: items,
+      filter: ProductBatchFilter.updated,
+    ));
+  }
+
+  _filterCallBack(List<ProductBatch> items, ProductBatchFilter filter) {
+    BlocProvider.of<ProductBatchBloc>(context).add(FilterEvent(
+      productBatchList: items,
+      filter: filter,
+    ));
+  }
+
   Widget _buildProductBatchItems(List<ProductBatch> productBatchList) {
     var cellWidth = MediaQuery.of(context).size.width / 4;
     return Padding(
@@ -157,47 +174,71 @@ class _ProductBatchTableState extends State<ProductBatchTable>
       child: customDataTable(
         context: context,
         columns: [
-          DataColumn(
-            label: Container(
-              width: cellWidth,
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    child: Text(
-                      'Датум истек',
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Expanded(
-                    child: orderByDate
-                        ? Icon(Icons.arrow_drop_down)
-                        : Icon(Icons.arrow_drop_up),
-                  ),
-                ],
-              ),
+          customDataColumn(
+            context: context,
+            label: 'Дата Истек',
+            cellWidth: cellWidth,
+            filter: ProductBatchFilter.expiryDate,
+            currentFilter: filter,
+            filterCallback: () => _filterCallBack(
+              productBatchList,
+              ProductBatchFilter.expiryDate,
             ),
-            onSort: (i, b) {
-              if (!orderByDate) {
-                BlocProvider.of<ProductBatchBloc>(context).add(
-                  OrderByExpiryDateEvent(),
-                );
-              } else {
-                BlocProvider.of<ProductBatchBloc>(context)
-                    .add(AllProductBatch());
-              }
-              setState(() {
-                orderByDate = !orderByDate;
-              });
-            },
+            updatedFilterCallback: () => _updatedFilterCallback(
+              productBatchList,
+            ),
           ),
-          DataColumn(label: Text('Производ')),
-          DataColumn(label: Text('Количина')),
-          DataColumn(label: Text('Баркод')),
+          customDataColumn(
+            context: context,
+            label: 'Производ',
+            cellWidth: cellWidth,
+            filter: ProductBatchFilter.productName,
+            currentFilter: filter,
+            filterCallback: () => _filterCallBack(
+              productBatchList,
+              ProductBatchFilter.productName,
+            ),
+            updatedFilterCallback: () => _updatedFilterCallback(
+              productBatchList,
+            ),
+          ),
+          customDataColumn(
+            context: context,
+            label: 'Количина',
+            cellWidth: cellWidth,
+            filter: ProductBatchFilter.quantity,
+            currentFilter: filter,
+            filterCallback: () => _filterCallBack(
+              productBatchList,
+              ProductBatchFilter.quantity,
+            ),
+            updatedFilterCallback: () => _updatedFilterCallback(
+              productBatchList,
+            ),
+          ),
+          customDataColumn(
+            context: context,
+            label: 'Баркод',
+            cellWidth: cellWidth,
+            filter: ProductBatchFilter.barCode,
+            currentFilter: filter,
+            filterCallback: () => _filterCallBack(
+              productBatchList,
+              ProductBatchFilter.barCode,
+            ),
+            updatedFilterCallback: () => _updatedFilterCallback(
+              productBatchList,
+            ),
+          ),
         ],
         rows: productBatchList
             .map(
               (_batch) => DataRow(
                 onSelectChanged: (val) async {
+                  FocusScopeNode currentFocus = FocusScope.of(context);
+                  if (!currentFocus.hasPrimaryFocus) {
+                    currentFocus.unfocus();
+                  }
                   Product product =
                       await this.db.productDao.getByServerId(_batch.productId);
                   if (val) {

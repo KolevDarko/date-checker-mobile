@@ -38,12 +38,15 @@ class ProductBatchBloc extends Bloc<ProductBatchEvent, ProductBatchState> {
         yield ProductBatchError(
             error: 'Something went wrong. Please try again.');
       }
-    } else if (event is OrderByExpiryDateEvent) {
+    } else if (event is FilterEvent) {
       yield ProductBatchLoading();
       try {
-        List<ProductBatch> productBatchList =
-            await productBatchRepository.orderedByExpiryDateList();
-        yield OrderedByExpiryDate(productBatchList: productBatchList);
+        List<ProductBatch> productBatchList = await productBatchRepository
+            .applyFilter(event.productBatchList, event.filter);
+        yield FilteredBatches(
+          productBatchList: productBatchList,
+          filter: event.filter,
+        );
       } catch (e) {
         yield ProductBatchError(
             error: 'Something went wrong. Please try again.');

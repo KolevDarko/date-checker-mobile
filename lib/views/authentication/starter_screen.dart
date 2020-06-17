@@ -2,6 +2,7 @@ import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/custom_widgets/splash_screen.dart';
 import 'package:date_checker_app/views/authentication/data_sync.dart';
 import 'package:date_checker_app/views/authentication/login_screen.dart';
+import 'package:date_checker_app/views/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,7 +32,7 @@ class LoginView extends StatelessWidget {
                   return LoginScreen();
                 } else if (state is AuthenticationSuccess) {
                   _saveBatchWarnings(context);
-                  return DataSync();
+                  return HomePage();
                 }
               },
             );

@@ -1,3 +1,4 @@
+import 'package:date_checker_app/repository/repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:date_checker_app/database/models.dart';
 
@@ -23,9 +24,13 @@ class EditProductBatch extends ProductBatchEvent {
   List<Object> get props => [productBatch];
 }
 
-class OrderByExpiryDateEvent extends ProductBatchEvent {
+class FilterEvent extends ProductBatchEvent {
+  final List<ProductBatch> productBatchList;
+  final ProductBatchFilter filter;
+
+  FilterEvent({this.productBatchList, this.filter});
   @override
-  List<Object> get props => null;
+  List<Object> get props => [productBatchList, filter];
 }
 
 class AllProductBatch extends ProductBatchEvent {

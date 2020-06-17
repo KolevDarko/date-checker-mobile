@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
                 Tab(icon: Text("Производи")),
               ],
             ),
-            title: Text('Date Checker Tabs'),
+            title: Text('Табови'),
             actions: <Widget>[
               IconButton(
                 icon: Icon(
@@ -60,8 +60,6 @@ class _HomePageState extends State<HomePage> {
                   BlocProvider.of<LoggedOutBloc>(context).add(
                     LogOutPressed(),
                   );
-
-                  Navigator.pop(context);
                 },
               )
             ],
@@ -112,6 +110,10 @@ class _HomePageState extends State<HomePage> {
         {
           return FloatingActionButton(
             onPressed: () {
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus) {
+                currentFocus.unfocus();
+              }
               Navigator.of(context).push(
                 createRoute(AddOrEditProductBatchView()),
               );

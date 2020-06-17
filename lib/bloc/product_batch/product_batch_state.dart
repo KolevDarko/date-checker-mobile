@@ -1,4 +1,5 @@
 import 'package:date_checker_app/database/models.dart';
+import 'package:date_checker_app/repository/repository.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
@@ -26,11 +27,12 @@ class AllProductBatchLoaded extends ProductBatchState {
   List<Object> get props => [productBatchList];
 }
 
-class OrderedByExpiryDate extends ProductBatchState {
+class FilteredBatches extends ProductBatchState {
   final List<ProductBatch> productBatchList;
+  final ProductBatchFilter filter;
 
-  OrderedByExpiryDate({this.productBatchList});
-  List<Object> get props => [productBatchList];
+  FilteredBatches({this.productBatchList, this.filter});
+  List<Object> get props => [productBatchList, this.filter];
 }
 
 class ProductBatchLoaded extends ProductBatchState {
