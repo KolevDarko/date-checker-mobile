@@ -29,8 +29,10 @@ class ProductPickerField extends FormField<Product> {
                         label: "Продукт",
                       );
                     }).then((val) {
-                  state.didChange(val);
-                  state.save();
+                  if (val != null) {
+                    state.didChange(val);
+                    state.save();
+                  }
                 });
               },
               child: Column(
@@ -136,8 +138,10 @@ class _ItemPickerDialogState<T> extends State<ItemPickerDialog> {
   filterItems() async {
     List<dynamic> filtered = [];
     if (_controller.text.length > 0) {
-      filtered =
-          await this.db.productDao.getProductsBySearchTerm(_controller.text);
+      filtered = await this
+          .db
+          .productDao
+          .getProductsBySearchTerm(_controller.text.toUpperCase());
     }
     setState(() {
       filteredItems = filtered;

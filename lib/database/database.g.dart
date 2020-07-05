@@ -192,7 +192,7 @@ class _$ProductDao extends ProductDao {
   @override
   Future<List<Product>> getProductsBySearchTerm(String inputString) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM Product WHERE instr(name, ?) > 0',
+        'SELECT * FROM Product WHERE instr(UPPER(name), ?) > 0',
         arguments: <dynamic>[inputString],
         mapper: _productMapper);
   }
