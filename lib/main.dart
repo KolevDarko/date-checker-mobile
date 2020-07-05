@@ -107,6 +107,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<AuthenticationBloc>(
+          create: (BuildContext context) => AuthenticationBloc(
+            authRepository: dependencyAssembler.get<AuthRepository>(),
+          )..add(
+              AuthenticationStarted(),
+            ),
+        ),
+        BlocProvider<LoggedOutBloc>(
+          create: (context) => LoggedOutBloc(
+            authBloc: BlocProvider.of<AuthenticationBloc>(context),
+          ),
+        ),
         BlocProvider<ProductBloc>(
           create: (BuildContext context) =>
               ProductBloc(productRepository: productRepository),
@@ -140,18 +152,6 @@ class MyApp extends StatelessWidget {
                 BlocProvider.of<SyncBatchWarningBloc>(context),
           ),
         ),
-        BlocProvider<AuthenticationBloc>(
-          create: (BuildContext context) => AuthenticationBloc(
-            authRepository: dependencyAssembler.get<AuthRepository>(),
-          )..add(
-              AuthenticationStarted(),
-            ),
-        ),
-        BlocProvider<LoggedOutBloc>(
-          create: (context) => LoggedOutBloc(
-            authBloc: BlocProvider.of<AuthenticationBloc>(context),
-          ),
-        )
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,

@@ -269,7 +269,6 @@ class User {
   String password;
   String firstName;
   String lastName;
-
   User(
     this.id,
     this.email,

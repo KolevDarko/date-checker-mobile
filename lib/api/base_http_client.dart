@@ -1,17 +1,36 @@
 import 'dart:convert';
 
 import 'package:date_checker_app/api/constants.dart';
+import 'package:date_checker_app/dependencies/dependency_assembler.dart';
+import 'package:date_checker_app/repository/repository.dart';
 import 'package:http/http.dart' as http;
 
 class BaseHttpClient {
   final http.Client httpClient;
   String baseUrl;
-  Map<String, String> httpAuthHeaders;
+  Map httpAuthHeaders;
+  String _token;
 
   BaseHttpClient({
     this.httpClient,
   }) : assert(httpClient != null) {
-    this.httpAuthHeaders = uploadBatchHeaders;
+    AuthRepository authRepo = dependencyAssembler.get<AuthRepository>();
+    this._token = authRepo.getToken();
+    authHeaders['Authorization'] = 'Token ${this._token}';
+    this.httpAuthHeaders = authHeaders;
+    print("base clinet constructor headers: ${this.httpAuthHeaders}");
+  }
+
+  Future<http.Response> noHeadersGetApiCallResponse({
+    String url,
+    String errorMessage,
+  }) async {
+    http.Response response = await httpClient.get(url);
+
+    if (response.statusCode != 200) {
+      throw Exception(errorMessage);
+    }
+    return response;
   }
 
   Future<http.Response> getApiCallResponse(
