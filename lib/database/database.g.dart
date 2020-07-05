@@ -329,10 +329,11 @@ class _$ProductBatchDao extends ProductBatchDao {
   }
 
   @override
-  Future<List<ProductBatch>> searchQuery(String inputString) async {
+  Future<List<ProductBatch>> searchQueryHelper(
+      String inputString, String inputString2) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM ProductBatch WHERE INSTR(productName, ?) > 0',
-        arguments: <dynamic>[inputString],
+        'SELECT * FROM ProductBatch WHERE INSTR(UPPER(productName), ?) > 0 OR INSTR(UPPER(barCode), ?) > 0',
+        arguments: <dynamic>[inputString, inputString2],
         mapper: _productBatchMapper);
   }
 

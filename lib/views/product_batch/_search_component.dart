@@ -16,7 +16,7 @@ class _SearchInputWidgetState extends State<SearchInputWidget> {
   @override
   void initState() {
     _controller.addListener(() {
-      if (_controller.text.length >= 3) {
+      if (_controller.text.length >= 1) {
         debouncer.run(() {
           BlocProvider.of<ProductBatchBloc>(context).add(
             FilterProductBatch(

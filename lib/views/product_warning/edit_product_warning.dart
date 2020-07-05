@@ -125,6 +125,7 @@ class _QuantityEditState extends State<QuantityEdit> {
                               AllProductBatch(),
                             );
                           }
+                          Navigator.pop(context);
                         },
                         child: Text('Елиминирај пратка'),
                       ),

@@ -64,9 +64,20 @@ abstract class ProductBatchDao {
   @Query('SELECT * FROM ProductBatch WHERE barCode = :barCode')
   Future<List<ProductBatch>> getByBarCode(String barCode);
 
-  @Query(
-      "SELECT * FROM ProductBatch WHERE INSTR(productName, :inputString) > 0")
-  Future<List<ProductBatch>> searchQuery(String inputString);
+  Future<List<ProductBatch>> searchQuery(String inputString) async {
+    return await searchQueryHelper(
+      inputString.toUpperCase(),
+      inputString.toUpperCase(),
+    );
+  }
+
+  @Query("""
+      SELECT * FROM ProductBatch 
+      WHERE INSTR(UPPER(productName), :inputString) > 0
+      OR INSTR(UPPER(barCode), :inputString2) > 0
+      """)
+  Future<List<ProductBatch>> searchQueryHelper(
+      String inputString, String inputString2);
 
   @Query('SELECT * FROM ProductBatch WHERE id = :id')
   Future<ProductBatch> get(int id);
