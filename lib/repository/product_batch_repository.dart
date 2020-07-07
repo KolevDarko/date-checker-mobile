@@ -139,8 +139,7 @@ class ProductBatchRepository {
   Future<void> updateProductBatchesLocally(
       List<ProductBatch> productBatches) async {
     try {
-      int updatedItems =
-          await this.db.productBatchDao.updateBatches(productBatches);
+      int _ = await this.db.productBatchDao.updateBatches(productBatches);
     } catch (e) {
       throw Exception(
           "Something went wrong when tried to update product batches in the database.");

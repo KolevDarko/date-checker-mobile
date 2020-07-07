@@ -33,6 +33,7 @@ class LoginView extends StatelessWidget {
                   _saveBatchWarnings(context);
                   return HomePage();
                 }
+                return Container();
               },
             );
           },

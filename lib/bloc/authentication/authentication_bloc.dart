@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/repository/auth_repository.dart';
 
 class AuthenticationBloc

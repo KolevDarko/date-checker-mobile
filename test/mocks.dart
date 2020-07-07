@@ -1,6 +1,5 @@
 import 'package:date_checker_app/api/auth_http_client.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
-import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/repository/repository.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;

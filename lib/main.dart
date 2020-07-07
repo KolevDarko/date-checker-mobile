@@ -1,7 +1,6 @@
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/bloc_delegate.dart';
 import 'package:date_checker_app/database/database.dart';
-import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/database/provider.dart';
 import 'package:date_checker_app/dependencies/dependency_assembler.dart';
 import 'package:date_checker_app/dependencies/encryption_service.dart';

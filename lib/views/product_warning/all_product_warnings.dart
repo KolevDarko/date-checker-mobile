@@ -2,9 +2,6 @@ import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/custom_widgets/custom_table.dart';
 import 'package:date_checker_app/custom_widgets/button_with_indicator.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/dependencies/dependency_assembler.dart';
-import 'package:date_checker_app/repository/batch_warning_repository.dart';
-
 import 'package:date_checker_app/views/product_warning/edit_product_warning.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -163,5 +160,6 @@ class _BatchWarningTableState extends State<BatchWarningTable>
           return TextStyle(color: Colors.orange);
         }
     }
+    return TextStyle(color: Colors.black);
   }
 }
