@@ -13,14 +13,14 @@ class AuthenticationInitial extends AuthenticationState {
 class AuthenticationSuccess extends AuthenticationState {
   final User loggedUser;
 
-  const AuthenticationSuccess(this.loggedUser);
+  const AuthenticationSuccess({this.loggedUser});
 
   @override
   List<Object> get props => [loggedUser];
 
-  @override
-  String toString() =>
-      'AuthenticationSuccess { displayName: ${loggedUser.firstName} }';
+  // @override
+  // String toString() =>
+  //     'AuthenticationSuccess { displayName: ${loggedUser.firstName} }';
 }
 
 class AuthenticationFailure extends AuthenticationState {

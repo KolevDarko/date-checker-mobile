@@ -1,3 +1,4 @@
+import 'package:date_checker_app/api/auth_http_client.dart';
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/repository/repository.dart';
@@ -6,10 +7,13 @@ import 'package:http/http.dart' as http;
 import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/api/product_batch_client.dart';
 import 'package:date_checker_app/api/products_client.dart';
+import 'package:http_interceptor/http_client_with_interceptor.dart';
 
-class MockHttpClient extends Mock implements http.Client {}
+class MockHttpClient extends Mock implements HttpClientWithInterceptor {}
 
 class MockResponse extends Mock implements http.Response {}
+
+class MockAuthHttpClient extends Mock implements AuthHttpClient {}
 
 class MockProductsApiClient extends Mock implements ProductsApiClient {}
 

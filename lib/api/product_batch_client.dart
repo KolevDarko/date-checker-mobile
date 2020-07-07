@@ -11,7 +11,9 @@ class ProductBatchApiClient extends BaseHttpClient {
 
   ProductBatchApiClient({this.httpClient})
       : assert(httpClient != null),
-        super(httpClient: httpClient);
+        super(
+          httpClient: httpClient,
+        );
 
   Future<List<ProductBatch>> getAllProductBatchesFromServer() async {
     List<dynamic> productBatchesJson;

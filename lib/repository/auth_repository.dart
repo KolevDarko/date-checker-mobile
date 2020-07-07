@@ -1,3 +1,4 @@
+import 'package:date_checker_app/api/auth_http_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/encryption_service.dart';
@@ -7,38 +8,49 @@ class AuthRepository {
   final AppDatabase _db;
   final LocalStorageService _localStorage;
   final EncryptionService _encryptionService;
+  final AuthHttpClient _authClient;
   static String userValueKey = 'user';
+  static String tokenValueKey = 'token';
 
   AuthRepository(
       {LocalStorageService localStorage,
       AppDatabase db,
-      EncryptionService encryptionService})
+      EncryptionService encryptionService,
+      AuthHttpClient authHttpClient})
       : _localStorage = localStorage,
         _encryptionService = encryptionService,
         _db = db,
+        _authClient = authHttpClient,
         assert(localStorage != null),
         assert(db != null),
-        assert(encryptionService != null);
+        assert(encryptionService != null),
+        assert(authHttpClient != null);
 
-  Future<User> signIn({String email, String password}) async {
-    User user = await this._db.userDao.getUserByEmail(email);
-    if (user != null && _passwordMatches(user.password, password)) {
-      _localStorage.saveToDiskAsString(userValueKey, user.email);
-      return user;
+  Future<bool> signIn({String email, String password}) async {
+    String token =
+        await this._authClient.getAuthToken(user: email, password: password);
+
+    if (token != null) {
+      _localStorage.saveToDiskAsString(tokenValueKey, token);
+      return true;
     }
     throw Exception("No such user.");
   }
 
   Future<void> signOut() async {
-    _localStorage.removeEntry(userValueKey);
+    _localStorage.removeEntry(tokenValueKey);
   }
 
   Future<bool> isSignedIn() async {
-    String entry = _localStorage.getStringEntry(userValueKey);
+    String entry = _localStorage.getStringEntry(tokenValueKey);
     if (entry != null) {
       return true;
     }
     return false;
+  }
+
+  String getToken() {
+    return _localStorage.getStringEntry(tokenValueKey);
   }
 
   Future<User> getLoggedUser() async {

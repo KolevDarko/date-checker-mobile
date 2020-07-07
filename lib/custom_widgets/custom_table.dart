@@ -7,12 +7,15 @@ Widget customDataTable({
 }) {
   return SingleChildScrollView(
     child: FittedBox(
-      child: DataTable(
-        showCheckboxColumn: false,
-        columnSpacing: 0.0,
-        horizontalMargin: 0.0,
-        columns: columns,
-        rows: rows,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: DataTable(
+          showCheckboxColumn: false,
+          columnSpacing: 0.0,
+          horizontalMargin: 0.0,
+          columns: columns,
+          rows: rows,
+        ),
       ),
     ),
   );

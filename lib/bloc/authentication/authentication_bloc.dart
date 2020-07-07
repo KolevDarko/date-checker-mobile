@@ -26,15 +26,14 @@ class AuthenticationBloc
   Stream<AuthenticationState> _mapAuthenticationStartedToState() async* {
     final signedIn = await this.authRepository.isSignedIn();
     if (signedIn) {
-      User user = await this.authRepository.getLoggedUser();
-      yield AuthenticationSuccess(user);
+      yield AuthenticationSuccess();
     } else {
       yield AuthenticationFailure();
     }
   }
 
   Stream<AuthenticationState> _mapAuthenticationLoggedInToState() async* {
-    yield AuthenticationSuccess(await this.authRepository.getLoggedUser());
+    yield AuthenticationSuccess();
   }
 
   Stream<AuthenticationState> _mapAuthenticationLoggedOutToState() async* {

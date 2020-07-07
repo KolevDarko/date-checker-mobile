@@ -41,15 +41,6 @@ Future<void> main() async {
     localStorage: ls,
     encService: eS,
   );
-  AuthRepository auth = dependencyAssembler.get<AuthRepository>();
-  String hashedPass = await auth.hashPassword("123456");
-  try {
-    User user = User(2, "admin@admin.com", hashedPass, "Admin", "User");
-    await db.userDao.add(user);
-  } catch (e) {
-    print(e);
-    print("user exists");
-  }
 
   runApp(
     InheritedDataProviderHelper(
@@ -107,6 +98,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<AuthenticationBloc>(
+          create: (BuildContext context) => AuthenticationBloc(
+            authRepository: dependencyAssembler.get<AuthRepository>(),
+          )..add(
+              AuthenticationStarted(),
+            ),
+        ),
+        BlocProvider<LoggedOutBloc>(
+          create: (context) => LoggedOutBloc(
+            authBloc: BlocProvider.of<AuthenticationBloc>(context),
+          ),
+        ),
         BlocProvider<ProductBloc>(
           create: (BuildContext context) =>
               ProductBloc(productRepository: productRepository),
@@ -140,18 +143,6 @@ class MyApp extends StatelessWidget {
                 BlocProvider.of<SyncBatchWarningBloc>(context),
           ),
         ),
-        BlocProvider<AuthenticationBloc>(
-          create: (BuildContext context) => AuthenticationBloc(
-            authRepository: dependencyAssembler.get<AuthRepository>(),
-          )..add(
-              AuthenticationStarted(),
-            ),
-        ),
-        BlocProvider<LoggedOutBloc>(
-          create: (context) => LoggedOutBloc(
-            authBloc: BlocProvider.of<AuthenticationBloc>(context),
-          ),
-        )
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,

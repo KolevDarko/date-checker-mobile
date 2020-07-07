@@ -49,7 +49,7 @@ void main() {
           () async {
         var response = MockResponse();
         when(response.statusCode).thenReturn(500);
-        when(mockHttpClient.get(batchWarningsUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(batchWarningsUrl))
             .thenAnswer((_) => Future.value(response));
         try {
           await batchWarningApiClient.getAllBatchWarningsFromServer();
@@ -62,7 +62,7 @@ void main() {
         var response = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(batchWarningsUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(batchWarningsUrl))
             .thenAnswer((_) => Future.value(response));
 
         List<BatchWarning> warnings =
@@ -99,9 +99,9 @@ void main() {
         var response = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(syncBatchWarningsUrl,
-                headers: uploadBatchHeaders))
-            .thenAnswer((_) => Future.value(response));
+        when(mockHttpClient.get(
+          syncBatchWarningsUrl,
+        )).thenAnswer((_) => Future.value(response));
 
         List<BatchWarning> warnings =
             await batchWarningApiClient.getLatestBatchWarnings(1);
@@ -113,9 +113,9 @@ void main() {
           () async {
         var response = MockResponse();
         when(response.statusCode).thenReturn(500);
-        when(mockHttpClient.get(syncBatchWarningsUrl,
-                headers: uploadBatchHeaders))
-            .thenAnswer((_) => Future.value(response));
+        when(mockHttpClient.get(
+          syncBatchWarningsUrl,
+        )).thenAnswer((_) => Future.value(response));
         try {
           await batchWarningApiClient.getLatestBatchWarnings(1);
           fail('Should throw');
@@ -138,7 +138,6 @@ void main() {
         when(response.statusCode).thenReturn(500);
         when(mockHttpClient.put(
           batchWarningsUrl,
-          headers: uploadBatchHeaders,
           body: json.encode(BatchWarning.toJsonMap(warnings)),
         )).thenAnswer((_) => Future.value(response));
         try {
@@ -154,7 +153,6 @@ void main() {
         when(response.body).thenReturn(json.encode({"success": true}));
         when(mockHttpClient.put(
           batchWarningsUrl,
-          headers: uploadBatchHeaders,
           body: json.encode(BatchWarning.toJsonMap(warnings)),
         )).thenAnswer((_) => Future.value(response));
         var bodyResponse =

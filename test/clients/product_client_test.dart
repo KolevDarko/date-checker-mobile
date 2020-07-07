@@ -55,7 +55,7 @@ void main() {
           () async {
         final response = MockResponse();
         when(response.statusCode).thenReturn(404);
-        when(mockHttpClient.get(productsUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(productsUrl))
             .thenAnswer((_) => Future.value(response));
         try {
           await productsApiClient.getAllProductsFromServer();
@@ -68,7 +68,7 @@ void main() {
         var response = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(productsUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(productsUrl))
             .thenAnswer((_) => Future.value(response));
         List<Product> products =
             await productsApiClient.getAllProductsFromServer();
@@ -82,12 +82,12 @@ void main() {
         var responseNext = MockResponse();
         when(responseNext.statusCode).thenReturn(200);
         when(responseNext.body).thenReturn(jsonResponseNext);
-        when(mockHttpClient.get(productsUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(productsUrl))
             .thenAnswer((_) => Future.value(responseNext));
 
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(nextUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(nextUrl))
             .thenAnswer((_) => Future.value(response));
 
         List<Product> products =
@@ -106,7 +106,7 @@ void main() {
       test('throws exception on non-200 status code', () async {
         final response = MockResponse();
         when(response.statusCode).thenReturn(404);
-        when(mockHttpClient.get(finalUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(finalUrl))
             .thenAnswer((_) => Future.value(response));
         try {
           await productsApiClient.getLatestProducts(product.id);
@@ -154,7 +154,7 @@ void main() {
         """;
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(finalUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(finalUrl))
             .thenAnswer((_) => Future.value(response));
 
         List<Product> products =

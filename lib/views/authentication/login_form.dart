@@ -108,13 +108,15 @@ class _LoginFormState extends State<LoginForm> {
                     controller: _emailController,
                     decoration: InputDecoration(
                       icon: Icon(Icons.email),
-                      labelText: 'Емаил',
+                      labelText: 'Име',
                     ),
                     keyboardType: TextInputType.emailAddress,
                     autovalidate: true,
                     autocorrect: false,
                     validator: (_) {
-                      return !state.isEmailValid ? 'Невалиден емаил' : null;
+                      return !state.isEmailValid
+                          ? 'Мора да има над 3 карактери.'
+                          : null;
                     },
                   ),
                   TextFormField(

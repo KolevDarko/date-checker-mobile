@@ -1,23 +1,27 @@
 import 'dart:convert';
-
-import 'package:date_checker_app/api/constants.dart';
 import 'package:http/http.dart' as http;
 
 class BaseHttpClient {
   final http.Client httpClient;
-  String baseUrl;
-  Map<String, String> httpAuthHeaders;
 
-  BaseHttpClient({
-    this.httpClient,
-  }) : assert(httpClient != null) {
-    this.httpAuthHeaders = uploadBatchHeaders;
+  BaseHttpClient({this.httpClient});
+
+  Future<http.Response> noHeadersPostApiCallResponse(
+      {String url, String errorMessage, dynamic body}) async {
+    http.Response response = await httpClient.post(
+      url,
+      body: body,
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(errorMessage);
+    }
+    return response;
   }
 
   Future<http.Response> getApiCallResponse(
       {String url, String errorMessage}) async {
-    http.Response response =
-        await httpClient.get(url, headers: httpAuthHeaders);
+    http.Response response = await httpClient.get(url);
 
     if (response.statusCode != 200) {
       throw Exception(errorMessage);
@@ -29,7 +33,6 @@ class BaseHttpClient {
       {String url, String errorMessage, dynamic body}) async {
     http.Response response = await httpClient.post(
       url,
-      headers: httpAuthHeaders,
       body: body,
     );
     if (response.statusCode != 200) {
@@ -42,7 +45,6 @@ class BaseHttpClient {
       {String url, String errorMessage, dynamic body}) async {
     http.Response response = await httpClient.put(
       url,
-      headers: httpAuthHeaders,
       body: body,
     );
 
@@ -54,8 +56,7 @@ class BaseHttpClient {
 
   Future<http.Response> deleteApiCallResponse(
       {String url, String errorMessage}) async {
-    http.Response response =
-        await httpClient.delete(url, headers: httpAuthHeaders);
+    http.Response response = await httpClient.delete(url);
     if (response.statusCode != 200) {
       throw Exception(errorMessage);
     }

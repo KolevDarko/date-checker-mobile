@@ -10,7 +10,9 @@ class BatchWarningApiClient extends BaseHttpClient {
 
   BatchWarningApiClient({this.httpClient})
       : assert(httpClient != null),
-        super(httpClient: httpClient);
+        super(
+          httpClient: httpClient,
+        );
 
   Future<List<BatchWarning>> getAllBatchWarningsFromServer() async {
     http.Response response = await getApiCallResponse(

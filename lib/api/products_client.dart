@@ -11,7 +11,9 @@ class ProductsApiClient extends BaseHttpClient {
 
   ProductsApiClient({this.httpClient})
       : assert(httpClient != null),
-        super(httpClient: httpClient);
+        super(
+          httpClient: httpClient,
+        );
 
   Future<List<Product>> getAllProductsFromServer() async {
     List<dynamic> productsJson = [];
