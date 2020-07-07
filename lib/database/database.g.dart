@@ -310,7 +310,7 @@ class _$ProductBatchDao extends ProductBatchDao {
   @override
   Future<List<ProductBatch>> getUnsyncedProductBatches() async {
     return _queryAdapter.queryList(
-        'SELECT * FROM ProductBatch WHERE NOT sync AND serverId NOT NULL',
+        'SELECT * FROM ProductBatch WHERE NOT synced AND serverId NOT NULL',
         mapper: _productBatchMapper);
   }
 

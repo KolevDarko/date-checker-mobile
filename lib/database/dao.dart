@@ -55,7 +55,7 @@ abstract class ProductBatchDao {
   @Query('SELECT * FROM ProductBatch WHERE serverId IS NULL')
   Future<List<ProductBatch>> getNewProductBatches();
 
-  @Query('SELECT * FROM ProductBatch WHERE NOT sync AND serverId NOT NULL')
+  @Query('SELECT * FROM ProductBatch WHERE NOT synced AND serverId NOT NULL')
   Future<List<ProductBatch>> getUnsyncedProductBatches();
 
   @Query('SELECT * FROM ProductBatch WHERE name = :name')
