@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
+import '../mocks.dart';
+
 class MockLocalStorageService extends Mock implements LocalStorageService {}
 
 class MockEncryptionService extends Mock implements EncryptionService {}
@@ -60,12 +62,11 @@ void main() {
     test('signIn with existing user and valid credentials', () async {
       when(localStorage.saveToDiskAsString(userValueKey, user.email))
           .thenReturn(null);
-      when(encryptionService.matchHashedStrings('pass123', 'pass123'))
-          .thenReturn(true);
-      User loggedInUser = await authRepository.signIn(
+      var response = MockResponse();
+      // when(http)
+      bool signedIn = await authRepository.signIn(
           email: user.email, password: user.password);
-      expect(loggedInUser.email, user.email);
-      expect(loggedInUser, isNot(null));
+      expect(signedIn, true);
     });
 
     test('signIn with existing user and invalid credentials', () async {
@@ -74,7 +75,7 @@ void main() {
       when(encryptionService.matchHashedStrings('pass123', '123456'))
           .thenReturn(false);
       try {
-        User loggedInUser =
+        bool signedIn =
             await authRepository.signIn(email: user.email, password: '123456');
       } catch (e) {
         expect(e.toString(), 'Exception: No such user.');

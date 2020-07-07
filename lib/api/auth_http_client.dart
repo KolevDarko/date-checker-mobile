@@ -13,9 +13,11 @@ class AuthHttpClient extends BaseHttpClient {
         super(httpClient: httpClient);
 
   Future<String> getAuthToken({String user, String password}) async {
-    http.Response response = await noHeadersGetApiCallResponse(
+    dynamic body = jsonEncode({"username": user, "password": password});
+    http.Response response = await noHeadersPostApiCallResponse(
       errorMessage: 'Failed to obtain token',
       url: authUrl,
+      body: body,
     );
     final responseBody = jsonDecode(response.body);
     return responseBody['token'];

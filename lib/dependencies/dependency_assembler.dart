@@ -1,3 +1,4 @@
+import 'package:date_checker_app/api/auth_http_client.dart';
 import 'package:date_checker_app/api/batch_warning_client.dart';
 import 'package:date_checker_app/api/product_batch_client.dart';
 import 'package:date_checker_app/database/database.dart';
@@ -27,10 +28,12 @@ void setupDependencyAssembler({
 
   dependencyAssembler.registerLazySingleton(
     () => AuthRepository(
-      db: db,
-      localStorage: localStorage,
-      encryptionService: encService,
-    ),
+        db: db,
+        localStorage: localStorage,
+        encryptionService: encService,
+        authHttpClient: AuthHttpClient(
+          httpClient: httpClient,
+        )),
   );
 
   dependencyAssembler.registerLazySingleton(

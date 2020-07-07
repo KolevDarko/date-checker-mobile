@@ -6,7 +6,7 @@ const productBatchesUrl = baseUrl + '/api/product-batches/';
 const syncBatchesUrl = baseUrl + '/api/sync/batches/';
 const authUrl = baseUrl + '/api-token-auth/';
 
-Map authHeaders = {
-  'Authorization': '',
+Map<String, String> uploadBatchHeaders = {
+  'Authorization': 'Token 6f51968bda023efc8b9bd3b8ea65d9beccc58b87',
   'Content-Type': 'application/json',
 };

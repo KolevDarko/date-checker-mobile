@@ -1,6 +1,5 @@
 import 'package:date_checker_app/bloc/bloc.dart';
 import 'package:date_checker_app/custom_widgets/splash_screen.dart';
-import 'package:date_checker_app/views/authentication/data_sync.dart';
 import 'package:date_checker_app/views/authentication/login_screen.dart';
 import 'package:date_checker_app/views/home/home_page.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +44,7 @@ class LoginView extends StatelessWidget {
   _saveBatchWarnings(BuildContext context) {
     BlocProvider.of<ProductSyncBloc>(context).add(SyncProductData());
     BlocProvider.of<ProductBloc>(context).add(FetchAllProducts());
+    BlocProvider.of<BatchWarningBloc>(context).add(AllBatchWarnings());
     BlocProvider.of<ProductBatchBloc>(context)
       ..add(SyncProductBatchData())
       ..add(AllProductBatch());

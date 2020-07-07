@@ -190,7 +190,7 @@ void main() async {
       test('user logged in state test', () {
         final expectedResponse = [
           AuthenticationInitial(),
-          AuthenticationSuccess(user),
+          AuthenticationSuccess(),
         ];
         when(authRepository.isSignedIn()).thenAnswer((_) => Future.value(true));
         when(authRepository.getLoggedUser())
@@ -203,7 +203,7 @@ void main() async {
       test('user logged in state test', () {
         final expectedResponse = [
           AuthenticationInitial(),
-          AuthenticationSuccess(user),
+          AuthenticationSuccess(),
         ];
         when(authRepository.isSignedIn()).thenAnswer((_) => Future.value(true));
         when(authRepository.getLoggedUser())
@@ -218,7 +218,7 @@ void main() async {
       test('get logged in user', () {
         final expectedResponse = [
           AuthenticationInitial(),
-          AuthenticationSuccess(user),
+          AuthenticationSuccess(),
         ];
         when(authRepository.getLoggedUser())
             .thenAnswer((_) => Future.value(user));

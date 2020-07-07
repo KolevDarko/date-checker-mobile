@@ -1,5 +1,4 @@
 import 'package:date_checker_app/api/auth_http_client.dart';
-import 'package:date_checker_app/api/constants.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/encryption_service.dart';
@@ -27,27 +26,22 @@ class AuthRepository {
         assert(encryptionService != null),
         assert(authHttpClient != null);
 
-  Future<User> signIn({String email, String password, String token}) async {
+  Future<bool> signIn({String email, String password}) async {
     String token =
         await this._authClient.getAuthToken(user: email, password: password);
-
-    User user = await this._db.userDao.getUserByEmail(email);
-
-    if (user != null && _passwordMatches(user.password, password)) {
-      _localStorage.saveToDiskAsString(userValueKey, user.email);
+    if (token != null) {
       _localStorage.saveToDiskAsString(tokenValueKey, token);
-      return user;
+      return true;
     }
     throw Exception("No such user.");
   }
 
   Future<void> signOut() async {
-    _localStorage.removeEntry(userValueKey);
     _localStorage.removeEntry(tokenValueKey);
   }
 
   Future<bool> isSignedIn() async {
-    String entry = _localStorage.getStringEntry(userValueKey);
+    String entry = _localStorage.getStringEntry(tokenValueKey);
     if (entry != null) {
       return true;
     }

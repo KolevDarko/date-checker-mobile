@@ -41,15 +41,6 @@ Future<void> main() async {
     localStorage: ls,
     encService: eS,
   );
-  AuthRepository auth = dependencyAssembler.get<AuthRepository>();
-  String hashedPass = await auth.hashPassword("123456");
-  try {
-    User user = User(2, "admin@admin.com", hashedPass, "Admin", "User");
-    await db.userDao.add(user);
-  } catch (e) {
-    print(e);
-    print("user exists");
-  }
 
   runApp(
     InheritedDataProviderHelper(
