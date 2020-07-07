@@ -33,6 +33,7 @@ void setupDependencyAssembler({
         encryptionService: encService,
         authHttpClient: AuthHttpClient(
           httpClient: httpClient,
+          localStorage: localStorage,
         )),
   );
 
@@ -40,6 +41,7 @@ void setupDependencyAssembler({
     () => ProductRepository(
       productsApiClient: ProductsApiClient(
         httpClient: httpClient,
+        localStorage: localStorage,
       ),
       db: db,
     ),
@@ -48,6 +50,7 @@ void setupDependencyAssembler({
     () => ProductBatchRepository(
       productBatchApiClient: ProductBatchApiClient(
         httpClient: httpClient,
+        localStorage: localStorage,
       ),
       db: db,
     ),
@@ -56,6 +59,7 @@ void setupDependencyAssembler({
     () => BatchWarningRepository(
       batchWarningApi: BatchWarningApiClient(
         httpClient: httpClient,
+        localStorage: localStorage,
       ),
       db: db,
     ),

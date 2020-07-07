@@ -1,21 +1,19 @@
 import 'dart:convert';
-import 'package:date_checker_app/dependencies/dependency_assembler.dart';
+import 'package:date_checker_app/dependencies/local_storage_service.dart';
 import 'package:date_checker_app/repository/repository.dart';
 import 'package:http/http.dart' as http;
 
 class BaseHttpClient {
   final http.Client httpClient;
+  final LocalStorageService localStorage;
   String baseUrl;
   Map<String, String> httpAuthHeaders;
   String _token;
 
-  BaseHttpClient({
-    this.httpClient,
-  }) : assert(httpClient != null);
+  BaseHttpClient({this.httpClient, this.localStorage});
 
   void _setHeaders() {
-    AuthRepository authRepo = dependencyAssembler.get<AuthRepository>();
-    this._token = authRepo.getToken();
+    this._token = localStorage.getStringEntry(AuthRepository.tokenValueKey);
     this.httpAuthHeaders = {
       'Authorization': "Token ${this._token}",
       'Content-Type': 'application/json',
