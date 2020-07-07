@@ -1,19 +1,14 @@
 import 'dart:convert';
-
-import 'package:date_checker_app/dependencies/local_storage_service.dart';
 import 'package:http/http.dart' as http;
-
 import 'base_http_client.dart';
 import 'constants.dart';
 
 class AuthHttpClient extends BaseHttpClient {
   final http.Client httpClient;
-  final LocalStorageService localStorage;
 
-  AuthHttpClient({this.httpClient, this.localStorage})
+  AuthHttpClient({this.httpClient})
       : assert(httpClient != null),
-        assert(localStorage != null),
-        super(httpClient: httpClient, localStorage: localStorage);
+        super(httpClient: httpClient);
 
   Future<String> getAuthToken({String user, String password}) async {
     dynamic body = jsonEncode({"username": user, "password": password});

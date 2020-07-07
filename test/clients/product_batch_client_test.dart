@@ -99,7 +99,7 @@ void main() {
           () async {
         var response = MockResponse();
         when(response.statusCode).thenReturn(404);
-        when(mockHttpClient.get(productBatchesUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(productBatchesUrl))
             .thenAnswer((_) => Future.value(response));
 
         try {
@@ -116,12 +116,12 @@ void main() {
         var responseNext = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponseNext);
-        when(mockHttpClient.get(productBatchesUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(productBatchesUrl))
             .thenAnswer((_) => Future.value(response));
 
         when(responseNext.statusCode).thenReturn(200);
         when(responseNext.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(nextUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(nextUrl))
             .thenAnswer((_) => Future.value(responseNext));
 
         List<ProductBatch> batches =
@@ -135,7 +135,7 @@ void main() {
         var response = MockResponse();
         when(response.statusCode).thenReturn(200);
         when(response.body).thenReturn(jsonResponse);
-        when(mockHttpClient.get(productBatchesUrl, headers: uploadBatchHeaders))
+        when(mockHttpClient.get(productBatchesUrl))
             .thenAnswer((_) => Future.value(response));
 
         List<ProductBatch> batches =
@@ -161,7 +161,6 @@ void main() {
         when(response.statusCode).thenReturn(500);
         when(mockHttpClient.put(
           syncBatchesUrl,
-          headers: uploadBatchHeaders,
           body: jsonProductBatches,
         )).thenAnswer((_) => Future.value(response));
         try {
@@ -177,7 +176,6 @@ void main() {
         when(response.body).thenReturn(json.encode({"success": true}));
         when(mockHttpClient.put(
           syncBatchesUrl,
-          headers: uploadBatchHeaders,
           body: jsonProductBatches,
         )).thenAnswer((_) => Future.value(response));
         var responseBody =
@@ -225,7 +223,6 @@ void main() {
         when(response.body).thenReturn(jsonResponse);
         when(mockHttpClient.post(
           syncBatchesUrl,
-          headers: uploadBatchHeaders,
           body: json.encode(ProductBatch.toJsonList([newBatch])),
         )).thenAnswer((_) => Future.value(response));
 
@@ -240,7 +237,6 @@ void main() {
         when(response.statusCode).thenReturn(500);
         when(mockHttpClient.post(
           syncBatchesUrl,
-          headers: uploadBatchHeaders,
           body: json.encode(ProductBatch.toJsonList([newBatch])),
         )).thenAnswer((_) => Future.value(response));
 

@@ -2,21 +2,17 @@ import 'dart:convert';
 
 import 'package:date_checker_app/api/constants.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/dependencies/local_storage_service.dart';
 import 'package:http/http.dart' as http;
 
 import 'base_http_client.dart';
 
 class ProductsApiClient extends BaseHttpClient {
   final http.Client httpClient;
-  final LocalStorageService localStorage;
 
-  ProductsApiClient({this.httpClient, this.localStorage})
+  ProductsApiClient({this.httpClient})
       : assert(httpClient != null),
-        assert(localStorage != null),
         super(
           httpClient: httpClient,
-          localStorage: localStorage,
         );
 
   Future<List<Product>> getAllProductsFromServer() async {

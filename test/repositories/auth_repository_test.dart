@@ -1,3 +1,4 @@
+import 'package:date_checker_app/api/auth_http_client.dart';
 import 'package:date_checker_app/database/database.dart';
 import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/dependencies/encryption_service.dart';
@@ -22,18 +23,21 @@ void main() {
   AuthRepository authRepository;
   EncryptionService encryptionService;
   String userValueKey;
+  AuthHttpClient authHttpClient;
 
   setUp(() async {
     userValueKey = 'user';
     user = User(1, "test@test.com", "pass123", "Admin", "Admin");
     db = await $FloorAppDatabase.inMemoryDatabaseBuilder().build();
     await db.userDao.add(user);
+    authHttpClient = MockAuthHttpClient();
     encryptionService = MockEncryptionService();
     localStorage = MockLocalStorageService();
     authRepository = AuthRepository(
       db: db,
       localStorage: localStorage,
       encryptionService: encryptionService,
+      authHttpClient: authHttpClient,
     );
   });
 
@@ -60,10 +64,10 @@ void main() {
 
   group('signIn tests', () {
     test('signIn with existing user and valid credentials', () async {
-      when(localStorage.saveToDiskAsString(userValueKey, user.email))
-          .thenReturn(null);
-      var response = MockResponse();
-      // when(http)
+      when(authHttpClient.getAuthToken(
+              user: user.email, password: user.password))
+          .thenAnswer((_) => Future.value("token"));
+
       bool signedIn = await authRepository.signIn(
           email: user.email, password: user.password);
       expect(signedIn, true);
@@ -84,18 +88,18 @@ void main() {
   });
 
   group('isSignedIn tests', () {
-    String userKey;
+    String tokenKey;
     setUp(() {
-      userKey = 'user';
+      tokenKey = 'token';
     });
     test('isSignedIn true', () async {
-      when(localStorage.getStringEntry(userKey)).thenReturn(user.email);
+      when(localStorage.getStringEntry(tokenKey)).thenReturn("token");
       bool isSignedIn = await authRepository.isSignedIn();
       expect(isSignedIn, true);
     });
 
     test('isSignedIn false', () async {
-      when(localStorage.getStringEntry(userKey)).thenReturn(null);
+      when(localStorage.getStringEntry(tokenKey)).thenReturn(null);
       bool isSignedIn = await authRepository.isSignedIn();
       expect(isSignedIn, false);
     });

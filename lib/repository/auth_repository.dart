@@ -29,6 +29,7 @@ class AuthRepository {
   Future<bool> signIn({String email, String password}) async {
     String token =
         await this._authClient.getAuthToken(user: email, password: password);
+
     if (token != null) {
       _localStorage.saveToDiskAsString(tokenValueKey, token);
       return true;

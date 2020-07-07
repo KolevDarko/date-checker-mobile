@@ -18,9 +18,9 @@ class AuthenticationSuccess extends AuthenticationState {
   @override
   List<Object> get props => [loggedUser];
 
-  @override
-  String toString() =>
-      'AuthenticationSuccess { displayName: ${loggedUser.firstName} }';
+  // @override
+  // String toString() =>
+  //     'AuthenticationSuccess { displayName: ${loggedUser.firstName} }';
 }
 
 class AuthenticationFailure extends AuthenticationState {

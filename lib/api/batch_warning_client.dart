@@ -3,19 +3,15 @@ import 'dart:convert';
 import 'package:date_checker_app/api/base_http_client.dart';
 import 'package:date_checker_app/api/constants.dart';
 import 'package:date_checker_app/database/models.dart';
-import 'package:date_checker_app/dependencies/local_storage_service.dart';
 import 'package:http/http.dart' as http;
 
 class BatchWarningApiClient extends BaseHttpClient {
   final http.Client httpClient;
-  final LocalStorageService localStorage;
 
-  BatchWarningApiClient({this.httpClient, this.localStorage})
+  BatchWarningApiClient({this.httpClient})
       : assert(httpClient != null),
-        assert(localStorage != null),
         super(
           httpClient: httpClient,
-          localStorage: localStorage,
         );
 
   Future<List<BatchWarning>> getAllBatchWarningsFromServer() async {
