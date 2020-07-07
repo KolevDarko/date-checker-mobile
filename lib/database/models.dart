@@ -183,6 +183,7 @@ class BatchWarning {
     } else if (this.priority == 'EXPIRED') {
       return Colors.red;
     }
+    return Colors.black;
   }
 
   static BatchWarning fromJson(dynamic json) {

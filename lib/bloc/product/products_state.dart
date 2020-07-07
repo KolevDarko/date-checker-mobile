@@ -1,5 +1,4 @@
 import 'package:date_checker_app/database/models.dart';
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class ProductState extends Equatable {

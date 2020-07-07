@@ -1,5 +1,3 @@
-import 'package:date_checker_app/bloc/bloc.dart';
-
 abstract class LoggedOutState {
   const LoggedOutState();
 }
