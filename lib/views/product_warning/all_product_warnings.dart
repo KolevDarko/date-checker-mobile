@@ -5,6 +5,10 @@ import 'package:date_checker_app/database/models.dart';
 import 'package:date_checker_app/views/product_warning/edit_product_warning.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:date_checker_app/database/database.dart';
+
+import '../../main.dart';
+
 
 class BatchWarningTable extends StatefulWidget {
   const BatchWarningTable({Key key}) : super(key: key);
@@ -14,9 +18,12 @@ class BatchWarningTable extends StatefulWidget {
 
 class _BatchWarningTableState extends State<BatchWarningTable>
     with AutomaticKeepAliveClientMixin {
+  AppDatabase db;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    db = InheritedDataProviderHelper.of(context).database;
   }
 
   @override
@@ -87,14 +94,16 @@ class _BatchWarningTableState extends State<BatchWarningTable>
                   ],
                   rows: state.allBatchWarning.map((warning) {
                     return DataRow(
-                      onSelectChanged: (selected) {
+                      onSelectChanged: (selected) async {
                         if (selected) {
+                          ProductBatch productBatch = await db.productBatchDao.get(warning.productBatchId);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => QuantityEdit(
                                 oldQuantity: warning.newQuantity,
                                 batchWarning: warning,
+                                productBatch: productBatch
                               ),
                             ),
                           );

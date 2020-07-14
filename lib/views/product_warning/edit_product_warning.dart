@@ -7,9 +7,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class QuantityEdit extends StatefulWidget {
   final int oldQuantity;
   final BatchWarning batchWarning;
+  final ProductBatch productBatch;
 
-  const QuantityEdit({Key key, this.oldQuantity, this.batchWarning})
+  const QuantityEdit(
+      {Key key, this.oldQuantity, this.batchWarning, this.productBatch})
       : super(key: key);
+
   @override
   _QuantityEditState createState() => _QuantityEditState();
 }
@@ -39,104 +42,124 @@ class _QuantityEditState extends State<QuantityEdit> {
         centerTitle: true,
         title: Text('Промени Количина'),
       ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: TextFormField(
-                  controller: _quantity,
-                  focusNode: _quantityNode,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: 'Quantity',
+      body: Padding(
+          padding: EdgeInsets.all(20),
+          child: SingleChildScrollView(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                Row(children: <Widget>[
+                  Text(
+                    "Пратка Код: ${widget.productBatch.barCode}",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                   ),
-                  onFieldSubmitted: (val) {
-                    _quantityNode.unfocus();
-                  },
-                  validator: (value) {
-                    var parsedStringNumber = int.tryParse(value);
+                  SizedBox(width: 40),
+                  Text(
+                    "Истекува на: ${widget.productBatch.expirationDate}",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  )
+                ]),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: TextFormField(
+                          controller: _quantity,
+                          focusNode: _quantityNode,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                            labelText: 'Quantity',
+                          ),
+                          onFieldSubmitted: (val) {
+                            _quantityNode.unfocus();
+                          },
+                          validator: (value) {
+                            var parsedStringNumber = int.tryParse(value);
 
-                    if (value.length == 0) {
-                      return 'Field is required';
-                    } else if (parsedStringNumber.runtimeType != int) {
-                      return 'Quantity must be a number';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: RaisedButton(
-                        color: Colors.greenAccent,
-                        child: Text('Зачувај промени'),
-                        onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            int quantity = int.tryParse(_quantity.value.text);
-                            if (widget.oldQuantity == quantity) {
-                              Navigator.pop(context);
-                            } else {
-                              BlocProvider.of<BatchWarningBloc>(context)
-                                ..add(
-                                  EditQuantityEvent(
-                                    quantity: quantity,
-                                    batchWarning: widget.batchWarning,
-                                  ),
-                                )
-                                ..add(AllBatchWarnings());
-                              BlocProvider.of<BatchWarningBloc>(context);
-                              BlocProvider.of<ProductBatchBloc>(context)
-                                  .add(AllProductBatch());
-                              Navigator.pop(context);
+                            if (value.length == 0) {
+                              return 'Field is required';
+                            } else if (parsedStringNumber.runtimeType != int) {
+                              return 'Quantity must be a number';
                             }
-                          }
-                        },
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: RaisedButton(
-                        color: Colors.redAccent,
-                        onPressed: () async {
-                          bool confirmed = await confirmationDialog(
-                            context,
-                            'Важно',
-                            'Дали сте сигурни дека сакате да ја отстраните оваа пратка од базата на податоци?',
-                          );
-                          if (confirmed) {
-                            BlocProvider.of<ProductBatchBloc>(context).add(
-                              RemoveProductBatch(
-                                warning: widget.batchWarning,
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: RaisedButton(
+                                color: Colors.greenAccent,
+                                child: Text('Зачувај промени'),
+                                onPressed: () {
+                                  if (_formKey.currentState.validate()) {
+                                    int quantity =
+                                        int.tryParse(_quantity.value.text);
+                                    if (widget.oldQuantity == quantity) {
+                                      Navigator.pop(context);
+                                    } else {
+                                      BlocProvider.of<BatchWarningBloc>(context)
+                                        ..add(
+                                          EditQuantityEvent(
+                                            quantity: quantity,
+                                            batchWarning: widget.batchWarning,
+                                          ),
+                                        )
+                                        ..add(AllBatchWarnings());
+                                      BlocProvider.of<BatchWarningBloc>(
+                                          context);
+                                      BlocProvider.of<ProductBatchBloc>(context)
+                                          .add(AllProductBatch());
+                                      Navigator.pop(context);
+                                    }
+                                  }
+                                },
                               ),
-                            );
-                            BlocProvider.of<ProductBatchBloc>(context).add(
-                              AllProductBatch(),
-                            );
-                          }
-                          Navigator.pop(context);
-                        },
-                        child: Text('Елиминирај пратка'),
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: RaisedButton(
+                                color: Colors.redAccent,
+                                onPressed: () async {
+                                  bool confirmed = await confirmationDialog(
+                                    context,
+                                    'Важно',
+                                    'Дали сте сигурни дека сакате да ја отстраните оваа пратка од базата на податоци?',
+                                  );
+                                  if (confirmed) {
+                                    BlocProvider.of<ProductBatchBloc>(context)
+                                        .add(
+                                      RemoveProductBatch(
+                                        warning: widget.batchWarning,
+                                      ),
+                                    );
+                                    BlocProvider.of<ProductBatchBloc>(context)
+                                        .add(
+                                      AllProductBatch(),
+                                    );
+                                  }
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Елиминирај пратка'),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+                ),
+              ]))),
     );
   }
 }

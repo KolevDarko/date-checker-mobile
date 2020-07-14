@@ -8,7 +8,7 @@ Widget customDataTable({
   return SingleChildScrollView(
     child: FittedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.only(left: 20),
         child: DataTable(
           showCheckboxColumn: false,
           columnSpacing: 0.0,

@@ -218,7 +218,7 @@ class _ProductBatchTableState extends State<ProductBatchTable>
           ),
           customDataColumn(
             context: context,
-            label: 'Баркод',
+            label: 'Пратка Код',
             cellWidth: cellWidth,
             filter: ProductBatchFilter.barCode,
             currentFilter: filter,
